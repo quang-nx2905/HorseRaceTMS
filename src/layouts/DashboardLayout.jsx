@@ -1,3 +1,6 @@
+import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
+
 function DashboardLayout({ children }) {
   return (
     <div className="flex min-h-screen bg-zinc-950 text-white">
@@ -9,44 +12,67 @@ function DashboardLayout({ children }) {
           HorseRaceTMS
         </h1>
 
+        {/* Navigation */}
         <nav className="space-y-5">
 
-          <p className="hover:text-yellow-400 cursor-pointer transition">
+          <Link
+            to="/"
+            className="block hover:text-yellow-400 transition"
+          >
             Dashboard
-          </p>
+          </Link>
 
-          <p className="hover:text-yellow-400 cursor-pointer transition">
+          <Link
+            to="/tournaments"
+            className="block hover:text-yellow-400 transition"
+          >
             Tournaments
-          </p>
+          </Link>
 
-          <p className="hover:text-yellow-400 cursor-pointer transition">
+          <Link
+            to="/horses"
+            className="block hover:text-yellow-400 transition"
+          >
             Horses
-          </p>
+          </Link>
 
-          <p className="hover:text-yellow-400 cursor-pointer transition">
-            Jockeys
-          </p>
-
-          <p className="hover:text-yellow-400 cursor-pointer transition">
+          <Link
+            to="/live-races"
+            className="block hover:text-yellow-400 transition"
+          >
             Live Races
-          </p>
+          </Link>
 
-          <p className="hover:text-yellow-400 cursor-pointer transition">
+          <Link
+            to="/leaderboard"
+            className="block hover:text-yellow-400 transition"
+          >
             Leaderboard
-          </p>
+          </Link>
 
-          <p className="hover:text-yellow-400 cursor-pointer transition">
+          <Link
+            to="/predictions"
+            className="block hover:text-yellow-400 transition"
+          >
             Predictions
-          </p>
+          </Link>
 
         </nav>
 
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8">
-        {children}
-      </main>
+      <div className="flex-1 flex flex-col">
+
+        {/* Navbar */}
+        <Navbar />
+
+        {/* Page Content */}
+        <main className="flex-1 p-8 overflow-auto">
+          {children}
+        </main>
+
+      </div>
 
     </div>
   );
