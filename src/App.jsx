@@ -6,6 +6,7 @@ import Horses from "./pages/Horses";
 import LiveRace from "./pages/LiveRace";
 import Leaderboard from "./pages/Leaderboard";
 import Predictions from "./pages/Predictions";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -14,6 +15,8 @@ function App() {
       <Routes>
 
         <Route path="/" element={<Dashboard />} />
+        
+        <Route path="/login" element={<Login />} />
 
         <Route path="/tournaments" element={<Tournament />} />
 
