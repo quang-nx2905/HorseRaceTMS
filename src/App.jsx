@@ -1,3 +1,4 @@
+import UpcomingRaces from "./components/ui/UpcomingRaces";
 import TournamentOverview from "./components/ui/TournamentOverview";
 import AnalyticsChart from "./components/ui/AnalyticsChart";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -50,6 +51,7 @@ function App() {
 
       {/* Main Content */}
       <div className="grid grid-cols-3 gap-6">
+      <TournamentOverview />
 
         {/* Analytics */}
         <div className="col-span-2 bg-white rounded-[32px] border border-zinc-200 p-10">
