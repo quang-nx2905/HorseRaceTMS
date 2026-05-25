@@ -1,135 +1,78 @@
 import DashboardLayout from "../layouts/DashboardLayout";
 
-import StatsCard from "../components/ui/StatsCard";
-import AnalyticsChart from "../components/ui/AnalyticsChart";
-import TournamentOverview from "../components/ui/TournamentOverview";
-import UpcomingRaces from "../components/ui/UpcomingRaces";
+import StatCard from "../components/ui/StatCard";
 
 function Dashboard() {
+
   return (
+
     <DashboardLayout>
 
-      {/* Header */}
-      <div className="mb-10">
+      <div className="space-y-10">
 
-        <h1 className="text-6xl font-bold">
-          Dashboard
-        </h1>
+        {/* HEADER */}
+        <div>
 
-        <p className="text-zinc-500 mt-3 text-lg">
-          Monitor tournaments, races, and performance analytics.
-        </p>
+          <h1
+            className="
+              text-5xl
+              font-bold
+              dark:text-white
+              mb-3
+            "
+          >
+            Dashboard
+          </h1>
 
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-6 mb-8">
-
-        <StatsCard
-          title="Total Tournaments"
-          value="124"
-          highlight="+12%"
-        />
-
-        <StatsCard
-          title="Active Races"
-          value="18"
-        />
-
-        <StatsCard
-          title="Total Horses"
-          value="2,450"
-          subtitle="Elite Breed"
-        />
-
-        <StatsCard
-          title="Win Rate Analytics"
-          value="68.4%"
-          highlight="Premium"
-        />
-
-      </div>
-
-      {/* Main Analytics */}
-      <div className="grid grid-cols-3 gap-6">
-
-        {/* Analytics */}
-        <div className="col-span-2 bg-white rounded-[32px] border border-zinc-200 p-10">
-
-          <div className="flex justify-between items-center mb-10">
-
-            <div>
-
-              <h2 className="text-4xl font-bold">
-                Weekly Race Analytics
-              </h2>
-
-              <p className="text-zinc-500 mt-2">
-                Performance metrics across all active circuits
-              </p>
-
-            </div>
-
-          </div>
-
-          <AnalyticsChart />
+          <p className="text-zinc-500 text-lg">
+            Monitor tournaments,
+            races, predictions,
+            and analytics.
+          </p>
 
         </div>
 
-        {/* Right Panel */}
-        <div className="space-y-6">
+        {/* STATS */}
+        <div
+          className="
+            grid
+            grid-cols-1
+            md:grid-cols-2
+            xl:grid-cols-4
+            gap-6
+          "
+        >
 
-          <div className="bg-white rounded-[28px] border border-zinc-200 p-8">
+          <StatCard
+            title="Total Tournaments"
+            value="124"
+            subtitle="+12% this month"
+          />
 
-            <h2 className="text-2xl font-bold mb-6">
-              Recent Activity
-            </h2>
+          <StatCard
+            title="Active Races"
+            value="18"
+            subtitle="Currently running"
+          />
 
-            <div className="space-y-5">
+          <StatCard
+            title="Total Horses"
+            value="2,450"
+            subtitle="Elite race horses"
+          />
 
-              <div>
-                <p className="font-semibold">
-                  Thunderbolt placed 1st
-                </p>
-
-                <p className="text-zinc-400 mt-1">
-                  2 mins ago
-                </p>
-              </div>
-
-              <div>
-                <p className="font-semibold">
-                  New tournament registered
-                </p>
-
-                <p className="text-zinc-400 mt-1">
-                  15 mins ago
-                </p>
-              </div>
-
-              <div>
-                <p className="font-semibold">
-                  Prediction odds updated
-                </p>
-
-                <p className="text-zinc-400 mt-1">
-                  1 hour ago
-                </p>
-              </div>
-
-            </div>
-
-          </div>
+          <StatCard
+            title="Prediction Accuracy"
+            value="68%"
+            subtitle="AI prediction engine"
+          />
 
         </div>
 
       </div>
-
-      <TournamentOverview />
-
-      <UpcomingRaces />
 
     </DashboardLayout>
+
   );
 }
 
