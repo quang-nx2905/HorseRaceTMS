@@ -1,3 +1,5 @@
+import Tournaments from "./pages/Tournaments";
+
 import {
   BrowserRouter,
   Routes,
@@ -15,6 +17,11 @@ function App() {
         <Route
           path="/"
           element={<Dashboard />}
+        />
+
+        <Route
+          path="/tournaments"
+          element={<Tournaments />}
         />
 
       </Routes>
