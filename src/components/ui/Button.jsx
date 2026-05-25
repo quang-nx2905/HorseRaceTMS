@@ -3,7 +3,9 @@ function Button({
     variant = "primary",
     onClick,
 }) {
+
     const styles = {
+
         primary:
             "bg-yellow-400 text-black",
 
@@ -12,6 +14,7 @@ function Button({
 
         danger:
             "bg-red-100 text-red-500",
+
     };
 
     return (
@@ -23,6 +26,9 @@ function Button({
         rounded-2xl
         font-semibold
         transition-all
+        hover:scale-[1.02]
+        active:scale-[0.98]
+
         ${styles[variant]}
       `}
         >
