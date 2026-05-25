@@ -1,5 +1,37 @@
 import DashboardLayout from "../layouts/DashboardLayout";
 
+import Button from "../components/ui/Button";
+import StatusBadge from "../components/ui/StatusBadge";
+
+const horses = [
+  {
+    name: "Thunderbolt",
+    stable: "Elite Racing Club",
+    breed: "Arabian",
+    age: "5 Years",
+    status: "Active",
+    winRate: "78%",
+  },
+
+  {
+    name: "Golden Arrow",
+    stable: "Royal Derby Team",
+    breed: "Thoroughbred",
+    age: "4 Years",
+    status: "Recovery",
+    winRate: "65%",
+  },
+
+  {
+    name: "Black Phantom",
+    stable: "Tokyo Elite Stable",
+    breed: "Mustang",
+    age: "6 Years",
+    status: "Training",
+    winRate: "82%",
+  },
+];
+
 function Horses() {
   return (
     <DashboardLayout>
@@ -19,15 +51,13 @@ function Horses() {
 
         </div>
 
-        <button className="bg-yellow-400 px-8 py-4 rounded-2xl font-semibold">
-
+        <Button>
           + Add Horse
-
-        </button>
+        </Button>
 
       </div>
 
-      {/* Search + Filters */}
+      {/* Search */}
       <div className="flex gap-4 mb-8">
 
         <input
@@ -36,24 +66,24 @@ function Horses() {
           className="flex-1 bg-white border border-zinc-200 rounded-2xl px-6 py-4 outline-none"
         />
 
-        <button className="bg-white border border-zinc-200 px-6 py-4 rounded-2xl">
+        <Button variant="secondary">
           Active
-        </button>
+        </Button>
 
-        <button className="bg-white border border-zinc-200 px-6 py-4 rounded-2xl">
-          Injured
-        </button>
+        <Button variant="secondary">
+          Recovery
+        </Button>
 
-        <button className="bg-white border border-zinc-200 px-6 py-4 rounded-2xl">
-          Retired
-        </button>
+        <Button variant="secondary">
+          Training
+        </Button>
 
       </div>
 
       {/* Table */}
       <div className="bg-white border border-zinc-200 rounded-[32px] overflow-hidden">
 
-        {/* Table Header */}
+        {/* Header */}
         <div className="grid grid-cols-6 px-8 py-6 border-b border-zinc-100 bg-zinc-50 font-semibold text-zinc-500">
 
           <div>Horse</div>
@@ -70,146 +100,69 @@ function Horses() {
 
         </div>
 
-        {/* Row 1 */}
-        <div className="grid grid-cols-6 px-8 py-6 border-b border-zinc-100 items-center">
+        {/* Rows */}
+        {horses.map((horse, index) => (
 
-          <div>
+          <div
+            key={index}
+            className="grid grid-cols-6 px-8 py-6 border-b border-zinc-100 items-center"
+          >
 
-            <h3 className="font-bold text-lg">
-              Thunderbolt
-            </h3>
+            {/* Horse */}
+            <div>
 
-            <p className="text-zinc-400 mt-1">
-              Elite Racing Club
-            </p>
+              <h3 className="font-bold text-lg">
+                {horse.name}
+              </h3>
 
-          </div>
+              <p className="text-zinc-400 mt-1">
+                {horse.stable}
+              </p>
 
-          <div>Arabian</div>
+            </div>
 
-          <div>5 Years</div>
+            {/* Breed */}
+            <div>
+              {horse.breed}
+            </div>
 
-          <div>
+            {/* Age */}
+            <div>
+              {horse.age}
+            </div>
 
-            <span className="bg-green-100 text-green-600 px-4 py-2 rounded-2xl text-sm font-semibold">
+            {/* Status */}
+            <div>
 
-              Active
+              <StatusBadge
+                status={horse.status}
+              />
 
-            </span>
+            </div>
 
-          </div>
+            {/* Win Rate */}
+            <div className="font-semibold">
 
-          <div className="font-semibold">
-            78%
-          </div>
+              {horse.winRate}
 
-          <div className="flex gap-3">
+            </div>
 
-            <button className="bg-zinc-100 px-5 py-2 rounded-xl">
-              Edit
-            </button>
+            {/* Actions */}
+            <div className="flex gap-3">
 
-            <button className="bg-red-100 text-red-500 px-5 py-2 rounded-xl">
-              Delete
-            </button>
+              <Button variant="secondary">
+                Edit
+              </Button>
 
-          </div>
+              <Button variant="danger">
+                Delete
+              </Button>
 
-        </div>
-
-        {/* Row 2 */}
-        <div className="grid grid-cols-6 px-8 py-6 border-b border-zinc-100 items-center">
-
-          <div>
-
-            <h3 className="font-bold text-lg">
-              Golden Arrow
-            </h3>
-
-            <p className="text-zinc-400 mt-1">
-              Royal Derby Team
-            </p>
-
-          </div>
-
-          <div>Thoroughbred</div>
-
-          <div>4 Years</div>
-
-          <div>
-
-            <span className="bg-yellow-100 text-yellow-600 px-4 py-2 rounded-2xl text-sm font-semibold">
-
-              Recovery
-
-            </span>
+            </div>
 
           </div>
 
-          <div className="font-semibold">
-            65%
-          </div>
-
-          <div className="flex gap-3">
-
-            <button className="bg-zinc-100 px-5 py-2 rounded-xl">
-              Edit
-            </button>
-
-            <button className="bg-red-100 text-red-500 px-5 py-2 rounded-xl">
-              Delete
-            </button>
-
-          </div>
-
-        </div>
-
-        {/* Row 3 */}
-        <div className="grid grid-cols-6 px-8 py-6 items-center">
-
-          <div>
-
-            <h3 className="font-bold text-lg">
-              Black Phantom
-            </h3>
-
-            <p className="text-zinc-400 mt-1">
-              Tokyo Elite Stable
-            </p>
-
-          </div>
-
-          <div>Mustang</div>
-
-          <div>6 Years</div>
-
-          <div>
-
-            <span className="bg-blue-100 text-blue-600 px-4 py-2 rounded-2xl text-sm font-semibold">
-
-              Training
-
-            </span>
-
-          </div>
-
-          <div className="font-semibold">
-            82%
-          </div>
-
-          <div className="flex gap-3">
-
-            <button className="bg-zinc-100 px-5 py-2 rounded-xl">
-              Edit
-            </button>
-
-            <button className="bg-red-100 text-red-500 px-5 py-2 rounded-xl">
-              Delete
-            </button>
-
-          </div>
-
-        </div>
+        ))}
 
       </div>
 
