@@ -1,3 +1,4 @@
+import Horses from "./pages/Horses";
 import Tournaments from "./pages/Tournaments";
 
 import {
