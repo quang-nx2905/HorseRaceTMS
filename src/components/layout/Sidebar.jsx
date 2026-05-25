@@ -67,20 +67,23 @@ function SidebarItem({
   active,
 }) {
   return (
-    <div
-      className={`px-5 py-4 rounded-2xl cursor-pointer
-      ${
-        active
-          ? "bg-white border border-zinc-200"
-          : "hover:bg-white"
-      }`}
+    <NavLink
+      to="/"
+      className={({ isActive }) =>
+        `block px-5 py-4 rounded-2xl transition-all
+        ${
+          isActive
+            ? "bg-white border border-zinc-200 shadow-sm"
+            : "hover:bg-white"
+        }`
+      }
     >
 
       <span className="font-medium">
         {text}
       </span>
 
-    </div>
+    </NavLink>
   );
 }
 
