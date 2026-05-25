@@ -19,6 +19,8 @@ import Register from "./pages/Register";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
+import Settings from "./pages/Settings";
+
 function App() {
 
   return (
@@ -115,6 +117,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Spectator />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <Settings />
             </ProtectedRoute>
           }
         />

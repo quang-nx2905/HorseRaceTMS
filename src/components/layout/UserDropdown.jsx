@@ -1,5 +1,7 @@
 import { useState } from "react";
+
 import { useNavigate } from "react-router-dom";
+
 import toast from "react-hot-toast";
 
 function UserDropdown() {
@@ -28,13 +30,17 @@ function UserDropdown() {
           flex
           items-center
           gap-3
+
           bg-white
           dark:bg-zinc-900
+
           border
           border-zinc-200
           dark:border-zinc-800
+
           px-4
           py-3
+
           rounded-2xl
         "
             >
@@ -76,58 +82,81 @@ function UserDropdown() {
             absolute
             right-0
             top-[80px]
+
             w-[260px]
+
             bg-white
             dark:bg-zinc-900
+
             border
             border-zinc-200
             dark:border-zinc-800
+
             rounded-[28px]
+
             shadow-xl
+
             p-3
+
             z-50
           "
                 >
 
+                    {/* Profile */}
                     <button
                         className="
               w-full
               text-left
+
               px-5
               py-4
+
               rounded-2xl
+
               hover:bg-zinc-100
               dark:hover:bg-zinc-800
+
               dark:text-white
             "
                     >
                         Profile
                     </button>
 
+                    {/* Settings */}
                     <button
+                        onClick={() => navigate("/settings")}
                         className="
               w-full
               text-left
+
               px-5
               py-4
+
               rounded-2xl
+
               hover:bg-zinc-100
               dark:hover:bg-zinc-800
+
               dark:text-white
             "
                     >
                         Settings
                     </button>
 
+                    {/* Logout */}
                     <button
                         onClick={handleLogout}
                         className="
               w-full
               text-left
+
               px-5
               py-4
+
               rounded-2xl
+
               hover:bg-red-50
+
               text-red-500
             "
                     >
