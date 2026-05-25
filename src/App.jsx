@@ -20,6 +20,7 @@ import Register from "./pages/Register";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
 
 function App() {
 
@@ -126,6 +127,15 @@ function App() {
           element={
             <ProtectedRoute>
               <Settings />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />
