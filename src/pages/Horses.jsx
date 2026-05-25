@@ -1,12 +1,9 @@
 import { useState } from "react";
-
+import toast from "react-hot-toast";
 import DashboardLayout from "../layouts/DashboardLayout";
-
 import Button from "../components/ui/Button";
 import StatusBadge from "../components/ui/StatusBadge";
-
 import Modal from "../components/ui/Modal";
-
 import Input from "../components/ui/Input";
 import Select from "../components/ui/Select";
 import Textarea from "../components/ui/Textarea";
@@ -74,7 +71,16 @@ function Horses() {
                 <input
                     type="text"
                     placeholder="Search horses..."
-                    className="flex-1 bg-white border border-zinc-200 rounded-2xl px-6 py-4 outline-none"
+                    className="
+            flex-1
+            bg-white
+            border
+            border-zinc-200
+            rounded-2xl
+            px-6
+            py-4
+            outline-none
+          "
                 />
 
                 <Button variant="secondary">
@@ -95,7 +101,17 @@ function Horses() {
             <div className="bg-white border border-zinc-200 rounded-[32px] overflow-hidden">
 
                 {/* Header */}
-                <div className="grid grid-cols-6 px-8 py-6 border-b border-zinc-100 bg-zinc-50 font-semibold text-zinc-500">
+                <div className="
+          grid
+          grid-cols-6
+          px-8
+          py-6
+          border-b
+          border-zinc-100
+          bg-zinc-50
+          font-semibold
+          text-zinc-500
+        ">
 
                     <div>Horse</div>
                     <div>Breed</div>
@@ -111,7 +127,15 @@ function Horses() {
 
                     <div
                         key={index}
-                        className="grid grid-cols-6 px-8 py-6 border-b border-zinc-100 items-center"
+                        className="
+              grid
+              grid-cols-6
+              px-8
+              py-6
+              border-b
+              border-zinc-100
+              items-center
+            "
                     >
 
                         {/* Horse */}
@@ -217,7 +241,17 @@ function Horses() {
                             Cancel
                         </Button>
 
-                        <Button>
+                        <Button
+                            onClick={() => {
+
+                                toast.success(
+                                    "Horse added successfully"
+                                );
+
+                                setOpen(false);
+
+                            }}
+                        >
                             Save Horse
                         </Button>
 
