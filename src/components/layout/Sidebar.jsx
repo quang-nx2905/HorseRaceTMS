@@ -1,3 +1,5 @@
+import { NavLink } from "react-router-dom";
+
 function Sidebar() {
   return (
     <div className="w-[280px] h-screen bg-[#f8f6f4] border-r border-zinc-200 fixed left-0 top-0 flex flex-col justify-between">
