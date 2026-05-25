@@ -1,45 +1,42 @@
-import { useState } from "react";
+import {
+    useState,
+    useEffect,
+} from "react";
+
 import toast from "react-hot-toast";
+
 import DashboardLayout from "../layouts/DashboardLayout";
+
 import Button from "../components/ui/Button";
 import StatusBadge from "../components/ui/StatusBadge";
+
 import Modal from "../components/ui/Modal";
+
 import Input from "../components/ui/Input";
 import Select from "../components/ui/Select";
 import Textarea from "../components/ui/Textarea";
 
-const horses = [
-    {
-        name: "Thunderbolt",
-        stable: "Elite Racing Club",
-        breed: "Arabian",
-        age: "5 Years",
-        status: "Active",
-        winRate: "78%",
-    },
+import HorsesLoading from "../components/loading/HorsesLoading";
 
-    {
-        name: "Golden Arrow",
-        stable: "Royal Derby Team",
-        breed: "Thoroughbred",
-        age: "4 Years",
-        status: "Recovery",
-        winRate: "65%",
-    },
+import EmptyState from "../components/ui/EmptyState";
 
-    {
-        name: "Black Phantom",
-        stable: "Tokyo Elite Stable",
-        breed: "Mustang",
-        age: "6 Years",
-        status: "Training",
-        winRate: "82%",
-    },
-];
+const horses = [];
 
 function Horses() {
 
     const [open, setOpen] = useState(false);
+
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+
+        setTimeout(() => {
+
+            setLoading(false);
+
+        }, 2000);
+
+    }, []);
 
     return (
         <DashboardLayout>
@@ -97,102 +94,107 @@ function Horses() {
 
             </div>
 
-            {/* Table */}
-            <div className="bg-white border border-zinc-200 rounded-[32px] overflow-hidden">
+            {/* Loading */}
+            {loading ? (
 
-                {/* Header */}
-                <div className="
-          grid
-          grid-cols-6
-          px-8
-          py-6
-          border-b
-          border-zinc-100
-          bg-zinc-50
-          font-semibold
-          text-zinc-500
-        ">
+                <HorsesLoading />
 
-                    <div>Horse</div>
-                    <div>Breed</div>
-                    <div>Age</div>
-                    <div>Status</div>
-                    <div>Win Rate</div>
-                    <div>Actions</div>
+            ) : horses.length === 0 ? (
 
-                </div>
+                <EmptyState
+                    title="No Horses Found"
+                    description="
+            There are currently no horses
+            registered in the tournament system.
+          "
+                    buttonText="Add First Horse"
+                />
 
-                {/* Rows */}
-                {horses.map((horse, index) => (
+            ) : (
 
-                    <div
-                        key={index}
-                        className="
-              grid
-              grid-cols-6
-              px-8
-              py-6
-              border-b
-              border-zinc-100
-              items-center
-            "
-                    >
+                <div className="bg-white border border-zinc-200 rounded-[32px] overflow-hidden">
 
-                        {/* Horse */}
-                        <div>
+                    {/* Header */}
+                    <div className="
+            grid
+            grid-cols-6
+            px-8
+            py-6
+            border-b
+            border-zinc-100
+            bg-zinc-50
+            font-semibold
+            text-zinc-500
+          ">
 
-                            <h3 className="font-bold text-lg">
-                                {horse.name}
-                            </h3>
-
-                            <p className="text-zinc-400 mt-1">
-                                {horse.stable}
-                            </p>
-
-                        </div>
-
-                        {/* Breed */}
-                        <div>
-                            {horse.breed}
-                        </div>
-
-                        {/* Age */}
-                        <div>
-                            {horse.age}
-                        </div>
-
-                        {/* Status */}
-                        <div>
-
-                            <StatusBadge
-                                status={horse.status}
-                            />
-
-                        </div>
-
-                        {/* Win Rate */}
-                        <div className="font-semibold">
-                            {horse.winRate}
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex gap-3">
-
-                            <Button variant="secondary">
-                                Edit
-                            </Button>
-
-                            <Button variant="danger">
-                                Delete
-                            </Button>
-
-                        </div>
+                        <div>Horse</div>
+                        <div>Breed</div>
+                        <div>Age</div>
+                        <div>Status</div>
+                        <div>Win Rate</div>
+                        <div>Actions</div>
 
                     </div>
 
-                ))}
+                    {/* Rows */}
+                    {horses.map((horse, index) => (
 
-            </div>
+                        <div
+                            key={index}
+                            className="
+                grid
+                grid-cols-6
+                px-8
+                py-6
+                border-b
+                border-zinc-100
+                items-center
+              "
+                        >
+
+                            <div>
+
+                                <h3 className="font-bold text-lg">
+                                    {horse.name}
+                                </h3>
+
+                                <p className="text-zinc-400 mt-1">
+                                    {horse.stable}
+                                </p>
+
+                            </div>
+
+                            <div>{horse.breed}</div>
+
+                            <div>{horse.age}</div>
+
+                            <div>
+                                <StatusBadge status={horse.status} />
+                            </div>
+
+                            <div className="font-semibold">
+                                {horse.winRate}
+                            </div>
+
+                            <div className="flex gap-3">
+
+                                <Button variant="secondary">
+                                    Edit
+                                </Button>
+
+                                <Button variant="danger">
+                                    Delete
+                                </Button>
+
+                            </div>
+
+                        </div>
+
+                    ))}
+
+                </div>
+
+            )}
 
             {/* Modal */}
             <Modal
