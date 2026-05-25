@@ -1,6 +1,12 @@
+import { useState } from "react";
+
 import DashboardLayout from "../layouts/DashboardLayout";
+
 import Button from "../components/ui/Button";
 import StatusBadge from "../components/ui/StatusBadge";
+
+import Modal from "../components/ui/Modal";
+
 import Input from "../components/ui/Input";
 import Select from "../components/ui/Select";
 import Textarea from "../components/ui/Textarea";
@@ -35,6 +41,9 @@ const horses = [
 ];
 
 function Horses() {
+
+    const [open, setOpen] = useState(false);
+
     return (
         <DashboardLayout>
 
@@ -53,7 +62,7 @@ function Horses() {
 
                 </div>
 
-                <Button>
+                <Button onClick={() => setOpen(true)}>
                     + Add Horse
                 </Button>
 
@@ -89,15 +98,10 @@ function Horses() {
                 <div className="grid grid-cols-6 px-8 py-6 border-b border-zinc-100 bg-zinc-50 font-semibold text-zinc-500">
 
                     <div>Horse</div>
-
                     <div>Breed</div>
-
                     <div>Age</div>
-
                     <div>Status</div>
-
                     <div>Win Rate</div>
-
                     <div>Actions</div>
 
                 </div>
@@ -144,9 +148,7 @@ function Horses() {
 
                         {/* Win Rate */}
                         <div className="font-semibold">
-
                             {horse.winRate}
-
                         </div>
 
                         {/* Actions */}
@@ -167,6 +169,63 @@ function Horses() {
                 ))}
 
             </div>
+
+            {/* Modal */}
+            <Modal
+                isOpen={open}
+                onClose={() => setOpen(false)}
+                title="Add New Horse"
+            >
+
+                <div className="space-y-6">
+
+                    <Input
+                        label="Horse Name"
+                        placeholder="Enter horse name"
+                    />
+
+                    <Input
+                        label="Breed"
+                        placeholder="Enter horse breed"
+                    />
+
+                    <Input
+                        label="Age"
+                        placeholder="Enter horse age"
+                    />
+
+                    <Select
+                        label="Status"
+                        options={[
+                            "Active",
+                            "Training",
+                            "Recovery",
+                        ]}
+                    />
+
+                    <Textarea
+                        label="Description"
+                        placeholder="Horse performance details..."
+                    />
+
+                    <div className="flex justify-end gap-4 pt-4">
+
+                        <Button
+                            variant="secondary"
+                            onClick={() => setOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+
+                        <Button>
+                            Save Horse
+                        </Button>
+
+                    </div>
+
+                </div>
+
+            </Modal>
 
         </DashboardLayout>
     );
