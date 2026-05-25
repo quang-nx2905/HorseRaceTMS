@@ -1,11 +1,3 @@
-import Horses from "./pages/Horses";
-import Tournaments from "./pages/Tournaments";
-import Jockeys from "./pages/Jockeys";
-import Predictions from "./pages/Predictions";
-import Leaderboard from "./pages/Leaderboard";
-import LiveTracking from "./pages/LiveTracking";
-import Referee from "./pages/Referee";
-
 import {
   BrowserRouter,
   Routes,
@@ -13,8 +5,20 @@ import {
 } from "react-router-dom";
 
 import Dashboard from "./pages/Dashboard";
+import Tournaments from "./pages/Tournaments";
+import Horses from "./pages/Horses";
+import Jockeys from "./pages/Jockeys";
+import Predictions from "./pages/Predictions";
+import Leaderboard from "./pages/Leaderboard";
+import LiveTracking from "./pages/LiveTracking";
+import Referee from "./pages/Referee";
+import Spectator from "./pages/Spectator";
+
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
 function App() {
+
   return (
     <BrowserRouter>
 
@@ -58,6 +62,21 @@ function App() {
         <Route
           path="/referee"
           element={<Referee />}
+        />
+
+        <Route
+          path="/spectator"
+          element={<Spectator />}
+        />
+
+        <Route
+          path="/login"
+          element={<Login />}
+        />
+
+        <Route
+          path="/register"
+          element={<Register />}
         />
 
       </Routes>
