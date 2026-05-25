@@ -86,24 +86,8 @@ function App() {
           </div>
 
           {/* Fake Chart */}
-          <div className="h-[420px] flex items-end gap-6">
-
-            <div className="flex-1 bg-yellow-100 rounded-t-[24px] h-[40%]"></div>
-
-            <div className="flex-1 bg-yellow-200 rounded-t-[24px] h-[55%]"></div>
-
-            <div className="flex-1 bg-yellow-100 rounded-t-[24px] h-[48%]"></div>
-
-            <div className="flex-1 bg-yellow-400 rounded-t-[24px] h-[78%]"></div>
-
-            <div className="flex-1 bg-yellow-200 rounded-t-[24px] h-[60%]"></div>
-
-            <div className="flex-1 bg-yellow-300 rounded-t-[24px] h-[85%]"></div>
-
-            <div className="flex-1 bg-yellow-100 rounded-t-[24px] h-[70%]"></div>
-
-          </div>
-
+          
+        <AnalyticsChart />
         </div>
 
         {/* Right Panel */}
