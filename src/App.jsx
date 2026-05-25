@@ -1,5 +1,7 @@
 import Horses from "./pages/Horses";
 import Tournaments from "./pages/Tournaments";
+import Jockeys from "./pages/Jockeys";
+import Predictions from "./pages/Predictions";
 
 import {
   BrowserRouter,
@@ -28,6 +30,16 @@ function App() {
         <Route
           path="/horses"
           element={<Horses />}
+        />
+
+        <Route
+          path="/jockeys"
+          element={<Jockeys />}
+        />
+
+        <Route
+          path="/predictions"
+          element={<Predictions />}
         />
 
       </Routes>
