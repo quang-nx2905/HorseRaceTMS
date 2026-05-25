@@ -2,6 +2,8 @@ import DashboardLayout from "../layouts/DashboardLayout";
 
 import StatCard from "../components/ui/StatCard";
 
+import AnalyticsChart from "../components/charts/AnalyticsChart";
+
 function Dashboard() {
 
   return (
@@ -68,6 +70,9 @@ function Dashboard() {
           />
 
         </div>
+
+        {/* CHART */}
+        <AnalyticsChart />
 
       </div>
 
