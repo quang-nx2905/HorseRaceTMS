@@ -17,6 +17,8 @@ import Spectator from "./pages/Spectator";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
+import ProtectedRoute from "./routes/ProtectedRoute";
+
 function App() {
 
   return (
@@ -24,51 +26,7 @@ function App() {
 
       <Routes>
 
-        <Route
-          path="/"
-          element={<Dashboard />}
-        />
-
-        <Route
-          path="/tournaments"
-          element={<Tournaments />}
-        />
-
-        <Route
-          path="/horses"
-          element={<Horses />}
-        />
-
-        <Route
-          path="/jockeys"
-          element={<Jockeys />}
-        />
-
-        <Route
-          path="/predictions"
-          element={<Predictions />}
-        />
-
-        <Route
-          path="/leaderboard"
-          element={<Leaderboard />}
-        />
-
-        <Route
-          path="/live-tracking"
-          element={<LiveTracking />}
-        />
-
-        <Route
-          path="/referee"
-          element={<Referee />}
-        />
-
-        <Route
-          path="/spectator"
-          element={<Spectator />}
-        />
-
+        {/* PUBLIC */}
         <Route
           path="/login"
           element={<Login />}
@@ -77,6 +35,88 @@ function App() {
         <Route
           path="/register"
           element={<Register />}
+        />
+
+        {/* PROTECTED */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/tournaments"
+          element={
+            <ProtectedRoute>
+              <Tournaments />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/horses"
+          element={
+            <ProtectedRoute>
+              <Horses />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/jockeys"
+          element={
+            <ProtectedRoute>
+              <Jockeys />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/predictions"
+          element={
+            <ProtectedRoute>
+              <Predictions />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/leaderboard"
+          element={
+            <ProtectedRoute>
+              <Leaderboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/live-tracking"
+          element={
+            <ProtectedRoute>
+              <LiveTracking />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/referee"
+          element={
+            <ProtectedRoute>
+              <Referee />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/spectator"
+          element={
+            <ProtectedRoute>
+              <Spectator />
+            </ProtectedRoute>
+          }
         />
 
       </Routes>

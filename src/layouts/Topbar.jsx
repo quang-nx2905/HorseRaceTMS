@@ -1,37 +1,21 @@
 import UserDropdown from "./UserDropdown";
 
-import {
-    useTheme,
-} from "../../context/ThemeContext";
-
 function Topbar({
     setIsOpen,
 }) {
-
-    const {
-        darkMode,
-        setDarkMode,
-    } = useTheme();
 
     return (
         <div
             className="
         h-[90px]
         bg-[#f8f6f4]
-        dark:bg-[#18181b]
-
         border-b
         border-zinc-200
-        dark:border-zinc-800
-
         flex
         items-center
         justify-between
-
         px-4
         lg:px-10
-
-        transition-all
       "
         >
 
@@ -44,7 +28,6 @@ function Topbar({
                     className="
             lg:hidden
             text-3xl
-            dark:text-white
           "
                 >
                     ☰
@@ -56,16 +39,10 @@ function Topbar({
             w-[220px]
             lg:w-[420px]
             h-[56px]
-
             bg-white
-            dark:bg-zinc-900
-
             rounded-2xl
-
             border
             border-zinc-200
-            dark:border-zinc-800
-
             flex
             items-center
             px-5
@@ -79,7 +56,6 @@ function Topbar({
               bg-transparent
               outline-none
               w-full
-              dark:text-white
             "
                     />
 
@@ -90,48 +66,16 @@ function Topbar({
             {/* RIGHT */}
             <div className="flex items-center gap-4">
 
-                {/* Theme */}
-                <button
-                    onClick={() =>
-                        setDarkMode(!darkMode)
-                    }
-                    className="
-            w-[56px]
-            h-[56px]
-
-            bg-white
-            dark:bg-zinc-900
-
-            border
-            border-zinc-200
-            dark:border-zinc-800
-
-            rounded-2xl
-            text-2xl
-
-            transition-all
-          "
-                >
-                    {darkMode ? "☀️" : "🌙"}
-                </button>
-
                 {/* Notification */}
                 <button
                     className="
             w-[56px]
             h-[56px]
-
             bg-white
-            dark:bg-zinc-900
-
             border
             border-zinc-200
-            dark:border-zinc-800
-
             rounded-2xl
             text-2xl
-
-            dark:text-white
           "
                 >
                     🔔

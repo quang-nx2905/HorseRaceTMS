@@ -1,9 +1,33 @@
+import {
+    Link,
+    useNavigate,
+} from "react-router-dom";
+
+import toast from "react-hot-toast";
+
 import AuthLayout from "../layouts/AuthLayout";
 
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
 
 function Login() {
+
+    const navigate = useNavigate();
+
+    const handleLogin = () => {
+
+        /* FAKE JWT TOKEN */
+        localStorage.setItem(
+            "token",
+            "horse-race-demo-token"
+        );
+
+        toast.success(
+            "Login successful"
+        );
+
+        navigate("/");
+    };
 
     return (
         <AuthLayout>
@@ -79,7 +103,7 @@ function Login() {
 
                     </div>
 
-                    <Button>
+                    <Button onClick={handleLogin}>
                         Sign In
                     </Button>
 
@@ -94,11 +118,18 @@ function Login() {
           "
                 >
                     Don’t have an account?
-                    <span className="text-yellow-500 font-semibold ml-2 cursor-pointer">
 
+                    <Link
+                        to="/register"
+                        className="
+              text-yellow-500
+              font-semibold
+              ml-2
+            "
+                    >
                         Register
+                    </Link>
 
-                    </span>
                 </p>
 
             </div>

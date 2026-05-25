@@ -1,30 +1,60 @@
-import { useState } from "react";
+import {
+    useState,
+} from "react";
 
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 
+import PageWrapper from "../components/layout/PageWrapper";
+
 function DashboardLayout({
     children,
 }) {
-    const [isOpen, setIsOpen] = useState(false);
+
+    const [isOpen, setIsOpen] =
+        useState(false);
 
     return (
-        <div className="flex bg-[#f5f5f4] min-h-screen">
+        <div
+            className="
+        flex
+        bg-[#f5f5f4]
+        min-h-screen
+      "
+        >
 
+            {/* Sidebar */}
             <Sidebar
                 isOpen={isOpen}
                 setIsOpen={setIsOpen}
             />
 
-            <div className="flex-1 lg:ml-[280px]">
+            {/* Main */}
+            <div
+                className="
+          flex-1
+          lg:ml-[280px]
+        "
+            >
 
+                {/* Topbar */}
                 <Topbar
                     setIsOpen={setIsOpen}
                 />
 
-                <div className="p-4 lg:p-10">
+                {/* Content */}
+                <div
+                    className="
+            p-4
+            lg:p-10
+          "
+                >
 
-                    {children}
+                    <PageWrapper>
+
+                        {children}
+
+                    </PageWrapper>
 
                 </div>
 

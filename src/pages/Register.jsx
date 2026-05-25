@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import AuthLayout from "../layouts/AuthLayout";
 
 import Input from "../components/ui/Input";
@@ -80,11 +82,18 @@ function Register() {
           "
                 >
                     Already have an account?
-                    <span className="text-yellow-500 font-semibold ml-2 cursor-pointer">
 
+                    <Link
+                        to="/login"
+                        className="
+              text-yellow-500
+              font-semibold
+              ml-2
+            "
+                    >
                         Sign In
+                    </Link>
 
-                    </span>
                 </p>
 
             </div>
