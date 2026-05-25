@@ -1,3 +1,4 @@
+import AnalyticsChart from "./components/ui/AnalyticsChart";
 import DashboardLayout from "./layouts/DashboardLayout";
 import StatsCard from "./components/ui/StatsCard";
 
