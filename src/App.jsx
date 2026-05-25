@@ -1,36 +1,66 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import Dashboard from "./pages/Dashboard";
-import Tournament from "./pages/Tournament";
-import Horses from "./pages/Horses";
-import LiveRace from "./pages/LiveRace";
-import Leaderboard from "./pages/Leaderboard";
-import Predictions from "./pages/Predictions";
-import Login from "./pages/Login";
+import DashboardLayout from "./layouts/DashboardLayout";
 
 function App() {
   return (
-    <BrowserRouter>
+    <DashboardLayout>
 
-      <Routes>
+      <h1 className="text-5xl font-bold mb-6">
+        Dashboard
+      </h1>
 
-        <Route path="/" element={<Dashboard />} />
-        
-        <Route path="/login" element={<Login />} />
+      <div className="grid grid-cols-4 gap-6">
 
-        <Route path="/tournaments" element={<Tournament />} />
+        <div className="bg-white rounded-3xl p-8 border border-zinc-200">
 
-        <Route path="/horses" element={<Horses />} />
+          <p className="text-zinc-500">
+            Total Tournaments
+          </p>
 
-        <Route path="/live-races" element={<LiveRace />} />
+          <h2 className="text-5xl font-bold mt-5">
+            124
+          </h2>
 
-        <Route path="/leaderboard" element={<Leaderboard />} />
+        </div>
 
-        <Route path="/predictions" element={<Predictions />} />
+        <div className="bg-white rounded-3xl p-8 border border-zinc-200">
 
-      </Routes>
+          <p className="text-zinc-500">
+            Active Races
+          </p>
 
-    </BrowserRouter>
+          <h2 className="text-5xl font-bold mt-5">
+            18
+          </h2>
+
+        </div>
+
+        <div className="bg-white rounded-3xl p-8 border border-zinc-200">
+
+          <p className="text-zinc-500">
+            Total Horses
+          </p>
+
+          <h2 className="text-5xl font-bold mt-5">
+            2450
+          </h2>
+
+        </div>
+
+        <div className="bg-white rounded-3xl p-8 border border-yellow-300">
+
+          <p className="text-zinc-500">
+            Win Rate
+          </p>
+
+          <h2 className="text-5xl font-bold mt-5 text-yellow-500">
+            68%
+          </h2>
+
+        </div>
+
+      </div>
+
+    </DashboardLayout>
   );
 }
 
