@@ -25,6 +25,11 @@ function App() {
           element={<Tournaments />}
         />
 
+        <Route
+          path="/horses"
+          element={<Horses />}
+        />
+
       </Routes>
 
     </BrowserRouter>
