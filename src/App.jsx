@@ -2,6 +2,9 @@ import Horses from "./pages/Horses";
 import Tournaments from "./pages/Tournaments";
 import Jockeys from "./pages/Jockeys";
 import Predictions from "./pages/Predictions";
+import Leaderboard from "./pages/Leaderboard";
+import LiveTracking from "./pages/LiveTracking";
+import Referee from "./pages/Referee";
 
 import {
   BrowserRouter,
@@ -40,6 +43,21 @@ function App() {
         <Route
           path="/predictions"
           element={<Predictions />}
+        />
+
+        <Route
+          path="/leaderboard"
+          element={<Leaderboard />}
+        />
+
+        <Route
+          path="/live-tracking"
+          element={<LiveTracking />}
+        />
+
+        <Route
+          path="/referee"
+          element={<Referee />}
         />
 
       </Routes>
