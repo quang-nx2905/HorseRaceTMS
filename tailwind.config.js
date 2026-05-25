@@ -23,6 +23,16 @@ export default {
           },
         },
 
+        shimmer: {
+          "0%": {
+            backgroundPosition: "-1000px 0",
+          },
+
+          "100%": {
+            backgroundPosition: "1000px 0",
+          },
+        },
+
       },
 
       animation: {
@@ -30,9 +40,11 @@ export default {
         fadeIn:
           "fadeIn 0.2s ease-out",
 
+        shimmer:
+          "shimmer 2s linear infinite",
+
       },
 
-      /* Colors */
       colors: {
 
         primary: "#facc15",
@@ -41,14 +53,12 @@ export default {
 
       },
 
-      /* Border Radius */
       borderRadius: {
 
         card: "32px",
 
       },
 
-      /* Box Shadow */
       boxShadow: {
 
         card:
