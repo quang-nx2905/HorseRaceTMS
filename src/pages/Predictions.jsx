@@ -1,165 +1,293 @@
-import Button from "../components/ui/Button";
-
-const predictions = [
-    {
-        horse: "Thunderbolt",
-        odds: "1.45x",
-        confidence: "92%",
-        reward: "+450 pts",
-        status: "Hot Pick",
-    },
-
-    {
-        horse: "Golden Arrow",
-        odds: "2.10x",
-        confidence: "78%",
-        reward: "+320 pts",
-        status: "Trending",
-    },
-
-    {
-        horse: "Black Phantom",
-        odds: "3.25x",
-        confidence: "65%",
-        reward: "+600 pts",
-        status: "High Risk",
-    },
-];
-
 function Predictions() {
-    return (
-        <>
 
-            {/* Header */}
-            <div className="flex justify-between items-center mb-10">
+    const predictions = [
+
+        {
+            horse: "Thunder Bolt",
+            race: "Golden Cup Final",
+            confidence: "92%",
+            odds: "1.8x",
+            status: "High Chance",
+        },
+
+        {
+            horse: "Night Fury",
+            race: "Royal Derby",
+            confidence: "76%",
+            odds: "2.4x",
+            status: "Moderate",
+        },
+
+        {
+            horse: "Silver Storm",
+            race: "Tokyo Sprint",
+            confidence: "61%",
+            odds: "3.1x",
+            status: "Risky",
+        },
+
+    ];
+
+    return (
+
+        <div>
+
+            {/* HEADER */}
+            <div
+                className="
+          flex
+          items-center
+          justify-between
+          mb-10
+        "
+            >
 
                 <div>
 
-                    <h1 className="text-6xl font-bold">
+                    <h1 className="page-title">
                         Predictions
                     </h1>
 
-                    <p className="text-zinc-500 mt-3 text-lg">
-                        Analyze race predictions, rewards, and performance metrics.
+                    <p className="page-subtitle">
+                        AI-powered race prediction
+                        and analytics engine.
                     </p>
 
                 </div>
 
-                <Button>
-                    Prediction History
-                </Button>
+                <button
+                    className="
+            bg-yellow-400
+            hover:bg-yellow-500
+
+            transition-all
+
+            px-6
+            py-4
+
+            rounded-2xl
+            font-semibold
+          "
+                >
+                    Generate Prediction
+                </button>
 
             </div>
 
-            {/* Top Stats */}
-            <div className="grid grid-cols-4 gap-6 mb-10">
+            {/* TOP CARDS */}
+            <div
+                className="
+          grid
+          grid-cols-1
+          md:grid-cols-3
 
-                <StatCard
-                    title="Prediction Accuracy"
-                    value="84%"
-                />
+          gap-6
 
-                <StatCard
-                    title="Total Predictions"
-                    value="12,450"
-                />
+          mb-8
+        "
+            >
 
-                <StatCard
-                    title="Rewards Earned"
-                    value="4,820"
-                />
+                {/* CARD */}
+                <div className="card p-8">
 
-                <StatCard
-                    title="Live Predictions"
-                    value="18"
-                />
+                    <p className="text-zinc-500 mb-4">
+                        Prediction Accuracy
+                    </p>
+
+                    <h2
+                        className="
+              text-5xl
+              font-black
+              mb-4
+            "
+                    >
+                        86%
+                    </h2>
+
+                    <div
+                        className="
+              h-3
+              bg-zinc-100
+              rounded-full
+              overflow-hidden
+            "
+                    >
+
+                        <div
+                            className="
+                h-full
+                w-[86%]
+                bg-yellow-400
+              "
+                        ></div>
+
+                    </div>
+
+                </div>
+
+                {/* CARD */}
+                <div className="card p-8">
+
+                    <p className="text-zinc-500 mb-4">
+                        Total AI Models
+                    </p>
+
+                    <h2
+                        className="
+              text-5xl
+              font-black
+            "
+                    >
+                        12
+                    </h2>
+
+                </div>
+
+                {/* CARD */}
+                <div className="card p-8">
+
+                    <p className="text-zinc-500 mb-4">
+                        Predictions Generated
+                    </p>
+
+                    <h2
+                        className="
+              text-5xl
+              font-black
+            "
+                    >
+                        14.2k
+                    </h2>
+
+                </div>
 
             </div>
 
-            {/* Prediction Cards */}
-            <div className="grid grid-cols-3 gap-6">
+            {/* PREDICTION LIST */}
+            <div className="space-y-6">
 
                 {predictions.map((item, index) => (
 
                     <div
                         key={index}
-                        className="bg-white border border-zinc-200 rounded-[32px] p-8"
+                        className="
+              card
+              p-8
+
+              hover:shadow-xl
+
+              transition-all
+            "
                     >
 
-                        {/* Badge */}
-                        <div className="flex justify-between items-center mb-8">
+                        <div
+                            className="
+                flex
+                items-center
+                justify-between
+                mb-6
+              "
+                        >
 
-                            <div className="w-[72px] h-[72px] bg-yellow-100 rounded-[24px] flex items-center justify-center text-3xl">
+                            <div>
 
-                                🏇
+                                <h2
+                                    className="
+                    text-3xl
+                    font-bold
+                    mb-2
+                  "
+                                >
+                                    {item.horse}
+                                </h2>
+
+                                <p className="text-zinc-500">
+                                    {item.race}
+                                </p>
 
                             </div>
 
-                            <span className="bg-yellow-100 text-yellow-600 px-4 py-2 rounded-2xl font-semibold text-sm">
+                            <span
+                                className={`
+                  px-4
+                  py-2
 
+                  rounded-full
+
+                  text-sm
+                  font-semibold
+
+                  ${item.status === "High Chance"
+                                        ? "bg-green-100 text-green-600"
+                                        : item.status === "Moderate"
+                                            ? "bg-yellow-100 text-yellow-700"
+                                            : "bg-red-100 text-red-500"
+                                    }
+                `}
+                            >
                                 {item.status}
-
                             </span>
 
                         </div>
 
-                        {/* Horse */}
-                        <h2 className="text-3xl font-bold mb-3">
-                            {item.horse}
-                        </h2>
+                        {/* STATS */}
+                        <div
+                            className="
+                grid
+                grid-cols-2
+                gap-6
+              "
+                        >
 
-                        <p className="text-zinc-500 leading-relaxed mb-8">
+                            {/* CONFIDENCE */}
+                            <div
+                                className="
+                  bg-zinc-50
+                  rounded-2xl
+                  p-6
+                "
+                            >
 
-                            AI-powered race prediction
-                            based on current performance analytics.
-
-                        </p>
-
-                        {/* Stats */}
-                        <div className="space-y-5 mb-8">
-
-                            <div className="flex justify-between">
-
-                                <span className="text-zinc-500">
-                                    Winning Odds
-                                </span>
-
-                                <span className="font-semibold">
-                                    {item.odds}
-                                </span>
-
-                            </div>
-
-                            <div className="flex justify-between">
-
-                                <span className="text-zinc-500">
+                                <p className="text-zinc-500 mb-3">
                                     Confidence
-                                </span>
+                                </p>
 
-                                <span className="font-semibold">
+                                <h3
+                                    className="
+                    text-4xl
+                    font-black
+                  "
+                                >
                                     {item.confidence}
-                                </span>
+                                </h3>
 
                             </div>
 
-                            <div className="flex justify-between">
+                            {/* ODDS */}
+                            <div
+                                className="
+                  bg-zinc-50
+                  rounded-2xl
+                  p-6
+                "
+                            >
 
-                                <span className="text-zinc-500">
-                                    Potential Reward
-                                </span>
+                                <p className="text-zinc-500 mb-3">
+                                    Betting Odds
+                                </p>
 
-                                <span className="font-semibold text-yellow-500">
-                                    {item.reward}
-                                </span>
+                                <h3
+                                    className="
+                    text-4xl
+                    font-black
+                  "
+                                >
+                                    {item.odds}
+                                </h3>
 
                             </div>
 
                         </div>
-
-                        {/* Action */}
-                        <Button>
-                            Predict Winner
-                        </Button>
 
                     </div>
 
@@ -167,27 +295,8 @@ function Predictions() {
 
             </div>
 
-        </>
-    );
-}
-
-/* Stat Card */
-function StatCard({
-    title,
-    value,
-}) {
-    return (
-        <div className="bg-white border border-zinc-200 rounded-[28px] p-8">
-
-            <p className="text-zinc-500">
-                {title}
-            </p>
-
-            <h2 className="text-5xl font-bold mt-5">
-                {value}
-            </h2>
-
         </div>
+
     );
 }
 
