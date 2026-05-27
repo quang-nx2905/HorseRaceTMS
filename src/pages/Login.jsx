@@ -1,151 +1,333 @@
-import {
-    Link,
-    useNavigate,
-} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-import toast from "react-hot-toast";
+import { useState } from "react";
 
-import AuthLayout from "../layouts/AuthLayout";
-
-import Input from "../components/ui/Input";
-import Button from "../components/ui/Button";
 import { useAuth } from "../context/AuthContext";
 
 function Login() {
 
     const navigate = useNavigate();
+
     const { login } = useAuth();
 
-    const handleLogin = (e) => {
-        e.preventDefault();
-        
-        const email = e.target.email.value;
-        const password = e.target.password.value;
+    const [email, setEmail] = useState("");
+
+    const [password, setPassword] = useState("");
+
+    const handleLogin = () => {
 
         if (!email || !password) {
-            toast.error("Please fill in all fields");
+            alert("Please enter email and password.");
             return;
         }
 
         login(email, password);
 
-        toast.success("Login successful");
-
         navigate("/");
     };
 
     return (
-        <AuthLayout>
+
+        <div
+            className="
+        min-h-screen
+        bg-[#f5f5f4]
+
+        flex
+        items-center
+        justify-center
+
+        p-8
+      "
+        >
 
             <div
                 className="
+          grid
+          grid-cols-1
+          xl:grid-cols-2
+
           w-full
-          max-w-[520px]
-          bg-white
-          border
-          border-zinc-200
+          max-w-7xl
+
+          overflow-hidden
+
           rounded-[40px]
-          p-10
+
+          shadow-2xl
+
+          bg-white
         "
             >
 
-                {/* Header */}
-                <div className="mb-10">
+                {/* LEFT */}
+                <div
+                    className="
+            p-14
 
-                    <h1
-                        className="
-              text-5xl
-              font-bold
-              mb-4
-            "
-                    >
-                        Welcome Back
-                    </h1>
+            flex
+            flex-col
+            justify-center
+          "
+                >
 
-                    <p className="text-zinc-500 text-lg">
-                        Sign in to continue managing
-                        your tournaments.
-                    </p>
+                    {/* LOGO */}
+                    <div className="mb-12">
 
-                </div>
+                        <div
+                            className="
+                w-20
+                h-20
 
-                {/* Form */}
-                <form onSubmit={handleLogin} className="space-y-6">
+                rounded-3xl
 
-                    <Input
-                        name="email"
-                        type="email"
-                        label="Email"
-                        placeholder="Enter your email"
-                        required
-                    />
+                bg-yellow-400
 
-                    <Input
-                        name="password"
-                        type="password"
-                        label="Password"
-                        placeholder="Enter your password"
-                        required
-                    />
+                flex
+                items-center
+                justify-center
 
-                    <div
-                        className="
-              flex
-              justify-between
-              items-center
-              text-sm
-            "
-                    >
+                text-4xl
+                font-black
 
-                        <label className="flex items-center gap-2">
+                mb-6
+              "
+                        >
+                            🏇
+                        </div>
 
-                            <input type="checkbox" />
+                        <h1
+                            className="
+                text-6xl
+                font-black
+                tracking-tight
+                mb-4
+              "
+                        >
+                            Welcome Back
+                        </h1>
 
-                            Remember me
+                        <p
+                            className="
+                text-zinc-500
+                text-xl
+                leading-8
+              "
+                        >
+                            Access the Horse Race Tournament
+                            Management System dashboard.
+                        </p>
 
-                        </label>
+                    </div>
 
-                        <button type="button" className="text-yellow-500 font-semibold hover:text-yellow-600">
+                    {/* FORM */}
+                    <div className="space-y-6">
 
-                            Forgot Password?
+                        {/* EMAIL */}
+                        <div>
 
+                            <label
+                                className="
+                  block
+                  text-sm
+                  font-semibold
+                  mb-3
+                "
+                            >
+                                Email Address
+                            </label>
+
+                            <input
+                                type="email"
+                                placeholder="Enter your email"
+
+                                value={email}
+                                onChange={(e) =>
+                                    setEmail(e.target.value)
+                                }
+
+                                className="
+                  w-full
+
+                  bg-zinc-100
+
+                  rounded-2xl
+
+                  px-6
+                  py-5
+
+                  outline-none
+
+                  focus:ring-2
+                  focus:ring-yellow-400
+
+                  transition-all
+                "
+                            />
+
+                        </div>
+
+                        {/* PASSWORD */}
+                        <div>
+
+                            <label
+                                className="
+                  block
+                  text-sm
+                  font-semibold
+                  mb-3
+                "
+                            >
+                                Password
+                            </label>
+
+                            <input
+                                type="password"
+                                placeholder="Enter your password"
+
+                                value={password}
+                                onChange={(e) =>
+                                    setPassword(e.target.value)
+                                }
+
+                                className="
+                  w-full
+
+                  bg-zinc-100
+
+                  rounded-2xl
+
+                  px-6
+                  py-5
+
+                  outline-none
+
+                  focus:ring-2
+                  focus:ring-yellow-400
+
+                  transition-all
+                "
+                            />
+
+                        </div>
+
+                        {/* BUTTON */}
+                        <button
+                            onClick={handleLogin}
+
+                            className="
+                w-full
+
+                bg-yellow-400
+                hover:bg-yellow-500
+
+                transition-all
+
+                py-5
+
+                rounded-2xl
+
+                font-bold
+                text-lg
+              "
+                        >
+                            Sign In
                         </button>
 
                     </div>
 
-                    <Button type="submit">
-                        Sign In
-                    </Button>
-
-                </form>
-
-                {/* Footer */}
-                <p
-                    className="
-            text-center
-            text-zinc-500
-            mt-8
-          "
-                >
-                    Don't have an account?
-
-                    <Link
-                        to="/register"
+                    {/* REGISTER */}
+                    <p
                         className="
-              text-yellow-500
-              font-semibold
-              ml-2
-              hover:text-yellow-600
+              mt-8
+              text-zinc-500
             "
                     >
-                        Register
-                    </Link>
+                        Don’t have an account?
 
-                </p>
+                        <Link
+                            to="/register"
+                            className="
+                ml-2
+                text-black
+                font-bold
+              "
+                        >
+                            Create Account
+                        </Link>
+
+                    </p>
+
+                </div>
+
+                {/* RIGHT */}
+                <div
+                    className="
+            hidden
+            xl:flex
+
+            bg-gradient-to-br
+            from-yellow-400
+            to-yellow-500
+
+            items-center
+            justify-center
+
+            p-16
+          "
+                >
+
+                    <div className="text-black">
+
+                        <p
+                            className="
+                uppercase
+                tracking-[6px]
+
+                font-semibold
+
+                mb-6
+              "
+                        >
+                            Elite Racing Platform
+                        </p>
+
+                        <h2
+                            className="
+                text-7xl
+                font-black
+                leading-tight
+                mb-8
+              "
+                        >
+                            Horse Race
+                            <br />
+                            Tournament
+                            <br />
+                            System
+                        </h2>
+
+                        <p
+                            className="
+                text-2xl
+                leading-10
+
+                max-w-xl
+              "
+                        >
+                            Professional management,
+                            AI predictions and real-time
+                            tournament operations platform.
+                        </p>
+
+                    </div>
+
+                </div>
 
             </div>
 
-        </AuthLayout>
+        </div>
+
     );
 }
 
