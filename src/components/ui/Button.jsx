@@ -1,47 +1,57 @@
 function Button({
+
     children,
+
     variant = "primary",
+
+    fullWidth = false,
+
     onClick,
-    type = "button",
-    disabled = false,
+
 }) {
 
-    const styles = {
+    const variants = {
 
         primary:
-            "bg-yellow-400 text-black hover:bg-yellow-500",
+            "bg-yellow-400 hover:bg-yellow-500 text-black",
 
-        secondary:
-            "bg-white border border-zinc-200 hover:bg-zinc-50",
+        dark:
+            "bg-zinc-900 hover:bg-black text-white",
 
         danger:
-            "bg-red-100 text-red-500 hover:bg-red-200",
+            "bg-red-500 hover:bg-red-600 text-white",
+
+        outline:
+            "border border-zinc-300 hover:bg-zinc-100 text-black",
 
     };
 
     return (
+
         <button
-            type={type}
             onClick={onClick}
-            disabled={disabled}
+
             className={`
         px-6
-        py-3
-        rounded-2xl
-        font-semibold
-        transition-all
-        hover:scale-[1.02]
-        active:scale-[0.98]
-        disabled:opacity-50
-        disabled:cursor-not-allowed
+        py-4
 
-        ${styles[variant]}
+        rounded-2xl
+
+        font-semibold
+
+        transition-all
+        duration-200
+
+        ${variants[variant]}
+
+        ${fullWidth ? "w-full" : ""}
       `}
         >
 
             {children}
 
         </button>
+
     );
 }
 
