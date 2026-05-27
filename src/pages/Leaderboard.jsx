@@ -1,252 +1,327 @@
-const leaderboard = [
-  {
-    rank: "#1",
-    horse: "Thunderbolt",
-    jockey: "Alex Carter",
-    points: "2,450",
-    winRate: "92%",
-  },
-
-  {
-    rank: "#2",
-    horse: "Golden Arrow",
-    jockey: "Michael Reeves",
-    points: "2,180",
-    winRate: "84%",
-  },
-
-  {
-    rank: "#3",
-    horse: "Black Phantom",
-    jockey: "Daniel Foster",
-    points: "1,920",
-    winRate: "79%",
-  },
-
-  {
-    rank: "#4",
-    horse: "Silver Blaze",
-    jockey: "Ryan Cooper",
-    points: "1,740",
-    winRate: "73%",
-  },
-];
-
 function Leaderboard() {
+
+  const rankings = [
+
+    {
+      rank: 1,
+      horse: "Thunder Bolt",
+      jockey: "Akira Sato",
+      wins: 48,
+      points: 1240,
+    },
+
+    {
+      rank: 2,
+      horse: "Golden Sprint",
+      jockey: "James Carter",
+      wins: 41,
+      points: 1130,
+    },
+
+    {
+      rank: 3,
+      horse: "Night Fury",
+      jockey: "Ryan Cooper",
+      wins: 36,
+      points: 980,
+    },
+
+    {
+      rank: 4,
+      horse: "Silver Storm",
+      jockey: "Lucas Fernandez",
+      wins: 24,
+      points: 760,
+    },
+
+  ];
+
   return (
-    <>
 
-      {/* Header */}
-      <div className="flex justify-between items-center mb-10">
+    <div>
 
-        <div>
+      {/* HEADER */}
+      <div className="mb-10">
 
-          <h1 className="text-6xl font-bold">
-            Leaderboard
-          </h1>
+        <h1 className="page-title">
+          Leaderboard
+        </h1>
 
-          <p className="text-zinc-500 mt-3 text-lg">
-            Track top-performing horses and elite jockey rankings.
+        <p className="page-subtitle">
+          Global horse racing rankings
+          and championship standings.
+        </p>
+
+      </div>
+
+      {/* TOP 3 */}
+      <div
+        className="
+          grid
+          grid-cols-1
+          md:grid-cols-3
+
+          gap-6
+
+          mb-10
+        "
+      >
+
+        {/* SECOND */}
+        <div
+          className="
+            card
+            p-8
+
+            flex
+            flex-col
+            items-center
+            justify-center
+
+            mt-10
+          "
+        >
+
+          <div
+            className="
+              w-24
+              h-24
+
+              rounded-full
+
+              bg-zinc-200
+
+              flex
+              items-center
+              justify-center
+
+              text-4xl
+              font-black
+
+              mb-6
+            "
+          >
+            2
+          </div>
+
+          <h2 className="text-3xl font-bold mb-2">
+            Golden Sprint
+          </h2>
+
+          <p className="text-zinc-500 mb-6">
+            James Carter
+          </p>
+
+          <h3 className="text-5xl font-black">
+            1130
+          </h3>
+
+          <p className="text-zinc-500 mt-2">
+            Points
           </p>
 
         </div>
 
-        <button className="bg-yellow-400 px-8 py-4 rounded-2xl font-semibold">
+        {/* FIRST */}
+        <div
+          className="
+            card
+            p-8
 
-          Export Report
+            flex
+            flex-col
+            items-center
+            justify-center
 
-        </button>
+            border-4
+            border-yellow-400
+          "
+        >
 
-      </div>
+          <div
+            className="
+              w-28
+              h-28
 
-      {/* Top Stats */}
-      <div className="grid grid-cols-4 gap-6 mb-10">
+              rounded-full
 
-        <StatCard
-          title="Top Win Rate"
-          value="92%"
-        />
+              bg-yellow-400
 
-        <StatCard
-          title="Elite Horses"
-          value="48"
-        />
+              flex
+              items-center
+              justify-center
 
-        <StatCard
-          title="Total Races"
-          value="124"
-        />
+              text-5xl
+              font-black
 
-        <StatCard
-          title="Prize Pool"
-          value="$5.8M"
-        />
+              mb-6
+            "
+          >
+            1
+          </div>
 
-      </div>
+          <h2 className="text-4xl font-black mb-2">
+            Thunder Bolt
+          </h2>
 
-      {/* Leaderboard Table */}
-      <div className="bg-white border border-zinc-200 rounded-[32px] overflow-hidden">
+          <p className="text-zinc-500 mb-6">
+            Akira Sato
+          </p>
 
-        {/* Header */}
-        <div className="grid grid-cols-5 px-8 py-6 border-b border-zinc-100 bg-zinc-50 font-semibold text-zinc-500">
+          <h3 className="text-6xl font-black">
+            1240
+          </h3>
 
-          <div>Rank</div>
-
-          <div>Horse</div>
-
-          <div>Jockey</div>
-
-          <div>Points</div>
-
-          <div>Win Rate</div>
+          <p className="text-zinc-500 mt-2">
+            Points
+          </p>
 
         </div>
 
-        {/* Rows */}
-        {leaderboard.map((item, index) => (
+        {/* THIRD */}
+        <div
+          className="
+            card
+            p-8
+
+            flex
+            flex-col
+            items-center
+            justify-center
+
+            mt-16
+          "
+        >
 
           <div
-            key={index}
-            className="grid grid-cols-5 px-8 py-6 border-b border-zinc-100 items-center"
+            className="
+              w-24
+              h-24
+
+              rounded-full
+
+              bg-orange-200
+
+              flex
+              items-center
+              justify-center
+
+              text-4xl
+              font-black
+
+              mb-6
+            "
           >
+            3
+          </div>
 
-            {/* Rank */}
-            <div>
+          <h2 className="text-3xl font-bold mb-2">
+            Night Fury
+          </h2>
 
-              <span
-                className={`text-2xl font-bold
-                ${
-                  index === 0
-                    ? "text-yellow-500"
-                    : "text-zinc-800"
-                }`}
-              >
+          <p className="text-zinc-500 mb-6">
+            Ryan Cooper
+          </p>
 
-                {item.rank}
+          <h3 className="text-5xl font-black">
+            980
+          </h3>
 
-              </span>
+          <p className="text-zinc-500 mt-2">
+            Points
+          </p>
 
-            </div>
+        </div>
 
-            {/* Horse */}
-            <div>
+      </div>
 
-              <h3 className="font-bold text-lg">
+      {/* TABLE */}
+      <div className="card overflow-hidden">
+
+        {/* HEADER */}
+        <div
+          className="
+            grid
+            grid-cols-5
+
+            px-8
+            py-6
+
+            border-b
+            border-zinc-200
+
+            text-sm
+            uppercase
+            tracking-wider
+
+            text-zinc-500
+            font-semibold
+          "
+        >
+
+          <p>Rank</p>
+
+          <p>Horse</p>
+
+          <p>Jockey</p>
+
+          <p>Wins</p>
+
+          <p>Points</p>
+
+        </div>
+
+        {/* ROWS */}
+        <div>
+
+          {rankings.map((item, index) => (
+
+            <div
+              key={index}
+              className="
+                grid
+                grid-cols-5
+
+                px-8
+                py-6
+
+                border-b
+                border-zinc-100
+
+                hover:bg-zinc-50
+
+                transition-all
+              "
+            >
+
+              <p className="font-black text-xl">
+                #{item.rank}
+              </p>
+
+              <p className="font-bold">
                 {item.horse}
-              </h3>
+              </p>
 
-              <p className="text-zinc-400 mt-1">
-                Elite Racing Division
+              <p className="text-zinc-600">
+                {item.jockey}
+              </p>
+
+              <p>{item.wins}</p>
+
+              <p className="font-black">
+                {item.points}
               </p>
 
             </div>
 
-            {/* Jockey */}
-            <div>
-              {item.jockey}
-            </div>
-
-            {/* Points */}
-            <div className="font-semibold">
-              {item.points}
-            </div>
-
-            {/* Win Rate */}
-            <div>
-
-              <div className="flex items-center gap-3">
-
-                <div className="w-full h-[10px] bg-zinc-100 rounded-full overflow-hidden">
-
-                  <div
-                    className="h-full bg-yellow-400 rounded-full"
-                    style={{
-                      width: item.winRate,
-                    }}
-                  ></div>
-
-                </div>
-
-                <span className="font-semibold">
-                  {item.winRate}
-                </span>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        ))}
-
-      </div>
-
-      {/* Bottom Analytics */}
-      <div className="grid grid-cols-2 gap-6 mt-8">
-
-        {/* Card */}
-        <div className="bg-white border border-zinc-200 rounded-[32px] p-8">
-
-          <h2 className="text-3xl font-bold mb-6">
-            Top Performing Stable
-          </h2>
-
-          <p className="text-zinc-500 leading-relaxed">
-
-            Royal Derby Team currently leads
-            the global tournament rankings
-            with the highest race consistency.
-
-          </p>
-
-        </div>
-
-        {/* Card */}
-        <div className="bg-black rounded-[32px] p-8 text-white">
-
-          <p className="text-yellow-400 font-semibold mb-4">
-            ANALYTICS INSIGHT
-          </p>
-
-          <h2 className="text-4xl font-bold leading-tight">
-
-            AI ranking predictions
-            improved by 28%
-
-          </h2>
-
-          <p className="text-zinc-400 mt-5 leading-relaxed">
-
-            Machine learning models now
-            provide more accurate performance forecasting.
-
-          </p>
+          ))}
 
         </div>
 
       </div>
-
-    </>
-  );
-}
-
-/* Stats Card */
-function StatCard({
-  title,
-  value,
-}) {
-  return (
-    <div className="bg-white border border-zinc-200 rounded-[28px] p-8">
-
-      <p className="text-zinc-500">
-        {title}
-      </p>
-
-      <h2 className="text-5xl font-bold mt-5">
-        {value}
-      </h2>
 
     </div>
+
   );
 }
 
