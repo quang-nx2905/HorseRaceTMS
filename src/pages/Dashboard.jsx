@@ -1,3 +1,13 @@
+import PageHeader from "../components/ui/PageHeader";
+
+import Button from "../components/ui/Button";
+
+import Card from "../components/ui/Card";
+
+import StatCard from "../components/dashboard/StatCard";
+
+import RecentRaceCard from "../components/dashboard/RecentRaceCard";
+
 function Dashboard() {
 
   return (
@@ -5,18 +15,20 @@ function Dashboard() {
     <div>
 
       {/* HEADER */}
-      <div className="mb-10">
+      <PageHeader
+        title="Dashboard"
 
-        <h1 className="page-title">
-          Dashboard
-        </h1>
-
-        <p className="page-subtitle">
+        subtitle="
           Welcome back to the Horse Race
           Tournament Management System.
-        </p>
+        "
 
-      </div>
+        action={
+          <Button>
+            + New Race
+          </Button>
+        }
+      />
 
       {/* STATS */}
       <div
@@ -25,107 +37,36 @@ function Dashboard() {
           grid-cols-1
           md:grid-cols-2
           xl:grid-cols-4
+
           gap-6
+
           mb-8
         "
       >
 
-        {/* CARD */}
-        <div
-          className="
-            card
-            p-8
-          "
-        >
+        <StatCard
+          title="Total Horses"
+          value="2,450"
+          subtitle="+12% this month"
+        />
 
-          <p className="text-zinc-400 uppercase text-sm">
-            Total Horses
-          </p>
+        <StatCard
+          title="Active Races"
+          value="18"
+          subtitle="Currently ongoing"
+        />
 
-          <h2
-            className="
-              text-5xl
-              font-bold
-              mt-5
-            "
-          >
-            2,450
-          </h2>
+        <StatCard
+          title="Predictions"
+          value="12.4k"
+          subtitle="AI generated insights"
+        />
 
-          <p className="text-yellow-500 mt-4">
-            +12% this month
-          </p>
-
-        </div>
-
-        {/* CARD */}
-        <div className="card p-8">
-
-          <p className="text-zinc-400 uppercase text-sm">
-            Active Races
-          </p>
-
-          <h2
-            className="
-              text-5xl
-              font-bold
-              mt-5
-            "
-          >
-            18
-          </h2>
-
-          <p className="text-zinc-500 mt-4">
-            Currently ongoing
-          </p>
-
-        </div>
-
-        {/* CARD */}
-        <div className="card p-8">
-
-          <p className="text-zinc-400 uppercase text-sm">
-            Predictions
-          </p>
-
-          <h2
-            className="
-              text-5xl
-              font-bold
-              mt-5
-            "
-          >
-            12.4k
-          </h2>
-
-          <p className="text-zinc-500 mt-4">
-            AI generated insights
-          </p>
-
-        </div>
-
-        {/* CARD */}
-        <div className="card p-8">
-
-          <p className="text-zinc-400 uppercase text-sm">
-            Win Accuracy
-          </p>
-
-          <h2
-            className="
-              text-5xl
-              font-bold
-              mt-5
-            "
-          >
-            86%
-          </h2>
-
-          <p className="text-zinc-500 mt-4">
-            Prediction engine
-          </p>
-
-        </div>
+        <StatCard
+          title="Win Accuracy"
+          value="86%"
+          subtitle="Prediction engine"
+        />
 
       </div>
 
@@ -135,14 +76,14 @@ function Dashboard() {
           grid
           grid-cols-1
           xl:grid-cols-3
+
           gap-6
         "
       >
 
-        {/* LEFT */}
-        <div
+        {/* ANALYTICS */}
+        <Card
           className="
-            card
             p-8
             xl:col-span-2
           "
@@ -160,12 +101,14 @@ function Dashboard() {
 
           </div>
 
-          {/* FAKE CHART */}
+          {/* CHART */}
           <div
             className="
               h-[320px]
+
               flex
               items-end
+
               gap-5
             "
           >
@@ -184,19 +127,20 @@ function Dashboard() {
 
           </div>
 
-        </div>
+        </Card>
 
         {/* RIGHT PANEL */}
         <div className="space-y-6">
 
-          {/* RECENT RACES */}
-          <div className="card p-6">
+          {/* RECENT */}
+          <Card className="p-6">
 
             <div
               className="
                 flex
                 items-center
                 justify-between
+
                 mb-6
               "
             >
@@ -213,141 +157,48 @@ function Dashboard() {
 
               </div>
 
-              <button
-                className="
-                  bg-yellow-400
-                  px-4
-                  py-2
-                  rounded-xl
-                  font-semibold
-                "
-              >
+              <Button>
                 View
-              </button>
+              </Button>
 
             </div>
 
             <div className="space-y-4">
 
-              {/* ITEM */}
-              <div
-                className="
-                  border
-                  border-zinc-200
-                  rounded-2xl
-                  p-4
-                "
-              >
+              <RecentRaceCard
+                title="Golden Cup Final"
+                location="Tokyo Arena"
+                prize="$120,000"
+                status="Live"
+              />
 
-                <div
-                  className="
-                    flex
-                    items-center
-                    justify-between
-                    mb-3
-                  "
-                >
+              <RecentRaceCard
+                title="Thunder Derby"
+                location="Royal Track"
+                prize="$95,000"
+                status="Completed"
+              />
 
-                  <h3 className="font-bold text-xl">
-                    Golden Cup Final
-                  </h3>
-
-                  <span
-                    className="
-                      bg-red-100
-                      text-red-500
-                      text-sm
-                      px-3
-                      py-1
-                      rounded-full
-                    "
-                  >
-                    Live
-                  </span>
-
-                </div>
-
-                <div
-                  className="
-                    flex
-                    justify-between
-                    text-zinc-500
-                  "
-                >
-
-                  <p>Tokyo Arena</p>
-
-                  <p>$120,000</p>
-
-                </div>
-
-              </div>
-
-              {/* ITEM */}
-              <div
-                className="
-                  border
-                  border-zinc-200
-                  rounded-2xl
-                  p-4
-                "
-              >
-
-                <div
-                  className="
-                    flex
-                    items-center
-                    justify-between
-                    mb-3
-                  "
-                >
-
-                  <h3 className="font-bold text-xl">
-                    Thunder Derby
-                  </h3>
-
-                  <span
-                    className="
-                      bg-green-100
-                      text-green-600
-                      text-sm
-                      px-3
-                      py-1
-                      rounded-full
-                    "
-                  >
-                    Completed
-                  </span>
-
-                </div>
-
-                <div
-                  className="
-                    flex
-                    justify-between
-                    text-zinc-500
-                  "
-                >
-
-                  <p>Royal Track</p>
-
-                  <p>$95,000</p>
-
-                </div>
-
-              </div>
+              <RecentRaceCard
+                title="Night Sprint"
+                location="Equinox Stadium"
+                prize="$150,000"
+                status="Upcoming"
+              />
 
             </div>
 
-          </div>
+          </Card>
 
           {/* PREMIUM */}
           <div
             className="
               rounded-3xl
+
               bg-gradient-to-br
               from-yellow-400
               to-yellow-500
+
               p-8
             "
           >
@@ -360,6 +211,7 @@ function Dashboard() {
               className="
                 text-4xl
                 font-black
+
                 mb-5
               "
             >
@@ -377,18 +229,9 @@ function Dashboard() {
               advanced analytics.
             </p>
 
-            <button
-              className="
-                bg-black
-                text-white
-                px-6
-                py-3
-                rounded-2xl
-                font-semibold
-              "
-            >
+            <Button variant="dark">
               Upgrade Now
-            </button>
+            </Button>
 
           </div>
 
