@@ -5,7 +5,7 @@ function Horses() {
         {
             name: "Thunder Bolt",
             breed: "Arabian",
-            age: "4",
+            age: 4,
             health: "Excellent",
             wins: 18,
         },
@@ -13,7 +13,7 @@ function Horses() {
         {
             name: "Golden Sprint",
             breed: "Thoroughbred",
-            age: "5",
+            age: 5,
             health: "Good",
             wins: 12,
         },
@@ -21,40 +21,42 @@ function Horses() {
         {
             name: "Night Fury",
             breed: "Quarter Horse",
-            age: "3",
+            age: 3,
             health: "Excellent",
             wins: 9,
+        },
+
+        {
+            name: "Silver Storm",
+            breed: "Mustang",
+            age: 6,
+            health: "Average",
+            wins: 5,
         },
 
     ];
 
     return (
-        <>
 
-            {/* Header */}
+        <div>
+
+            {/* HEADER */}
             <div
                 className="
           flex
           items-center
           justify-between
-
           mb-10
         "
             >
 
                 <div>
 
-                    <h1
-                        className="
-              text-6xl
-              font-bold
-              mb-4
-            "
-                    >
+                    <h1 className="page-title">
                         Horses
                     </h1>
 
-                    <p className="text-zinc-500 text-xl">
+                    <p className="page-subtitle">
                         Manage race horses and
                         performance information.
                     </p>
@@ -63,13 +65,14 @@ function Horses() {
 
                 <button
                     className="
-            px-8
+            bg-yellow-400
+            hover:bg-yellow-500
+            transition-all
+
+            px-6
             py-4
 
             rounded-2xl
-
-            bg-yellow-400
-
             font-semibold
           "
                 >
@@ -78,21 +81,38 @@ function Horses() {
 
             </div>
 
-            {/* Table */}
+            {/* SEARCH */}
+            <div className="card p-5 mb-6">
+
+                <input
+                    type="text"
+                    placeholder="Search horses..."
+                    className="
+            w-full
+
+            bg-zinc-100
+            dark:bg-zinc-800
+
+            rounded-2xl
+
+            px-5
+            py-4
+
+            outline-none
+          "
+                />
+
+            </div>
+
+            {/* TABLE */}
             <div
                 className="
-          bg-white
-
-          border
-          border-zinc-200
-
-          rounded-[32px]
-
+          card
           overflow-hidden
         "
             >
 
-                {/* Head */}
+                {/* TABLE HEADER */}
                 <div
                     className="
             grid
@@ -113,7 +133,7 @@ function Horses() {
           "
                 >
 
-                    <p>Name</p>
+                    <p>Horse</p>
 
                     <p>Breed</p>
 
@@ -125,7 +145,7 @@ function Horses() {
 
                 </div>
 
-                {/* Rows */}
+                {/* ROWS */}
                 <div>
 
                     {horses.map((horse, index) => (
@@ -143,41 +163,61 @@ function Horses() {
                 border-zinc-100
 
                 hover:bg-zinc-50
+                dark:hover:bg-zinc-800
 
                 transition-all
               "
                         >
 
-                            <p className="font-semibold">
-                                {horse.name}
+                            {/* NAME */}
+                            <div>
+
+                                <h3 className="font-bold text-lg">
+                                    {horse.name}
+                                </h3>
+
+                            </div>
+
+                            {/* BREED */}
+                            <p className="text-zinc-600 dark:text-zinc-300">
+                                {horse.breed}
                             </p>
 
-                            <p>{horse.breed}</p>
+                            {/* AGE */}
+                            <p className="text-zinc-600 dark:text-zinc-300">
+                                {horse.age} yrs
+                            </p>
 
-                            <p>{horse.age}</p>
-
-                            <p>
+                            {/* HEALTH */}
+                            <div>
 
                                 <span
-                                    className="
+                                    className={`
                     px-4
                     py-2
 
                     rounded-full
 
-                    bg-green-100
-                    text-green-600
-
                     text-sm
                     font-semibold
-                  "
+
+                    ${horse.health === "Excellent"
+                                            ? "bg-green-100 text-green-600"
+                                            : horse.health === "Good"
+                                                ? "bg-yellow-100 text-yellow-700"
+                                                : "bg-red-100 text-red-500"
+                                        }
+                  `}
                                 >
                                     {horse.health}
                                 </span>
 
-                            </p>
+                            </div>
 
-                            <p>{horse.wins}</p>
+                            {/* WINS */}
+                            <p className="font-bold">
+                                {horse.wins}
+                            </p>
 
                         </div>
 
@@ -186,7 +226,9 @@ function Horses() {
                 </div>
 
             </div>
-        </>
+
+        </div>
+
     );
 }
 
