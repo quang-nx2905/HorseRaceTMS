@@ -8,6 +8,13 @@ import StatCard from "../components/dashboard/StatCard";
 
 import RecentRaceCard from "../components/dashboard/RecentRaceCard";
 
+import AnalyticsChart from "../components/dashboard/AnalyticsChart";
+
+import {
+  statsData,
+  recentRaces,
+} from "../data/dashboardData";
+
 function Dashboard() {
 
   return (
@@ -44,29 +51,17 @@ function Dashboard() {
         "
       >
 
-        <StatCard
-          title="Total Horses"
-          value="2,450"
-          subtitle="+12% this month"
-        />
+        {statsData.map((item, index) => (
 
-        <StatCard
-          title="Active Races"
-          value="18"
-          subtitle="Currently ongoing"
-        />
+          <StatCard
+            key={index}
 
-        <StatCard
-          title="Predictions"
-          value="12.4k"
-          subtitle="AI generated insights"
-        />
+            title={item.title}
+            value={item.value}
+            subtitle={item.subtitle}
+          />
 
-        <StatCard
-          title="Win Accuracy"
-          value="86%"
-          subtitle="Prediction engine"
-        />
+        ))}
 
       </div>
 
@@ -101,31 +96,8 @@ function Dashboard() {
 
           </div>
 
-          {/* CHART */}
-          <div
-            className="
-              h-[320px]
-
-              flex
-              items-end
-
-              gap-5
-            "
-          >
-
-            <div className="bg-yellow-300 w-full h-[120px] rounded-t-3xl"></div>
-
-            <div className="bg-yellow-400 w-full h-[180px] rounded-t-3xl"></div>
-
-            <div className="bg-yellow-300 w-full h-[140px] rounded-t-3xl"></div>
-
-            <div className="bg-yellow-400 w-full h-[220px] rounded-t-3xl"></div>
-
-            <div className="bg-yellow-300 w-full h-[180px] rounded-t-3xl"></div>
-
-            <div className="bg-yellow-400 w-full h-[280px] rounded-t-3xl"></div>
-
-          </div>
+          {/* REAL CHART */}
+          <AnalyticsChart />
 
         </Card>
 
@@ -165,26 +137,18 @@ function Dashboard() {
 
             <div className="space-y-4">
 
-              <RecentRaceCard
-                title="Golden Cup Final"
-                location="Tokyo Arena"
-                prize="$120,000"
-                status="Live"
-              />
+              {recentRaces.map((race, index) => (
 
-              <RecentRaceCard
-                title="Thunder Derby"
-                location="Royal Track"
-                prize="$95,000"
-                status="Completed"
-              />
+                <RecentRaceCard
+                  key={index}
 
-              <RecentRaceCard
-                title="Night Sprint"
-                location="Equinox Stadium"
-                prize="$150,000"
-                status="Upcoming"
-              />
+                  title={race.title}
+                  location={race.location}
+                  prize={race.prize}
+                  status={race.status}
+                />
+
+              ))}
 
             </div>
 
