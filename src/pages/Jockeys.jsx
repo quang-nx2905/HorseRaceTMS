@@ -1,159 +1,247 @@
-import Button from "../components/ui/Button";
-import StatusBadge from "../components/ui/StatusBadge";
-
-const jockeys = [
-  {
-    name: "Alex Carter",
-    team: "Royal Derby Team",
-    experience: "8 Years",
-    status: "Active",
-    winRate: "84%",
-  },
-
-  {
-    name: "Michael Reeves",
-    team: "Tokyo Elite Stable",
-    experience: "5 Years",
-    status: "Training",
-    winRate: "71%",
-  },
-
-  {
-    name: "Daniel Foster",
-    team: "Elite Racing Club",
-    experience: "10 Years",
-    status: "Recovery",
-    winRate: "90%",
-  },
-];
-
 function Jockeys() {
-  return (
-    <>
 
-      {/* Header */}
-      <div className="flex justify-between items-center mb-10">
+  const jockeys = [
+
+    {
+      name: "James Carter",
+      country: "United Kingdom",
+      wins: 48,
+      experience: "8 Years",
+      status: "Elite",
+    },
+
+    {
+      name: "Ryan Cooper",
+      country: "United States",
+      wins: 36,
+      experience: "5 Years",
+      status: "Professional",
+    },
+
+    {
+      name: "Akira Sato",
+      country: "Japan",
+      wins: 52,
+      experience: "10 Years",
+      status: "Elite",
+    },
+
+    {
+      name: "Lucas Fernandez",
+      country: "Spain",
+      wins: 21,
+      experience: "3 Years",
+      status: "Rising Star",
+    },
+
+  ];
+
+  return (
+
+    <div>
+
+      {/* HEADER */}
+      <div
+        className="
+          flex
+          items-center
+          justify-between
+          mb-10
+        "
+      >
 
         <div>
 
-          <h1 className="text-6xl font-bold">
+          <h1 className="page-title">
             Jockeys
           </h1>
 
-          <p className="text-zinc-500 mt-3 text-lg">
-            Manage jockey performance, schedules, and race participation.
+          <p className="page-subtitle">
+            Professional jockey management
+            and performance overview.
           </p>
 
         </div>
 
-        <Button>
+        <button
+          className="
+            bg-yellow-400
+            hover:bg-yellow-500
+
+            transition-all
+
+            px-6
+            py-4
+
+            rounded-2xl
+            font-semibold
+          "
+        >
           + Add Jockey
-        </Button>
+        </button>
 
       </div>
 
-      {/* Search */}
-      <div className="flex gap-4 mb-8">
+      {/* GRID */}
+      <div
+        className="
+          grid
+          grid-cols-1
+          md:grid-cols-2
+          xl:grid-cols-4
 
-        <input
-          type="text"
-          placeholder="Search jockeys..."
-          className="flex-1 bg-white border border-zinc-200 rounded-2xl px-6 py-4 outline-none"
-        />
+          gap-6
+        "
+      >
 
-        <Button variant="secondary">
-          Active
-        </Button>
-
-        <Button variant="secondary">
-          Recovery
-        </Button>
-
-        <Button variant="secondary">
-          Training
-        </Button>
-
-      </div>
-
-      {/* Table */}
-      <div className="bg-white border border-zinc-200 rounded-[32px] overflow-hidden">
-
-        {/* Header */}
-        <div className="grid grid-cols-6 px-8 py-6 border-b border-zinc-100 bg-zinc-50 font-semibold text-zinc-500">
-
-          <div>Jockey</div>
-
-          <div>Team</div>
-
-          <div>Experience</div>
-
-          <div>Status</div>
-
-          <div>Win Rate</div>
-
-          <div>Actions</div>
-
-        </div>
-
-        {/* Rows */}
         {jockeys.map((jockey, index) => (
 
           <div
             key={index}
-            className="grid grid-cols-6 px-8 py-6 border-b border-zinc-100 items-center"
+            className="
+              card
+              p-7
+
+              hover:shadow-xl
+              hover:-translate-y-1
+
+              transition-all
+              duration-300
+            "
           >
 
-            {/* Name */}
-            <div>
+            {/* AVATAR */}
+            <div
+              className="
+                w-20
+                h-20
 
-              <h3 className="font-bold text-lg">
-                {jockey.name}
-              </h3>
+                rounded-full
 
-              <p className="text-zinc-400 mt-1">
-                Professional Rider
-              </p>
+                bg-yellow-400
+
+                flex
+                items-center
+                justify-center
+
+                text-3xl
+                font-black
+
+                mb-6
+              "
+            >
+              {jockey.name.charAt(0)}
+            </div>
+
+            {/* NAME */}
+            <h2
+              className="
+                text-3xl
+                font-bold
+                mb-2
+              "
+            >
+              {jockey.name}
+            </h2>
+
+            {/* COUNTRY */}
+            <p
+              className="
+                text-zinc-500
+                mb-8
+              "
+            >
+              {jockey.country}
+            </p>
+
+            {/* STATS */}
+            <div className="space-y-5 mb-8">
+
+              <div
+                className="
+                  flex
+                  items-center
+                  justify-between
+                "
+              >
+
+                <p className="text-zinc-500">
+                  Wins
+                </p>
+
+                <p className="font-bold text-xl">
+                  {jockey.wins}
+                </p>
+
+              </div>
+
+              <div
+                className="
+                  flex
+                  items-center
+                  justify-between
+                "
+              >
+
+                <p className="text-zinc-500">
+                  Experience
+                </p>
+
+                <p className="font-bold">
+                  {jockey.experience}
+                </p>
+
+              </div>
 
             </div>
 
-            {/* Team */}
-            <div>
-              {jockey.team}
-            </div>
+            {/* STATUS */}
+            <div className="mb-8">
 
-            {/* Experience */}
-            <div>
-              {jockey.experience}
-            </div>
+              <span
+                className={`
+                  px-4
+                  py-2
 
-            {/* Status */}
-            <div>
+                  rounded-full
 
-              <StatusBadge
-                status={jockey.status}
-              />
+                  text-sm
+                  font-semibold
 
-            </div>
-
-            {/* Win Rate */}
-            <div className="font-semibold">
-
-              {jockey.winRate}
-
-            </div>
-
-            {/* Actions */}
-            <div className="flex gap-3">
-
-              <Button variant="secondary">
-                Edit
-              </Button>
-
-              <Button variant="danger">
-                Delete
-              </Button>
+                  ${jockey.status === "Elite"
+                    ? "bg-green-100 text-green-600"
+                    : jockey.status === "Professional"
+                      ? "bg-yellow-100 text-yellow-700"
+                      : "bg-blue-100 text-blue-600"
+                  }
+                `}
+              >
+                {jockey.status}
+              </span>
 
             </div>
+
+            {/* BUTTON */}
+            <button
+              className="
+                w-full
+
+                bg-zinc-900
+                hover:bg-black
+
+                text-white
+
+                py-4
+
+                rounded-2xl
+
+                font-semibold
+
+                transition-all
+              "
+            >
+              View Profile
+            </button>
 
           </div>
 
@@ -161,7 +249,8 @@ function Jockeys() {
 
       </div>
 
-    </>
+    </div>
+
   );
 }
 
