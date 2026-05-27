@@ -1,103 +1,192 @@
-import DashboardLayout from "../layouts/DashboardLayout";
-
-import DataTable from "../components/ui/DataTable";
-
 function Horses() {
 
-    const columns = [
-
-        {
-            header: "Horse",
-            accessor: "name",
-        },
-
-        {
-            header: "Breed",
-            accessor: "breed",
-        },
-
-        {
-            header: "Age",
-            accessor: "age",
-        },
-
-        {
-            header: "Health",
-            accessor: "health",
-        },
-
-        {
-            header: "Win Rate",
-            accessor: "winRate",
-        },
-
-    ];
-
-    const data = [
+    const horses = [
 
         {
             name: "Thunder Bolt",
             breed: "Arabian",
-            age: "4y",
+            age: "4",
             health: "Excellent",
-            winRate: "82%",
+            wins: 18,
         },
 
         {
             name: "Golden Sprint",
             breed: "Thoroughbred",
-            age: "5y",
+            age: "5",
             health: "Good",
-            winRate: "74%",
+            wins: 12,
         },
 
         {
-            name: "Silver Storm",
+            name: "Night Fury",
             breed: "Quarter Horse",
-            age: "3y",
+            age: "3",
             health: "Excellent",
-            winRate: "91%",
+            wins: 9,
         },
 
     ];
 
     return (
+        <>
 
-        <DashboardLayout>
+            {/* Header */}
+            <div
+                className="
+          flex
+          items-center
+          justify-between
 
-            <div className="space-y-8">
+          mb-10
+        "
+            >
 
-                {/* Header */}
                 <div>
 
                     <h1
                         className="
-              text-5xl
+              text-6xl
               font-bold
-              dark:text-white
-              mb-3
+              mb-4
             "
                     >
-                        Horse Management
+                        Horses
                     </h1>
 
-                    <p className="text-zinc-500 text-lg">
-                        Monitor horse health,
-                        performance, and race stats.
+                    <p className="text-zinc-500 text-xl">
+                        Manage race horses and
+                        performance information.
                     </p>
 
                 </div>
 
-                {/* Table */}
-                <DataTable
-                    columns={columns}
-                    data={data}
-                />
+                <button
+                    className="
+            px-8
+            py-4
+
+            rounded-2xl
+
+            bg-yellow-400
+
+            font-semibold
+          "
+                >
+                    + Add Horse
+                </button>
 
             </div>
 
-        </DashboardLayout>
+            {/* Table */}
+            <div
+                className="
+          bg-white
 
+          border
+          border-zinc-200
+
+          rounded-[32px]
+
+          overflow-hidden
+        "
+            >
+
+                {/* Head */}
+                <div
+                    className="
+            grid
+            grid-cols-5
+
+            px-8
+            py-6
+
+            border-b
+            border-zinc-200
+
+            text-sm
+            uppercase
+            tracking-wider
+
+            text-zinc-500
+            font-semibold
+          "
+                >
+
+                    <p>Name</p>
+
+                    <p>Breed</p>
+
+                    <p>Age</p>
+
+                    <p>Health</p>
+
+                    <p>Wins</p>
+
+                </div>
+
+                {/* Rows */}
+                <div>
+
+                    {horses.map((horse, index) => (
+
+                        <div
+                            key={index}
+                            className="
+                grid
+                grid-cols-5
+
+                px-8
+                py-6
+
+                border-b
+                border-zinc-100
+
+                hover:bg-zinc-50
+
+                transition-all
+              "
+                        >
+
+                            <p className="font-semibold">
+                                {horse.name}
+                            </p>
+
+                            <p>{horse.breed}</p>
+
+                            <p>{horse.age}</p>
+
+                            <p>
+
+                                <span
+                                    className="
+                    px-4
+                    py-2
+
+                    rounded-full
+
+                    bg-green-100
+                    text-green-600
+
+                    text-sm
+                    font-semibold
+                  "
+                                >
+                                    {horse.health}
+                                </span>
+
+                            </p>
+
+                            <p>{horse.wins}</p>
+
+                        </div>
+
+                    ))}
+
+                </div>
+
+            </div>
+        </>
     );
 }
 

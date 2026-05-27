@@ -1,83 +1,60 @@
-import DashboardLayout from "../layouts/DashboardLayout";
-
-import StatCard from "../components/ui/StatCard";
-
-import AnalyticsChart from "../components/charts/AnalyticsChart";
-
 function Dashboard() {
-
   return (
+    <div>
 
-    <DashboardLayout>
+      <h1 className="page-title">
+        Dashboard
+      </h1>
 
-      <div className="space-y-10">
+      <p className="page-subtitle">
+        Welcome back to the Horse Race Tournament Management System.
+      </p>
 
-        {/* HEADER */}
-        <div>
+      <div className="grid grid-cols-4 gap-6 mb-8">
 
-          <h1
-            className="
-              text-5xl
-              font-bold
-              dark:text-white
-              mb-3
-            "
-          >
-            Dashboard
-          </h1>
-
-          <p className="text-zinc-500 text-lg">
-            Monitor tournaments,
-            races, predictions,
-            and analytics.
+        <div className="card p-8">
+          <p className="text-zinc-400 uppercase text-sm">
+            Total Horses
           </p>
 
+          <h2 className="text-5xl font-bold mt-5">
+            2,450
+          </h2>
         </div>
 
-        {/* STATS */}
-        <div
-          className="
-            grid
-            grid-cols-1
-            md:grid-cols-2
-            xl:grid-cols-4
-            gap-6
-          "
-        >
+        <div className="card p-8">
+          <p className="text-zinc-400 uppercase text-sm">
+            Active Races
+          </p>
 
-          <StatCard
-            title="Total Tournaments"
-            value="124"
-            subtitle="+12% this month"
-          />
-
-          <StatCard
-            title="Active Races"
-            value="18"
-            subtitle="Currently running"
-          />
-
-          <StatCard
-            title="Total Horses"
-            value="2,450"
-            subtitle="Elite race horses"
-          />
-
-          <StatCard
-            title="Prediction Accuracy"
-            value="68%"
-            subtitle="AI prediction engine"
-          />
-
+          <h2 className="text-5xl font-bold mt-5">
+            18
+          </h2>
         </div>
 
-        {/* CHART */}
-        <AnalyticsChart />
+        <div className="card p-8">
+          <p className="text-zinc-400 uppercase text-sm">
+            Predictions
+          </p>
+
+          <h2 className="text-5xl font-bold mt-5">
+            12.4k
+          </h2>
+        </div>
+
+        <div className="card p-8">
+          <p className="text-zinc-400 uppercase text-sm">
+            Win Accuracy
+          </p>
+
+          <h2 className="text-5xl font-bold mt-5">
+            86%
+          </h2>
+        </div>
 
       </div>
 
-    </DashboardLayout>
-
+    </div>
   );
 }
 

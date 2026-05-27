@@ -1,65 +1,18 @@
-import {
-    useState,
-} from "react";
-
 import Sidebar from "../components/layout/Sidebar";
 import Topbar from "../components/layout/Topbar";
 
-import PageWrapper from "../components/layout/PageWrapper";
-
-function DashboardLayout({
-    children,
-}) {
-
-    const [isOpen, setIsOpen] =
-        useState(false);
-
+function DashboardLayout({ children }) {
     return (
-        <div
-            className="
-        flex
-        bg-[#f5f5f4]
-        min-h-screen
-      "
-        >
+        <div className="flex min-h-screen bg-[#f5f5f4] dark:bg-zinc-900 transition-colors">
+            <Sidebar />
 
-            {/* Sidebar */}
-            <Sidebar
-                isOpen={isOpen}
-                setIsOpen={setIsOpen}
-            />
+            <div className="flex-1 flex flex-col">
+                <Topbar />
 
-            {/* Main */}
-            <div
-                className="
-          flex-1
-          lg:ml-[280px]
-        "
-            >
-
-                {/* Topbar */}
-                <Topbar
-                    setIsOpen={setIsOpen}
-                />
-
-                {/* Content */}
-                <div
-                    className="
-            p-4
-            lg:p-10
-          "
-                >
-
-                    <PageWrapper>
-
-                        {children}
-
-                    </PageWrapper>
-
-                </div>
-
+                <main className="p-8 dark:bg-zinc-900 flex-1 overflow-auto">
+                    {children}
+                </main>
             </div>
-
         </div>
     );
 }

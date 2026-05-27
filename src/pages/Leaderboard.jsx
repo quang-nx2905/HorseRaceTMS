@@ -1,5 +1,3 @@
-import DashboardLayout from "../layouts/DashboardLayout";
-
 const leaderboard = [
   {
     rank: "#1",
@@ -36,7 +34,7 @@ const leaderboard = [
 
 function Leaderboard() {
   return (
-    <DashboardLayout>
+    <>
 
       {/* Header */}
       <div className="flex justify-between items-center mb-10">
@@ -228,7 +226,7 @@ function Leaderboard() {
 
       </div>
 
-    </DashboardLayout>
+    </>
   );
 }
 

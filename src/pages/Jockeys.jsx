@@ -1,5 +1,3 @@
-import DashboardLayout from "../layouts/DashboardLayout";
-
 import Button from "../components/ui/Button";
 import StatusBadge from "../components/ui/StatusBadge";
 
@@ -31,7 +29,7 @@ const jockeys = [
 
 function Jockeys() {
   return (
-    <DashboardLayout>
+    <>
 
       {/* Header */}
       <div className="flex justify-between items-center mb-10">
@@ -163,7 +161,7 @@ function Jockeys() {
 
       </div>
 
-    </DashboardLayout>
+    </>
   );
 }
 

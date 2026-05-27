@@ -1,143 +1,22 @@
 import UserDropdown from "./UserDropdown";
 
-import {
-    useTheme,
-} from "../../context/ThemeContext";
-
-function Topbar({
-    setIsOpen,
-}) {
-
-    const {
-        darkMode,
-        setDarkMode,
-    } = useTheme();
-
+function Topbar() {
     return (
-        <div
-            className="
-        h-[90px]
-        bg-[#f8f6f4]
-        dark:bg-[#18181b]
+        <div className="h-[90px] bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-8 flex items-center justify-between transition-colors">
 
-        border-b
-        border-zinc-200
-        dark:border-zinc-800
+            <input
+                type="text"
+                placeholder="Search races..."
+                className="w-[300px] bg-zinc-100 dark:bg-zinc-800 dark:text-white rounded-2xl px-5 py-3 outline-none border border-transparent dark:border-zinc-700"
+            />
 
-        flex
-        items-center
-        justify-between
+            <div className="flex items-center gap-5">
 
-        px-4
-        lg:px-10
-
-        transition-all
-      "
-        >
-
-            {/* LEFT */}
-            <div className="flex items-center gap-4">
-
-                {/* Mobile Menu */}
-                <button
-                    onClick={() => setIsOpen(true)}
-                    className="
-            lg:hidden
-            text-3xl
-            dark:text-white
-          "
-                >
-                    ☰
+                <button className="bg-yellow-400 hover:bg-yellow-500 transition-all px-6 py-3 rounded-2xl font-semibold">
+                    + New Race
                 </button>
 
-                {/* Search */}
-                <div
-                    className="
-            w-[220px]
-            lg:w-[420px]
-            h-[56px]
-
-            bg-white
-            dark:bg-zinc-900
-
-            rounded-2xl
-
-            border
-            border-zinc-200
-            dark:border-zinc-800
-
-            flex
-            items-center
-            px-5
-          "
-                >
-
-                    <input
-                        type="text"
-                        placeholder="Search races..."
-                        className="
-              bg-transparent
-              outline-none
-              w-full
-              dark:text-white
-            "
-                    />
-
-                </div>
-
-            </div>
-
-            {/* RIGHT */}
-            <div className="flex items-center gap-4">
-
-                {/* Theme */}
-                <button
-                    onClick={() =>
-                        setDarkMode(!darkMode)
-                    }
-                    className="
-            w-[56px]
-            h-[56px]
-
-            bg-white
-            dark:bg-zinc-900
-
-            border
-            border-zinc-200
-            dark:border-zinc-800
-
-            rounded-2xl
-            text-2xl
-
-            transition-all
-          "
-                >
-                    {darkMode ? "☀️" : "🌙"}
-                </button>
-
-                {/* Notification */}
-                <button
-                    className="
-            w-[56px]
-            h-[56px]
-
-            bg-white
-            dark:bg-zinc-900
-
-            border
-            border-zinc-200
-            dark:border-zinc-800
-
-            rounded-2xl
-            text-2xl
-
-            dark:text-white
-          "
-                >
-                    🔔
-                </button>
-
-                {/* User */}
+                {/* User Avatar with Dropdown */}
                 <UserDropdown />
 
             </div>

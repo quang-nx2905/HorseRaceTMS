@@ -53,15 +53,13 @@ function AnalyticsChart() {
         <div
             className="
         bg-white
-        dark:bg-zinc-900
 
         border
         border-zinc-200
-        dark:border-zinc-800
 
         rounded-[32px]
 
-        p-8
+        p-10
       "
         >
 
@@ -70,24 +68,22 @@ function AnalyticsChart() {
 
                 <h2
                     className="
-            text-3xl
+            text-4xl
             font-bold
-            dark:text-white
-            mb-2
+            mb-3
           "
                 >
-                    Weekly Race Analytics
+                    Weekly Analytics
                 </h2>
 
                 <p className="text-zinc-500">
-                    Performance metrics across all
-                    active tournaments.
+                    Tournament performance overview
                 </p>
 
             </div>
 
             {/* CHART */}
-            <div className="h-[350px]">
+            <div className="h-[400px]">
 
                 <ResponsiveContainer
                     width="100%"
@@ -98,15 +94,11 @@ function AnalyticsChart() {
 
                         <CartesianGrid
                             strokeDasharray="3 3"
-                            stroke="#27272a"
                             opacity={0.1}
                         />
 
                         <XAxis
                             dataKey="day"
-                            tick={{
-                                fill: "#71717a",
-                            }}
                         />
 
                         <Tooltip />
@@ -116,9 +108,6 @@ function AnalyticsChart() {
                             dataKey="races"
                             stroke="#facc15"
                             strokeWidth={4}
-                            dot={{
-                                r: 6,
-                            }}
                         />
 
                     </LineChart>

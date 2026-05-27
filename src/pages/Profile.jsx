@@ -4,7 +4,7 @@ function Profile() {
 
     return (
 
-        <DashboardLayout>
+        <>
 
             <div className="space-y-10">
 
@@ -241,7 +241,7 @@ function Profile() {
 
             </div>
 
-        </DashboardLayout>
+        </>
 
     );
 }

@@ -1,5 +1,3 @@
-import DashboardLayout from "../layouts/DashboardLayout";
-
 import Button from "../components/ui/Button";
 
 const predictions = [
@@ -30,7 +28,7 @@ const predictions = [
 
 function Predictions() {
     return (
-        <DashboardLayout>
+        <>
 
             {/* Header */}
             <div className="flex justify-between items-center mb-10">
@@ -169,7 +167,7 @@ function Predictions() {
 
             </div>
 
-        </DashboardLayout>
+        </>
     );
 }
 

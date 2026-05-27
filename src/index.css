@@ -2,11 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-    background: #f5f5f4;
-    font-family: sans-serif;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.dark body {
-    background: #09090b;
+body {
+    font-family: Inter, sans-serif;
+    background: #f5f5f4;
+    color: #111827;
+}
+
+.page-title {
+    font-size: 56px;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.page-subtitle {
+    color: #71717a;
+    font-size: 18px;
+    margin-bottom: 40px;
+}
+
+.card {
+    background: white;
+    border-radius: 24px;
+    border: 1px solid #e4e4e7;
 }

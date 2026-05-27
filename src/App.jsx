@@ -2,147 +2,124 @@ import {
   BrowserRouter,
   Routes,
   Route,
+  Navigate,
 } from "react-router-dom";
 
-import Dashboard from "./pages/Dashboard";
-import Tournaments from "./pages/Tournaments";
-import Horses from "./pages/Horses";
-import Jockeys from "./pages/Jockeys";
-import Predictions from "./pages/Predictions";
-import Leaderboard from "./pages/Leaderboard";
-import LiveTracking from "./pages/LiveTracking";
-import Referee from "./pages/Referee";
-import Spectator from "./pages/Spectator";
+import { AuthProvider } from "./context/AuthContext";
+import DashboardLayout from "./layouts/DashboardLayout";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-
-import ProtectedRoute from "./routes/ProtectedRoute";
-
-import Settings from "./pages/Settings";
-import Profile from "./pages/Profile";
+import Dashboard from "./pages/Dashboard";
+import Horses from "./pages/Horses";
+import Tournaments from "./pages/Tournaments";
+import Jockeys from "./pages/Jockeys";
+import Predictions from "./pages/Predictions";
+import Leaderboard from "./pages/Leaderboard";
+import Referee from "./pages/Referee";
+import Spectator from "./pages/Spectator";
 
 function App() {
-
   return (
-    <BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-      <Routes>
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Dashboard />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        {/* PUBLIC */}
-        <Route
-          path="/login"
-          element={<Login />}
-        />
+          <Route
+            path="/horses"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Horses />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/register"
-          element={<Register />}
-        />
+          <Route
+            path="/tournaments"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Tournaments />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        {/* PROTECTED */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/jockeys"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Jockeys />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/tournaments"
-          element={
-            <ProtectedRoute>
-              <Tournaments />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/predictions"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Predictions />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/horses"
-          element={
-            <ProtectedRoute>
-              <Horses />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/leaderboard"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Leaderboard />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/jockeys"
-          element={
-            <ProtectedRoute>
-              <Jockeys />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/referee"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Referee />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/predictions"
-          element={
-            <ProtectedRoute>
-              <Predictions />
-            </ProtectedRoute>
-          }
-        />
+          <Route
+            path="/spectator"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Spectator />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
 
-        <Route
-          path="/leaderboard"
-          element={
-            <ProtectedRoute>
-              <Leaderboard />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/live-tracking"
-          element={
-            <ProtectedRoute>
-              <LiveTracking />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/referee"
-          element={
-            <ProtectedRoute>
-              <Referee />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/spectator"
-          element={
-            <ProtectedRoute>
-              <Spectator />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <Settings />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
-
-      </Routes>
-
-    </BrowserRouter>
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 

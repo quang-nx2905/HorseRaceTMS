@@ -9,22 +9,27 @@ import AuthLayout from "../layouts/AuthLayout";
 
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
 
     const navigate = useNavigate();
+    const { login } = useAuth();
 
-    const handleLogin = () => {
+    const handleLogin = (e) => {
+        e.preventDefault();
+        
+        const email = e.target.email.value;
+        const password = e.target.password.value;
 
-        /* FAKE JWT TOKEN */
-        localStorage.setItem(
-            "token",
-            "horse-race-demo-token"
-        );
+        if (!email || !password) {
+            toast.error("Please fill in all fields");
+            return;
+        }
 
-        toast.success(
-            "Login successful"
-        );
+        login(email, password);
+
+        toast.success("Login successful");
 
         navigate("/");
     };
@@ -65,17 +70,22 @@ function Login() {
                 </div>
 
                 {/* Form */}
-                <div className="space-y-6">
+                <form onSubmit={handleLogin} className="space-y-6">
 
                     <Input
+                        name="email"
+                        type="email"
                         label="Email"
                         placeholder="Enter your email"
+                        required
                     />
 
                     <Input
-                        label="Password"
+                        name="password"
                         type="password"
+                        label="Password"
                         placeholder="Enter your password"
+                        required
                     />
 
                     <div
@@ -95,7 +105,7 @@ function Login() {
 
                         </label>
 
-                        <button className="text-yellow-500 font-semibold">
+                        <button type="button" className="text-yellow-500 font-semibold hover:text-yellow-600">
 
                             Forgot Password?
 
@@ -103,11 +113,11 @@ function Login() {
 
                     </div>
 
-                    <Button onClick={handleLogin}>
+                    <Button type="submit">
                         Sign In
                     </Button>
 
-                </div>
+                </form>
 
                 {/* Footer */}
                 <p
@@ -117,7 +127,7 @@ function Login() {
             mt-8
           "
                 >
-                    Don’t have an account?
+                    Don't have an account?
 
                     <Link
                         to="/register"
@@ -125,6 +135,7 @@ function Login() {
               text-yellow-500
               font-semibold
               ml-2
+              hover:text-yellow-600
             "
                     >
                         Register

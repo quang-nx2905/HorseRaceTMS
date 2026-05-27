@@ -1,54 +1,121 @@
 import {
-  ResponsiveContainer,
   LineChart,
   Line,
   XAxis,
   Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
 } from "recharts";
 
-const data = [
-  { day: "Mon", value: 35 },
-  { day: "Tue", value: 48 },
-  { day: "Wed", value: 42 },
-  { day: "Thu", value: 70 },
-  { day: "Fri", value: 58 },
-  { day: "Sat", value: 45 },
-  { day: "Sun", value: 82 },
-];
-
 function AnalyticsChart() {
+
+  const data = [
+
+    {
+      day: "Mon",
+      races: 12,
+    },
+
+    {
+      day: "Tue",
+      races: 18,
+    },
+
+    {
+      day: "Wed",
+      races: 15,
+    },
+
+    {
+      day: "Thu",
+      races: 24,
+    },
+
+    {
+      day: "Fri",
+      races: 30,
+    },
+
+    {
+      day: "Sat",
+      races: 21,
+    },
+
+    {
+      day: "Sun",
+      races: 35,
+    },
+
+  ];
+
   return (
-    <div className="h-[420px] mt-6">
 
-      <ResponsiveContainer width="100%" height="100%">
+    <div
+      className="
+        bg-white
 
-        <LineChart data={data}>
+        border
+        border-zinc-200
 
-          <XAxis
-            dataKey="day"
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "#71717a" }}
-          />
+        rounded-[32px]
 
-          <Tooltip />
+        p-10
+      "
+    >
 
-          <Line
-            type="monotone"
-            dataKey="value"
-            stroke="#eab308"
-            strokeWidth={4}
-            dot={{
-              r: 6,
-              fill: "#eab308",
-            }}
-          />
+      {/* Header */}
+      <div className="mb-10">
 
-        </LineChart>
+        <h2
+          className="
+            text-4xl
+            font-bold
+            mb-3
+          "
+        >
+          Weekly Analytics
+        </h2>
 
-      </ResponsiveContainer>
+        <p className="text-zinc-500">
+          Tournament performance overview
+        </p>
+
+      </div>
+
+      {/* Chart */}
+      <div className="h-[400px]">
+
+        <ResponsiveContainer
+          width="100%"
+          height="100%"
+        >
+
+          <LineChart data={data}>
+
+            <CartesianGrid
+              strokeDasharray="3 3"
+              opacity={0.1}
+            />
+
+            <XAxis dataKey="day" />
+
+            <Tooltip />
+
+            <Line
+              type="monotone"
+              dataKey="races"
+              stroke="#facc15"
+              strokeWidth={4}
+            />
+
+          </LineChart>
+
+        </ResponsiveContainer>
+
+      </div>
 
     </div>
+
   );
 }
 

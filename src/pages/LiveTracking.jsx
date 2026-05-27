@@ -1,5 +1,3 @@
-import DashboardLayout from "../layouts/DashboardLayout";
-
 const liveRaces = [
     {
         horse: "Thunderbolt",
@@ -31,7 +29,7 @@ const liveRaces = [
 
 function LiveTracking() {
     return (
-        <DashboardLayout>
+        <>
 
             {/* Header */}
             <div className="flex justify-between items-center mb-10">
@@ -240,7 +238,7 @@ function LiveTracking() {
 
             </div>
 
-        </DashboardLayout>
+        </>
     );
 }
 

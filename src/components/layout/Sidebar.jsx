@@ -1,170 +1,71 @@
 import { NavLink } from "react-router-dom";
 
-function Sidebar({
-  isOpen,
-  setIsOpen,
-}) {
+function Sidebar() {
+
+  const menus = [
+    { name: "Dashboard", path: "/" },
+    { name: "Tournaments", path: "/tournaments" },
+    { name: "Horses", path: "/horses" },
+    { name: "Jockeys", path: "/jockeys" },
+    { name: "Predictions", path: "/predictions" },
+    { name: "Leaderboard", path: "/leaderboard" },
+    { name: "Referee", path: "/referee" },
+    { name: "Spectator", path: "/spectator" },
+  ];
+
   return (
-    <>
+    <div className="w-[260px] bg-white dark:bg-zinc-800 border-r border-zinc-200 dark:border-zinc-700 min-h-screen flex flex-col justify-between p-6 transition-colors">
 
-      {/* Overlay */}
-      {isOpen && (
-        <div
-          onClick={() => setIsOpen(false)}
-          className="fixed inset-0 bg-black/30 z-40 lg:hidden"
-        ></div>
-      )}
+      <div>
 
-      {/* Sidebar */}
-      <div
-        className={`
-        fixed top-0 left-0 z-50
-        w-[280px] h-screen
-        bg-[#f8f6f4]
-        border-r border-zinc-200
-        flex flex-col justify-between
-        transition-transform duration-300
+        <div className="mb-12">
+          <h1 className="text-4xl font-black dark:text-white">
+            EquineTrack
+          </h1>
 
-        ${
-          isOpen
-            ? "translate-x-0"
-            : "-translate-x-full"
-        }
-
-        lg:translate-x-0
-        `}
-      >
-
-        {/* Top */}
-        <div>
-
-          {/* Logo */}
-          <div className="px-8 py-10 flex justify-between items-center">
-
-            <div>
-
-              <h1 className="text-4xl font-bold">
-                EquineTrack
-              </h1>
-
-              <p className="text-zinc-500 mt-2">
-                Elite Tournament Management
-              </p>
-
-            </div>
-
-            {/* Mobile Close */}
-            <button
-              onClick={() => setIsOpen(false)}
-              className="lg:hidden text-2xl"
-            >
-              ✕
-            </button>
-
-          </div>
-
-          {/* Navigation */}
-          <div className="px-4 space-y-2">
-
-            <SidebarItem
-              text="Dashboard"
-              to="/"
-            />
-
-            <SidebarItem
-              text="Tournaments"
-              to="/tournaments"
-            />
-
-            <SidebarItem
-              text="Horses"
-              to="/horses"
-            />
-
-            <SidebarItem
-              text="Jockeys"
-              to="/jockeys"
-            />
-
-            <SidebarItem
-              text="Predictions"
-              to="/predictions"
-            />
-
-            <SidebarItem
-              text="Leaderboard"
-              to="/leaderboard"
-            />
-
-            <SidebarItem
-              text="Live Tracking"
-              to="/live-tracking"
-            />
-
-            <SidebarItem
-              text="Referee"
-              to="/referee"
-            />
-
-            <SidebarItem
-              text="Spectator"
-              to="/spectator"
-            />
-
-          </div>
-
+          <p className="text-zinc-500 dark:text-zinc-400 mt-2">
+            Elite Tournament
+            <br />
+            Management
+          </p>
         </div>
 
-        {/* Bottom */}
-        <div className="p-6">
+        <div className="space-y-3">
 
-          <div className="bg-yellow-400 rounded-[28px] p-6 mb-6">
-
-            <h2 className="font-bold text-2xl">
-              Upgrade to Pro
-            </h2>
-
-            <p className="text-sm mt-3 leading-relaxed">
-              Unlock advanced analytics
-              and AI insights.
-            </p>
-
-            <button className="bg-black text-white w-full py-4 rounded-2xl mt-6 font-semibold">
-
-              Upgrade Now
-
-            </button>
-
-          </div>
+          {menus.map((menu) => (
+            <NavLink
+              key={menu.path}
+              to={menu.path}
+              className={({ isActive }) =>
+                `block px-5 py-4 rounded-2xl transition-all font-medium ${isActive
+                  ? "bg-yellow-400 text-black"
+                  : "hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
+                }`
+              }
+            >
+              {menu.name}
+            </NavLink>
+          ))}
 
         </div>
 
       </div>
 
-    </>
-  );
-}
+      <div className="bg-yellow-50 dark:bg-yellow-950 rounded-3xl p-5 transition-colors">
+        <h3 className="text-xl font-bold dark:text-white mb-3">
+          Upgrade to Pro
+        </h3>
 
-function SidebarItem({
-  text,
-  to,
-}) {
-  return (
-    <NavLink
-      to={to}
-      className={({ isActive }) =>
-        `block px-5 py-4 rounded-2xl transition-all duration-200
-        ${
-          isActive
-            ? "bg-white border border-zinc-200 shadow-sm font-semibold"
-            : "hover:bg-white text-zinc-600"
-        }`
-      }
-    >
+        <p className="text-zinc-600 dark:text-zinc-300 text-sm mb-5">
+          Unlock advanced analytics and premium AI insights.
+        </p>
 
-      {text}
+        <button className="w-full bg-yellow-400 hover:bg-yellow-500 transition-all py-3 rounded-2xl font-semibold text-black">
+          Upgrade Now
+        </button>
+      </div>
 
-    </NavLink>
+    </div>
   );
 }
 

@@ -1,5 +1,3 @@
-import DashboardLayout from "../layouts/DashboardLayout";
-
 import {
     useTheme,
 } from "../context/ThemeContext";
@@ -13,7 +11,7 @@ function Settings() {
 
     return (
 
-        <DashboardLayout>
+        <>
 
             <div className="space-y-10">
 
@@ -206,7 +204,7 @@ function Settings() {
 
             </div>
 
-        </DashboardLayout>
+        </>
 
     );
 }

@@ -1,5 +1,3 @@
-import DashboardLayout from "../layouts/DashboardLayout";
-
 import Button from "../components/ui/Button";
 
 const incidents = [
@@ -27,7 +25,7 @@ const incidents = [
 
 function Referee() {
     return (
-        <DashboardLayout>
+        <>
 
             {/* Header */}
             <div className="flex justify-between items-center mb-10">
@@ -216,7 +214,7 @@ function Referee() {
 
             </div>
 
-        </DashboardLayout>
+        </>
     );
 }
 
