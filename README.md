@@ -7,6 +7,24 @@ This project was developed as part of the SWP391 course project.
 
 ---
 
+# 📌 Project Overview
+
+DerbyTrack is a comprehensive Horse Race Tournament Management System developed to modernize and simplify the management process of horse racing events.
+The platform is designed to support tournament organizers, referees, jockeys, and spectators through an intuitive and centralized web-based system.
+
+Traditional horse racing tournament management often involves manual tracking, scattered data handling, and inefficient communication between stakeholders. DerbyTrack addresses these challenges by providing an integrated solution for managing tournaments, race schedules, horses, jockeys, predictions, rankings, and spectator interactions in real time.
+
+The system focuses on:
+
+* Improving tournament organization efficiency
+* Enhancing race management workflow
+* Providing accurate ranking and prediction systems
+* Delivering a modern user experience
+* Supporting role-based access for different user types
+
+With a modern technology stack including ReactJS, ASP.NET Core Web API, Entity Framework Core, and SQL Server, DerbyTrack aims to deliver a scalable, maintainable, and user-friendly platform suitable for both academic and real-world horse racing management scenarios.
+
+
 # 🚀 Features
 
 ## 🔐 Authentication & Authorization
