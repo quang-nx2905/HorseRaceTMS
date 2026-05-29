@@ -112,12 +112,16 @@ The system follows the **3-Layer Architecture**:
 src/
 ├── assets/
 ├── components/
+├── context/
+├── data/
 ├── layouts/
 ├── pages/
 ├── routes/
-├── services/
-├── utils/
-└── App.jsx
+├── styles/
+├── App.css
+├── App.jsx
+├── index.css
+└── main.jsx
 ```
 
 ---
