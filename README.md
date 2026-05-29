@@ -17,6 +17,7 @@ With a component-based architecture, the system ensures maintainability, scalabi
 TailwindCSS is used to create a clean and professional dashboard interface, while Axios handles seamless communication with the ASP.NET Core Web API backend.
 The Front-End focuses on delivering smooth navigation, responsive layouts, and an intuitive workflow to improve overall user experience and system usability.
 
+
 # 🚀 Features
 
 ## 🔐 Authentication & Authorization
