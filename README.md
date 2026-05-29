@@ -7,23 +7,15 @@ This project was developed as part of the SWP391 course project.
 
 ---
 
-# 📌 Project Overview
+# 📌 Front-End Overview
 
-DerbyTrack is a comprehensive Horse Race Tournament Management System developed to modernize and simplify the management process of horse racing events.
-The platform is designed to support tournament organizers, referees, jockeys, and spectators through an intuitive and centralized web-based system.
+The Front-End of Horse Race Web is developed using ReactJS and Vite to provide a modern, responsive, and interactive user experience for the Horse Race Tournament Management System.
 
-Traditional horse racing tournament management often involves manual tracking, scattered data handling, and inefficient communication between stakeholders. DerbyTrack addresses these challenges by providing an integrated solution for managing tournaments, race schedules, horses, jockeys, predictions, rankings, and spectator interactions in real time.
+The application is designed to support core functionalities such as authentication, tournament management, horse and jockey management, prediction systems, leaderboards, and spectator interaction.
+With a component-based architecture, the system ensures maintainability, scalability, and efficient UI development.
 
-The system focuses on:
-
-* Improving tournament organization efficiency
-* Enhancing race management workflow
-* Providing accurate ranking and prediction systems
-* Delivering a modern user experience
-* Supporting role-based access for different user types
-
-With a modern technology stack including ReactJS, ASP.NET Core Web API, Entity Framework Core, and SQL Server, DerbyTrack aims to deliver a scalable, maintainable, and user-friendly platform suitable for both academic and real-world horse racing management scenarios.
-
+TailwindCSS is used to create a clean and professional dashboard interface, while Axios handles seamless communication with the ASP.NET Core Web API backend.
+The Front-End focuses on delivering smooth navigation, responsive layouts, and an intuitive workflow to improve overall user experience and system usability.
 
 # 🚀 Features
 
