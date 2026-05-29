@@ -1,24 +1,173 @@
-# React + Vite
+# 🏇 Horses Race - Horse Race Tournament Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Horse Race is a modern web-based platform designed to manage and organize horse racing tournaments efficiently.
+The system provides comprehensive tools for tournament administration, horse and jockey management, race scheduling, predictions, rankings, and spectator interaction.
 
-Currently, two official plugins are available:
+This project was developed as part of the SWP391 course project.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+# 🚀 Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🔐 Authentication & Authorization
 
-## Expanding the ESLint configuration
+* Secure JWT Authentication
+* User Login & Registration
+* Role-based Access Control
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🏆 Tournament Management
 
-## Demo UI
+* Create and manage tournaments
+* Organize race schedules
+* Track tournament progress and status
 
-Login UI
-![Demo Login UI](https://github.com/quang-nx2905/horse-racing-tms-fe/blob/main/screen-shots/login.png)
+## 🐎 Horse Management
 
-Register UI
-![Demo Register UI](https://github.com/quang-nx2905/horse-racing-tms-fe/blob/main/screen-shots/register.png)
+* Add, update, and manage horse information
+* Track horse statistics and performance
+
+## 🧑‍✈️ Jockey Management
+
+* Manage jockey profiles
+* Assign jockeys to races and horses
+* Performance tracking system
+
+## 👨‍⚖️ Referee Management
+
+* Referee assignment system
+* Race supervision management
+
+## 🎯 Prediction System
+
+* Race outcome prediction
+* Prediction ranking system
+* Win probability visualization
+
+## 🏅 Leaderboard System
+
+* Dynamic ranking updates
+* Tournament standings
+* Score tracking
+
+## 👥 Spectator Features
+
+* View race schedules
+* Follow tournament results
+* Watch leaderboard updates
+
+---
+
+# 🛠️ Tech Stack
+
+## Front-End
+
+* ReactJS
+* Vite
+* TailwindCSS
+* Axios
+* React Router DOM
+
+## Back-End
+
+* ASP.NET Core Web API
+* Entity Framework Core
+* JWT Authentication
+
+## Database
+
+* SQL Server
+
+## Development Tools
+
+* Git & GitHub
+* Postman
+* Visual Studio
+
+---
+
+# 🏗️ Architecture
+
+The system follows the **3-Layer Architecture**:
+
+* Presentation Layer (FE)
+* Business Logic Layer (BE)
+* Data Access Layer
+
+---
+
+# 📂 Project Structure
+
+```bash
+src/
+├── assets/
+├── components/
+├── layouts/
+├── pages/
+├── routes/
+├── services/
+├── utils/
+└── App.jsx
+```
+
+---
+
+# 📷 Screenshots
+
+## 🔐 Login Page
+
+<img src="./screen-shots/login.png" width="100%" />
+
+---
+
+## 📝 Register Page
+
+<img src="./screen-shots/register.png" width="100%" />
+
+---
+
+## 📊 Dashboard
+
+<img src="./screen-shots/dashboard.png" width="100%" />
+
+---
+
+## 🏆 Tournament Management
+
+<img src="./screen-shots/tournament.png" width="100%" />
+
+---
+
+## 🐎 Horse Management
+
+<img src="./screen-shots/horse.png" width="100%" />
+
+---
+
+## 🧑‍✈️ Jockey Management
+
+<img src="./screen-shots/jockey.png" width="100%" />
+
+---
+
+## 👨‍⚖️ Referee Management
+
+<img src="./screen-shots/referee.png" width="100%" />
+
+---
+
+## 🎯 Prediction System
+
+<img src="./screen-shots/prediction.png" width="100%" />
+
+---
+
+## 🏅 Leaderboard
+
+<img src="./screen-shots/leaderboard.png" width="100%" />
+
+---
+
+## 👥 Spectator Interface
+
+<img src="./screen-shots/spectator.png" width="100%" />
+
