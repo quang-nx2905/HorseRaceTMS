@@ -1,81 +1,59 @@
+jsx
 function EmptyState({
-    title,
-    description,
-    buttonText,
+  title,
+  description,
 }) {
 
-    return (
-        <div
-            className="
+  return (
+
+    <div
+      className="
         bg-white
+        dark:bg-zinc-900
+
         border
         border-zinc-200
-        rounded-[32px]
-        p-16
-        flex
-        flex-col
-        items-center
-        justify-center
+        dark:border-zinc-800
+
+        rounded-3xl
+
+        p-20
+
         text-center
       "
-        >
+    >
 
-            {/* Icon */}
-            <div
-                className="
-          w-[120px]
-          h-[120px]
-          rounded-full
-          bg-yellow-100
-          flex
-          items-center
-          justify-center
-          text-6xl
-          mb-8
-        "
-            >
-                🐎
-            </div>
+      <div className="text-7xl mb-6">
+        🐎
+      </div>
 
-            {/* Title */}
-            <h2
-                className="
+      <h2
+        className="
           text-4xl
-          font-bold
-          mb-4
-        "
-            >
-                {title}
-            </h2>
+          font-black
 
-            {/* Description */}
-            <p
-                className="
+          dark:text-white
+        "
+      >
+        {title}
+      </h2>
+
+      <p
+        className="
           text-zinc-500
-          max-w-[500px]
-          leading-relaxed
+          dark:text-zinc-400
+
+          mt-5
+
           text-lg
-          mb-8
         "
-            >
-                {description}
-            </p>
+      >
+        {description}
+      </p>
 
-            {/* Button */}
-            <button
-                className="
-          bg-yellow-400
-          px-8
-          py-4
-          rounded-2xl
-          font-semibold
-        "
-            >
-                {buttonText}
-            </button>
+    </div>
 
-        </div>
-    );
+  );
 }
 
 export default EmptyState;
