@@ -6,7 +6,15 @@ import {
   Trophy,
 } from "lucide-react";
 
+import { useState } from "react";
+
 function Tournaments() {
+
+  const [search, setSearch] =
+    useState("");
+
+  const [filter, setFilter] =
+    useState("All");
 
   const tournaments = [
 
@@ -47,6 +55,43 @@ function Tournaments() {
     },
 
   ];
+
+  // FILTER
+  const filteredTournaments =
+    tournaments.filter((item) => {
+
+      const matchesSearch =
+        item.name
+          .toLowerCase()
+          .includes(search.toLowerCase());
+
+      const matchesFilter =
+        filter === "All"
+          ? true
+          : item.status === filter;
+
+      return (
+        matchesSearch &&
+        matchesFilter
+      );
+
+    });
+
+  // STATS
+  const totalLive =
+    tournaments.filter(
+      (item) => item.status === "Live"
+    ).length;
+
+  const totalUpcoming =
+    tournaments.filter(
+      (item) => item.status === "Upcoming"
+    ).length;
+
+  const totalCompleted =
+    tournaments.filter(
+      (item) => item.status === "Completed"
+    ).length;
 
   return (
 
@@ -95,7 +140,48 @@ function Tournaments() {
 
       </div>
 
-      {/* SEARCH */}
+      {/* STATS */}
+      <div className="grid grid-cols-3 gap-6 mb-8">
+
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+
+          <p className="text-zinc-500">
+            Live Tournaments
+          </p>
+
+          <h2 className="text-4xl font-black mt-3 text-red-500">
+            {totalLive}
+          </h2>
+
+        </div>
+
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+
+          <p className="text-zinc-500">
+            Upcoming
+          </p>
+
+          <h2 className="text-4xl font-black mt-3 text-yellow-500">
+            {totalUpcoming}
+          </h2>
+
+        </div>
+
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+
+          <p className="text-zinc-500">
+            Completed
+          </p>
+
+          <h2 className="text-4xl font-black mt-3 text-green-500">
+            {totalCompleted}
+          </h2>
+
+        </div>
+
+      </div>
+
+      {/* SEARCH + FILTER */}
       <div
         className="
           bg-white
@@ -110,10 +196,14 @@ function Tournaments() {
           p-5
 
           mb-8
+
+          flex
+          gap-4
         "
       >
 
-        <div className="relative">
+        {/* SEARCH */}
+        <div className="relative flex-1">
 
           <Search
             size={20}
@@ -129,7 +219,15 @@ function Tournaments() {
 
           <input
             type="text"
+
+            value={search}
+
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+
             placeholder="Search tournaments..."
+
             className="
               w-full
 
@@ -150,157 +248,235 @@ function Tournaments() {
 
         </div>
 
+        {/* FILTER */}
+        <select
+          value={filter}
+
+          onChange={(e) =>
+            setFilter(e.target.value)
+          }
+
+          className="
+            bg-zinc-100
+            dark:bg-zinc-800
+
+            dark:text-white
+
+            rounded-2xl
+
+            px-5
+
+            outline-none
+          "
+        >
+
+          <option>
+            All
+          </option>
+
+          <option>
+            Live
+          </option>
+
+          <option>
+            Upcoming
+          </option>
+
+          <option>
+            Completed
+          </option>
+
+        </select>
+
       </div>
 
-      {/* GRID */}
-      <div className="grid grid-cols-2 gap-6">
+      {/* EMPTY */}
+      {filteredTournaments.length === 0 ? (
 
-        {tournaments.map((tournament) => (
+        <div
+          className="
+            bg-white
+            dark:bg-zinc-900
 
-          <div
-            key={tournament.id}
+            border
+            border-zinc-200
+            dark:border-zinc-800
 
-            className="
-              bg-white
-              dark:bg-zinc-900
+            rounded-3xl
 
-              border
-              border-zinc-200
-              dark:border-zinc-800
+            p-20
 
-              rounded-3xl
+            text-center
+          "
+        >
 
-              p-6
+          <div className="text-7xl mb-5">
+            🏆
+          </div>
 
-              hover:scale-[1.02]
+          <h2 className="text-3xl font-black dark:text-white">
+            No Tournaments Found
+          </h2>
 
-              transition-all
-              duration-300
-            "
-          >
+          <p className="text-zinc-500 mt-4">
+            Try changing your search or filters.
+          </p>
 
-            {/* TOP */}
-            <div className="flex items-start justify-between mb-6">
+        </div>
 
-              <div>
+      ) : (
 
-                <h2 className="text-2xl font-bold dark:text-white">
-                  {tournament.name}
-                </h2>
+        /* GRID */
+        <div className="grid grid-cols-2 gap-6">
 
-                <div className="flex items-center gap-2 mt-3 text-zinc-500">
+          {filteredTournaments.map((tournament) => (
 
-                  <MapPin size={16} />
+            <div
+              key={tournament.id}
+
+              className="
+                bg-white
+                dark:bg-zinc-900
+
+                border
+                border-zinc-200
+                dark:border-zinc-800
+
+                rounded-3xl
+
+                p-6
+
+                hover:scale-[1.02]
+
+                transition-all
+                duration-300
+              "
+            >
+
+              {/* TOP */}
+              <div className="flex items-start justify-between mb-6">
+
+                <div>
+
+                  <h2 className="text-2xl font-bold dark:text-white">
+                    {tournament.name}
+                  </h2>
+
+                  <div className="flex items-center gap-2 mt-3 text-zinc-500">
+
+                    <MapPin size={16} />
+
+                    <span>
+                      {tournament.location}
+                    </span>
+
+                  </div>
+
+                </div>
+
+                {/* STATUS */}
+                <div
+                  className={`
+                    px-4
+                    py-2
+
+                    rounded-full
+
+                    text-sm
+                    font-semibold
+
+                    ${tournament.status === "Live"
+                      ? "bg-red-100 text-red-500"
+                      : tournament.status === "Upcoming"
+                        ? "bg-yellow-100 text-yellow-600"
+                        : "bg-green-100 text-green-600"
+                    }
+                  `}
+                >
+
+                  {tournament.status}
+
+                </div>
+
+              </div>
+
+              {/* INFO */}
+              <div className="space-y-4">
+
+                <div className="flex items-center gap-3 text-zinc-500">
+
+                  <CalendarDays size={18} />
 
                   <span>
-                    {tournament.location}
+                    {tournament.date}
+                  </span>
+
+                </div>
+
+                <div className="flex items-center gap-3 text-zinc-500">
+
+                  <Trophy size={18} />
+
+                  <span>
+                    Prize Pool: {tournament.prize}
                   </span>
 
                 </div>
 
               </div>
 
-              {/* STATUS */}
-              <div
-                className={`
-                  px-4
-                  py-2
+              {/* BUTTONS */}
+              <div className="flex gap-4 mt-8">
 
-                  rounded-full
+                <button
+                  className="
+                    flex-1
 
-                  text-sm
-                  font-semibold
+                    bg-yellow-400
+                    hover:bg-yellow-500
 
-                  ${tournament.status === "Live"
-                    ? "bg-red-100 text-red-500"
-                    : tournament.status === "Upcoming"
-                      ? "bg-yellow-100 text-yellow-600"
-                      : "bg-green-100 text-green-600"
-                  }
-                `}
-              >
+                    py-3
 
-                {tournament.status}
+                    rounded-2xl
 
-              </div>
+                    font-semibold
 
-            </div>
+                    transition-all
+                  "
+                >
+                  View Details
+                </button>
 
-            {/* INFO */}
-            <div className="space-y-4">
+                <button
+                  className="
+                    flex-1
 
-              <div className="flex items-center gap-3 text-zinc-500">
+                    bg-zinc-100
+                    dark:bg-zinc-800
 
-                <CalendarDays size={18} />
+                    dark:text-white
 
-                <span>
-                  {tournament.date}
-                </span>
+                    py-3
 
-              </div>
+                    rounded-2xl
 
-              <div className="flex items-center gap-3 text-zinc-500">
+                    font-semibold
 
-                <Trophy size={18} />
-
-                <span>
-                  Prize Pool: {tournament.prize}
-                </span>
+                    transition-all
+                  "
+                >
+                  Edit
+                </button>
 
               </div>
 
             </div>
 
-            {/* BUTTONS */}
-            <div className="flex gap-4 mt-8">
+          ))}
 
-              <button
-                className="
-                  flex-1
+        </div>
 
-                  bg-yellow-400
-                  hover:bg-yellow-500
-
-                  py-3
-
-                  rounded-2xl
-
-                  font-semibold
-
-                  transition-all
-                "
-              >
-                View Details
-              </button>
-
-              <button
-                className="
-                  flex-1
-
-                  bg-zinc-100
-                  dark:bg-zinc-800
-
-                  dark:text-white
-
-                  py-3
-
-                  rounded-2xl
-
-                  font-semibold
-
-                  transition-all
-                "
-              >
-                Edit
-              </button>
-
-            </div>
-
-          </div>
-
-        ))}
-
-      </div>
+      )}
 
     </div>
 
