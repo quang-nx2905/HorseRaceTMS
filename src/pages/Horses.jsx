@@ -21,6 +21,8 @@ import FilterSelect from "../components/ui/FilterSelect";
 
 import ConfirmModal from "../components/ui/ConfirmModal";
 
+import FormModal from "../components/ui/FormModal";
+
 function Horses() {
 
     const [search, setSearch] =
@@ -35,57 +37,61 @@ function Horses() {
     const [deleteModal, setDeleteModal] =
         useState(false);
 
+    const [editModal, setEditModal] =
+        useState(false);
+
     const [selectedHorse, setSelectedHorse] =
         useState(null);
 
-    const horses = [
+    const [horses, setHorses] =
+        useState([
 
-        {
-            id: 1,
-            name: "Thunder Bolt",
-            breed: "Arabian",
-            age: 4,
-            health: "Excellent",
-            wins: 18,
-        },
+            {
+                id: 1,
+                name: "Thunder Bolt",
+                breed: "Arabian",
+                age: 4,
+                health: "Excellent",
+                wins: 18,
+            },
 
-        {
-            id: 2,
-            name: "Golden Sprint",
-            breed: "Thoroughbred",
-            age: 5,
-            health: "Good",
-            wins: 12,
-        },
+            {
+                id: 2,
+                name: "Golden Sprint",
+                breed: "Thoroughbred",
+                age: 5,
+                health: "Good",
+                wins: 12,
+            },
 
-        {
-            id: 3,
-            name: "Night Fury",
-            breed: "Mustang",
-            age: 6,
-            health: "Poor",
-            wins: 8,
-        },
+            {
+                id: 3,
+                name: "Night Fury",
+                breed: "Mustang",
+                age: 6,
+                health: "Poor",
+                wins: 8,
+            },
 
-        {
-            id: 4,
-            name: "Silver Arrow",
-            breed: "Arabian",
-            age: 3,
-            health: "Excellent",
-            wins: 22,
-        },
+            {
+                id: 4,
+                name: "Silver Arrow",
+                breed: "Arabian",
+                age: 3,
+                health: "Excellent",
+                wins: 22,
+            },
 
-        {
-            id: 5,
-            name: "Storm Racer",
-            breed: "Quarter Horse",
-            age: 5,
-            health: "Good",
-            wins: 15,
-        },
+            {
+                id: 5,
+                name: "Storm Racer",
+                breed: "Quarter Horse",
+                age: 5,
+                health: "Good",
+                wins: 15,
+            },
 
-    ];
+        ]);
 
     // SEARCH + FILTER
     const filteredHorses =
@@ -127,11 +133,43 @@ function Horses() {
     // DELETE
     const handleDelete = () => {
 
+        const updated =
+            horses.filter(
+                (horse) =>
+                    horse.id !== selectedHorse.id
+            );
+
+        setHorses(updated);
+
         toast.success(
             `${selectedHorse.name} deleted successfully`
         );
 
         setDeleteModal(false);
+    };
+
+    // EDIT
+    const handleEditSave = () => {
+
+        const updated =
+            horses.map((horse) => {
+
+                if (
+                    horse.id === selectedHorse.id
+                ) {
+                    return selectedHorse;
+                }
+
+                return horse;
+            });
+
+        setHorses(updated);
+
+        toast.success(
+            "Horse updated successfully"
+        );
+
+        setEditModal(false);
     };
 
     return (
@@ -248,7 +286,13 @@ function Horses() {
                         {/* ACTIONS */}
                         <div className="flex gap-3">
 
+                            {/* EDIT */}
                             <button
+                                onClick={() => {
+                                    setSelectedHorse(horse);
+                                    setEditModal(true);
+                                }}
+
                                 className="
                   w-10
                   h-10
@@ -266,6 +310,7 @@ function Horses() {
                                 <Pencil size={16} />
                             </button>
 
+                            {/* DELETE */}
                             <button
                                 onClick={() => {
                                     setSelectedHorse(horse);
@@ -324,6 +369,107 @@ function Horses() {
           ${selectedHorse?.name}?
         `}
             />
+
+            {/* EDIT MODAL */}
+            <FormModal
+                isOpen={editModal}
+
+                onClose={() =>
+                    setEditModal(false)
+                }
+
+                title="Edit Horse"
+            >
+
+                <div className="space-y-5">
+
+                    {/* NAME */}
+                    <input
+                        type="text"
+
+                        value={
+                            selectedHorse?.name || ""
+                        }
+
+                        onChange={(e) =>
+                            setSelectedHorse({
+                                ...selectedHorse,
+                                name: e.target.value,
+                            })
+                        }
+
+                        className="
+              w-full
+
+              bg-zinc-100
+              dark:bg-zinc-800
+
+              dark:text-white
+
+              rounded-2xl
+
+              px-5
+              py-4
+
+              outline-none
+            "
+                    />
+
+                    {/* BREED */}
+                    <input
+                        type="text"
+
+                        value={
+                            selectedHorse?.breed || ""
+                        }
+
+                        onChange={(e) =>
+                            setSelectedHorse({
+                                ...selectedHorse,
+                                breed: e.target.value,
+                            })
+                        }
+
+                        className="
+              w-full
+
+              bg-zinc-100
+              dark:bg-zinc-800
+
+              dark:text-white
+
+              rounded-2xl
+
+              px-5
+              py-4
+
+              outline-none
+            "
+                    />
+
+                    {/* SAVE */}
+                    <button
+                        onClick={handleEditSave}
+
+                        className="
+              w-full
+
+              bg-yellow-400
+              hover:bg-yellow-500
+
+              py-4
+
+              rounded-2xl
+
+              font-semibold
+            "
+                    >
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </FormModal>
 
         </div>
 
