@@ -180,6 +180,167 @@ function Tournaments() {
 
       </div>
 
+      {/* ANALYTICS */}
+      <div className="grid grid-cols-4 gap-6 mb-8">
+
+        {/* CARD */}
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="text-zinc-500">
+                Total Revenue
+              </p>
+
+              <h2 className="text-4xl font-black mt-3 dark:text-white">
+                $4.8M
+              </h2>
+
+            </div>
+
+            <div className="w-14 h-14 rounded-2xl bg-yellow-100 text-yellow-500 flex items-center justify-center text-2xl">
+              💰
+            </div>
+
+          </div>
+
+          <div className="mt-5">
+
+            <div className="w-full h-3 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+
+              <div className="w-[78%] h-full bg-yellow-400 rounded-full"></div>
+
+            </div>
+
+            <p className="text-sm text-zinc-500 mt-2">
+              +18% from last season
+            </p>
+
+          </div>
+
+        </div>
+
+        {/* CARD */}
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="text-zinc-500">
+                Audience Reach
+              </p>
+
+              <h2 className="text-4xl font-black mt-3 dark:text-white">
+                82K
+              </h2>
+
+            </div>
+
+            <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-500 flex items-center justify-center text-2xl">
+              📈
+            </div>
+
+          </div>
+
+          <div className="mt-5">
+
+            <div className="w-full h-3 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+
+              <div className="w-[62%] h-full bg-blue-500 rounded-full"></div>
+
+            </div>
+
+            <p className="text-sm text-zinc-500 mt-2">
+              +12% engagement growth
+            </p>
+
+          </div>
+
+        </div>
+
+        {/* CARD */}
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="text-zinc-500">
+                Sponsors
+              </p>
+
+              <h2 className="text-4xl font-black mt-3 dark:text-white">
+                34
+              </h2>
+
+            </div>
+
+            <div className="w-14 h-14 rounded-2xl bg-green-100 text-green-500 flex items-center justify-center text-2xl">
+              🤝
+            </div>
+
+          </div>
+
+          <div className="mt-5">
+
+            <div className="w-full h-3 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+
+              <div className="w-[85%] h-full bg-green-500 rounded-full"></div>
+
+            </div>
+
+            <p className="text-sm text-zinc-500 mt-2">
+              Stable sponsorship pipeline
+            </p>
+
+          </div>
+
+        </div>
+
+        {/* CARD */}
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+
+          <div className="flex items-center justify-between">
+
+            <div>
+
+              <p className="text-zinc-500">
+                AI Accuracy
+              </p>
+
+              <h2 className="text-4xl font-black mt-3 dark:text-white">
+                91%
+              </h2>
+
+            </div>
+
+            <div className="w-14 h-14 rounded-2xl bg-red-100 text-red-500 flex items-center justify-center text-2xl">
+              🧠
+            </div>
+
+          </div>
+
+          <div className="mt-5">
+
+            <div className="w-full h-3 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
+
+              <div className="w-[91%] h-full bg-red-500 rounded-full"></div>
+
+            </div>
+
+            <p className="text-sm text-zinc-500 mt-2">
+              AI prediction confidence
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
       {/* SEARCH + FILTER */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 mb-8 flex gap-4">
 
