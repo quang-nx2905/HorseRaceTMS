@@ -3,60 +3,22 @@ function StatCard({
     value,
     subtitle,
 }) {
-
     return (
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-7 transition-all hover:shadow-xl">
 
-        <div
-            className="
-        bg-white
-
-        border
-        border-zinc-200
-
-        rounded-[32px]
-
-        p-8
-
-        hover:-translate-y-1
-
-        transition-all
-      "
-        >
-
-            {/* Title */}
-            <p
-                className="
-          text-sm
-          uppercase
-          tracking-widest
-
-          text-zinc-500
-
-          mb-5
-        "
-            >
+            <p className="text-sm uppercase tracking-wider text-zinc-400">
                 {title}
             </p>
 
-            {/* Value */}
-            <h2
-                className="
-          text-5xl
-          font-bold
-
-          mb-4
-        "
-            >
+            <h2 className="text-5xl font-black mt-5 dark:text-white">
                 {value}
             </h2>
 
-            {/* Subtitle */}
-            <p className="text-zinc-500">
+            <p className="text-zinc-500 dark:text-zinc-400 mt-4">
                 {subtitle}
             </p>
 
         </div>
-
     );
 }
 

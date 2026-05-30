@@ -1,182 +1,87 @@
 function RecentRaces() {
 
     const races = [
-
         {
             name: "Golden Cup Final",
-            track: "Tokyo Arena",
-            status: "Live",
+            location: "Tokyo Arena",
             prize: "$120,000",
+            status: "Live",
         },
-
         {
             name: "Thunder Derby",
-            track: "Royal Track",
-            status: "Completed",
+            location: "Royal Track",
             prize: "$95,000",
+            status: "Completed",
         },
-
         {
             name: "Night Sprint",
-            track: "Equinox Stadium",
-            status: "Upcoming",
+            location: "Equinox Stadium",
             prize: "$150,000",
+            status: "Upcoming",
         },
-
     ];
 
     return (
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 h-[420px]">
 
-        <div
-            className="
-        bg-white
-
-        border
-        border-zinc-200
-
-        rounded-[32px]
-
-        p-10
-      "
-        >
-
-            {/* Header */}
-            <div
-                className="
-          flex
-          items-center
-          justify-between
-
-          mb-10
-        "
-            >
+            <div className="flex items-center justify-between mb-8">
 
                 <div>
-
-                    <h2
-                        className="
-              text-4xl
-              font-bold
-              mb-3
-            "
-                    >
+                    <h2 className="text-4xl font-black dark:text-white">
                         Recent Races
                     </h2>
 
-                    <p className="text-zinc-500">
+                    <p className="text-zinc-500 dark:text-zinc-400 mt-2">
                         Latest tournament activities
                     </p>
-
                 </div>
 
-                <button
-                    className="
-            px-6
-            py-3
-
-            rounded-2xl
-
-            bg-yellow-400
-
-            font-semibold
-          "
-                >
+                <button className="bg-yellow-400 hover:bg-yellow-500 px-5 py-3 rounded-2xl font-semibold">
                     View All
                 </button>
 
             </div>
 
-            {/* List */}
-            <div className="space-y-4">
+            <div className="space-y-5">
 
                 {races.map((race, index) => (
-
                     <div
                         key={index}
-                        className="
-              flex
-              items-center
-              justify-between
-
-              p-6
-
-              rounded-2xl
-
-              border
-              border-zinc-100
-
-              hover:bg-zinc-50
-
-              transition-all
-            "
+                        className="border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5"
                     >
 
-                        {/* Left */}
-                        <div>
+                        <div className="flex items-start justify-between">
 
-                            <h3
-                                className="
-                  text-2xl
-                  font-bold
-                  mb-2
-                "
-                            >
-                                {race.name}
-                            </h3>
+                            <div>
+                                <h3 className="text-2xl font-bold dark:text-white">
+                                    {race.name}
+                                </h3>
 
-                            <p className="text-zinc-500">
-                                {race.track}
-                            </p>
-
-                        </div>
-
-                        {/* Right */}
-                        <div className="text-right">
-
-                            <div
-                                className={`
-                  inline-flex
-
-                  px-4
-                  py-2
-
-                  rounded-full
-
-                  text-sm
-                  font-semibold
-
-                  mb-3
-
-                  ${race.status === "Live"
-                                        ? "bg-red-100 text-red-500"
-                                        : race.status === "Completed"
-                                            ? "bg-green-100 text-green-600"
-                                            : "bg-yellow-100 text-yellow-700"
-                                    }
-                `}
-                            >
-                                {race.status}
+                                <p className="text-zinc-500 dark:text-zinc-400 mt-2">
+                                    {race.location}
+                                </p>
                             </div>
 
-                            <p
-                                className="
-                  text-xl
-                  font-bold
-                "
-                            >
-                                {race.prize}
-                            </p>
+                            <div className="text-right">
+
+                                <span className="bg-yellow-100 text-yellow-700 text-sm px-3 py-1 rounded-full">
+                                    {race.status}
+                                </span>
+
+                                <p className="font-bold text-xl mt-4 dark:text-white">
+                                    {race.prize}
+                                </p>
+
+                            </div>
 
                         </div>
 
                     </div>
-
                 ))}
 
             </div>
 
         </div>
-
     );
 }
 

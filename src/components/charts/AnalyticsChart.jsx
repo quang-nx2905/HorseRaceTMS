@@ -1,123 +1,33 @@
-import {
-    LineChart,
-    Line,
-    XAxis,
-    Tooltip,
-    ResponsiveContainer,
-    CartesianGrid,
-} from "recharts";
-
 function AnalyticsChart() {
 
-    const data = [
-
-        {
-            day: "Mon",
-            races: 12,
-        },
-
-        {
-            day: "Tue",
-            races: 18,
-        },
-
-        {
-            day: "Wed",
-            races: 15,
-        },
-
-        {
-            day: "Thu",
-            races: 24,
-        },
-
-        {
-            day: "Fri",
-            races: 30,
-        },
-
-        {
-            day: "Sat",
-            races: 21,
-        },
-
-        {
-            day: "Sun",
-            races: 35,
-        },
-
-    ];
+    const bars = [40, 65, 45, 78, 70, 92];
 
     return (
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 h-[420px]">
 
-        <div
-            className="
-        bg-white
+            <h2 className="text-4xl font-black dark:text-white">
+                Weekly Analytics
+            </h2>
 
-        border
-        border-zinc-200
+            <p className="text-zinc-500 dark:text-zinc-400 mt-2">
+                Tournament performance overview
+            </p>
 
-        rounded-[32px]
+            <div className="flex items-end gap-4 h-[280px] mt-12">
 
-        p-10
-      "
-        >
-
-            {/* HEADER */}
-            <div className="mb-10">
-
-                <h2
-                    className="
-            text-4xl
-            font-bold
-            mb-3
-          "
-                >
-                    Weekly Analytics
-                </h2>
-
-                <p className="text-zinc-500">
-                    Tournament performance overview
-                </p>
-
-            </div>
-
-            {/* CHART */}
-            <div className="h-[400px]">
-
-                <ResponsiveContainer
-                    width="100%"
-                    height="100%"
-                >
-
-                    <LineChart data={data}>
-
-                        <CartesianGrid
-                            strokeDasharray="3 3"
-                            opacity={0.1}
-                        />
-
-                        <XAxis
-                            dataKey="day"
-                        />
-
-                        <Tooltip />
-
-                        <Line
-                            type="monotone"
-                            dataKey="races"
-                            stroke="#facc15"
-                            strokeWidth={4}
-                        />
-
-                    </LineChart>
-
-                </ResponsiveContainer>
+                {bars.map((bar, index) => (
+                    <div
+                        key={index}
+                        className="flex-1 bg-yellow-400 rounded-t-3xl transition-all hover:opacity-80"
+                        style={{
+                            height: `${bar}%`,
+                        }}
+                    />
+                ))}
 
             </div>
 
         </div>
-
     );
 }
 
