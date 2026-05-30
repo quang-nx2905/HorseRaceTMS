@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import toast from "react-hot-toast";
+
 import {
     Pencil,
     Trash2,
@@ -17,6 +19,8 @@ import Pagination from "../components/ui/Pagination";
 
 import FilterSelect from "../components/ui/FilterSelect";
 
+import ConfirmModal from "../components/ui/ConfirmModal";
+
 function Horses() {
 
     const [search, setSearch] =
@@ -28,9 +32,16 @@ function Horses() {
     const [currentPage, setCurrentPage] =
         useState(1);
 
+    const [deleteModal, setDeleteModal] =
+        useState(false);
+
+    const [selectedHorse, setSelectedHorse] =
+        useState(null);
+
     const horses = [
 
         {
+            id: 1,
             name: "Thunder Bolt",
             breed: "Arabian",
             age: 4,
@@ -39,6 +50,7 @@ function Horses() {
         },
 
         {
+            id: 2,
             name: "Golden Sprint",
             breed: "Thoroughbred",
             age: 5,
@@ -47,6 +59,7 @@ function Horses() {
         },
 
         {
+            id: 3,
             name: "Night Fury",
             breed: "Mustang",
             age: 6,
@@ -55,6 +68,7 @@ function Horses() {
         },
 
         {
+            id: 4,
             name: "Silver Arrow",
             breed: "Arabian",
             age: 3,
@@ -63,6 +77,7 @@ function Horses() {
         },
 
         {
+            id: 5,
             name: "Storm Racer",
             breed: "Quarter Horse",
             age: 5,
@@ -108,6 +123,16 @@ function Horses() {
             startIndex,
             startIndex + itemsPerPage
         );
+
+    // DELETE
+    const handleDelete = () => {
+
+        toast.success(
+            `${selectedHorse.name} deleted successfully`
+        );
+
+        setDeleteModal(false);
+    };
 
     return (
 
@@ -177,10 +202,10 @@ function Horses() {
                 ]}
             >
 
-                {currentHorses.map((horse, index) => (
+                {currentHorses.map((horse) => (
 
                     <div
-                        key={index}
+                        key={horse.id}
 
                         className="
               grid
@@ -242,6 +267,11 @@ function Horses() {
                             </button>
 
                             <button
+                                onClick={() => {
+                                    setSelectedHorse(horse);
+                                    setDeleteModal(true);
+                                }}
+
                                 className="
                   w-10
                   h-10
@@ -275,6 +305,24 @@ function Horses() {
                 totalPages={totalPages}
 
                 onPageChange={setCurrentPage}
+            />
+
+            {/* DELETE MODAL */}
+            <ConfirmModal
+                isOpen={deleteModal}
+
+                onClose={() =>
+                    setDeleteModal(false)
+                }
+
+                onConfirm={handleDelete}
+
+                title="Delete Horse"
+
+                description={`
+          Are you sure you want to delete
+          ${selectedHorse?.name}?
+        `}
             />
 
         </div>
