@@ -1,4 +1,8 @@
-import { useState } from "react";
+import {
+    useState,
+    useRef,
+    useEffect,
+} from "react";
 
 import {
     Bell,
@@ -17,6 +21,36 @@ function Topbar() {
 
     const [openNotifications, setOpenNotifications] =
         useState(false);
+
+    const notificationRef = useRef();
+
+    // CLICK OUTSIDE
+    useEffect(() => {
+
+        const handleClickOutside = (event) => {
+
+            if (
+                notificationRef.current &&
+                !notificationRef.current.contains(event.target)
+            ) {
+                setOpenNotifications(false);
+            }
+
+        };
+
+        document.addEventListener(
+            "mousedown",
+            handleClickOutside
+        );
+
+        return () => {
+            document.removeEventListener(
+                "mousedown",
+                handleClickOutside
+            );
+        };
+
+    }, []);
 
     return (
 
@@ -51,7 +85,10 @@ function Topbar() {
                 </button>
 
                 {/* NOTIFICATION */}
-                <div className="relative">
+                <div
+                    ref={notificationRef}
+                    className="relative"
+                >
 
                     <button
                         onClick={() =>
