@@ -5,19 +5,16 @@ import {
   MapPin,
   Trophy,
 } from "lucide-react";
-
 import { useState } from "react";
+import CreateTournamentModal from "../components/modals/CreateTournamentModal";
 
 function Tournaments() {
 
-  const [search, setSearch] =
-    useState("");
-
-  const [filter, setFilter] =
-    useState("All");
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("All");
+  const [openModal, setOpenModal] = useState(false);
 
   const tournaments = [
-
     {
       id: 1,
       name: "Golden Derby Championship",
@@ -53,10 +50,8 @@ function Tournaments() {
       prize: "$500,000",
       status: "Upcoming",
     },
-
   ];
 
-  // FILTER
   const filteredTournaments =
     tournaments.filter((item) => {
 
@@ -70,14 +65,10 @@ function Tournaments() {
           ? true
           : item.status === filter;
 
-      return (
-        matchesSearch &&
-        matchesFilter
-      );
+      return matchesSearch && matchesFilter;
 
     });
 
-  // STATS
   const totalLive =
     tournaments.filter(
       (item) => item.status === "Live"
@@ -113,23 +104,8 @@ function Tournaments() {
         </div>
 
         <button
-          className="
-            bg-yellow-400
-            hover:bg-yellow-500
-
-            transition-all
-
-            px-6
-            py-4
-
-            rounded-2xl
-
-            font-semibold
-
-            flex
-            items-center
-            gap-3
-          "
+          onClick={() => setOpenModal(true)}
+          className="bg-yellow-400 hover:bg-yellow-500 transition-all px-6 py-4 rounded-2xl font-semibold flex items-center gap-3"
         >
 
           <Plus size={20} />
@@ -182,68 +158,24 @@ function Tournaments() {
       </div>
 
       {/* SEARCH + FILTER */}
-      <div
-        className="
-          bg-white
-          dark:bg-zinc-900
-
-          border
-          border-zinc-200
-          dark:border-zinc-800
-
-          rounded-3xl
-
-          p-5
-
-          mb-8
-
-          flex
-          gap-4
-        "
-      >
+      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 mb-8 flex gap-4">
 
         {/* SEARCH */}
         <div className="relative flex-1">
 
           <Search
             size={20}
-            className="
-              absolute
-              left-4
-              top-1/2
-              -translate-y-1/2
-
-              text-zinc-400
-            "
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400"
           />
 
           <input
             type="text"
-
             value={search}
-
             onChange={(e) =>
               setSearch(e.target.value)
             }
-
             placeholder="Search tournaments..."
-
-            className="
-              w-full
-
-              bg-zinc-100
-              dark:bg-zinc-800
-
-              dark:text-white
-
-              rounded-2xl
-
-              pl-12
-              pr-5
-              py-4
-
-              outline-none
-            "
+            className="w-full bg-zinc-100 dark:bg-zinc-800 dark:text-white rounded-2xl pl-12 pr-5 py-4 outline-none"
           />
 
         </div>
@@ -251,40 +183,16 @@ function Tournaments() {
         {/* FILTER */}
         <select
           value={filter}
-
           onChange={(e) =>
             setFilter(e.target.value)
           }
-
-          className="
-            bg-zinc-100
-            dark:bg-zinc-800
-
-            dark:text-white
-
-            rounded-2xl
-
-            px-5
-
-            outline-none
-          "
+          className="bg-zinc-100 dark:bg-zinc-800 dark:text-white rounded-2xl px-5 outline-none"
         >
 
-          <option>
-            All
-          </option>
-
-          <option>
-            Live
-          </option>
-
-          <option>
-            Upcoming
-          </option>
-
-          <option>
-            Completed
-          </option>
+          <option>All</option>
+          <option>Live</option>
+          <option>Upcoming</option>
+          <option>Completed</option>
 
         </select>
 
@@ -293,22 +201,7 @@ function Tournaments() {
       {/* EMPTY */}
       {filteredTournaments.length === 0 ? (
 
-        <div
-          className="
-            bg-white
-            dark:bg-zinc-900
-
-            border
-            border-zinc-200
-            dark:border-zinc-800
-
-            rounded-3xl
-
-            p-20
-
-            text-center
-          "
-        >
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-20 text-center">
 
           <div className="text-7xl mb-5">
             🏆
@@ -326,31 +219,13 @@ function Tournaments() {
 
       ) : (
 
-        /* GRID */
         <div className="grid grid-cols-2 gap-6">
 
           {filteredTournaments.map((tournament) => (
 
             <div
               key={tournament.id}
-
-              className="
-                bg-white
-                dark:bg-zinc-900
-
-                border
-                border-zinc-200
-                dark:border-zinc-800
-
-                rounded-3xl
-
-                p-6
-
-                hover:scale-[1.02]
-
-                transition-all
-                duration-300
-              "
+              className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 hover:scale-[1.02] transition-all duration-300"
             >
 
               {/* TOP */}
@@ -379,9 +254,7 @@ function Tournaments() {
                   className={`
                     px-4
                     py-2
-
                     rounded-full
-
                     text-sm
                     font-semibold
 
@@ -428,43 +301,11 @@ function Tournaments() {
               {/* BUTTONS */}
               <div className="flex gap-4 mt-8">
 
-                <button
-                  className="
-                    flex-1
-
-                    bg-yellow-400
-                    hover:bg-yellow-500
-
-                    py-3
-
-                    rounded-2xl
-
-                    font-semibold
-
-                    transition-all
-                  "
-                >
+                <button className="flex-1 bg-yellow-400 hover:bg-yellow-500 py-3 rounded-2xl font-semibold transition-all">
                   View Details
                 </button>
 
-                <button
-                  className="
-                    flex-1
-
-                    bg-zinc-100
-                    dark:bg-zinc-800
-
-                    dark:text-white
-
-                    py-3
-
-                    rounded-2xl
-
-                    font-semibold
-
-                    transition-all
-                  "
-                >
+                <button className="flex-1 bg-zinc-100 dark:bg-zinc-800 dark:text-white py-3 rounded-2xl font-semibold transition-all">
                   Edit
                 </button>
 
@@ -478,9 +319,17 @@ function Tournaments() {
 
       )}
 
+      {/* MODAL */}
+      <CreateTournamentModal
+        open={openModal}
+        onClose={() =>
+          setOpenModal(false)
+        }
+      />
+
     </div>
 
   );
 }
 
-export default Tournaments;
+export default Tournaments; 
