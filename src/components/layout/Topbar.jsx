@@ -15,9 +15,14 @@ import NotificationPanel from "../notifications/NotificationPanel";
 
 import { useLayout } from "../../context/LayoutContext";
 
+import { useNotifications } from "../../context/NotificationContext";
+
 function Topbar() {
 
     const { toggleSidebar } = useLayout();
+
+    const { unreadCount } =
+        useNotifications();
 
     const [openNotifications, setOpenNotifications] =
         useState(false);
@@ -96,15 +101,22 @@ function Topbar() {
                                 !openNotifications
                             )
                         }
+
                         className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center relative"
                     >
 
                         <Bell size={20} />
 
                         {/* BADGE */}
-                        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
-                            2
-                        </div>
+                        {unreadCount > 0 && (
+
+                            <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+
+                                {unreadCount}
+
+                            </div>
+
+                        )}
 
                     </button>
 

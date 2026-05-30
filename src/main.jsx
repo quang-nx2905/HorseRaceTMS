@@ -12,6 +12,8 @@ import { LayoutProvider } from "./context/LayoutContext";
 
 import { Toaster } from "react-hot-toast";
 
+import { NotificationProvider } from "./context/NotificationContext";
+
 ReactDOM.createRoot(
   document.getElementById("root")
 ).render(
@@ -22,18 +24,22 @@ ReactDOM.createRoot(
 
       <LayoutProvider>
 
-        <Toaster
-          position="top-right"
+        <NotificationProvider>
 
-          toastOptions={{
-            style: {
-              borderRadius: "18px",
-              padding: "16px",
-            },
-          }}
-        />
+          <Toaster
+            position="top-right"
 
-        <App />
+            toastOptions={{
+              style: {
+                borderRadius: "18px",
+                padding: "16px",
+              },
+            }}
+          />
+
+          <App />
+
+        </NotificationProvider>
 
       </LayoutProvider>
 

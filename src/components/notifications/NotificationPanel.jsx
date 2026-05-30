@@ -1,68 +1,15 @@
-import { useState } from "react";
-
 import NotificationItem from "./NotificationItem";
+
+import { useNotifications } from "../../context/NotificationContext";
 
 function NotificationPanel() {
 
-    const [notifications, setNotifications] =
-        useState([
-
-            {
-                id: 1,
-                title: "Race Completed",
-                message: "Thunder Bolt won the Spring Championship.",
-                time: "2 min ago",
-                unread: true,
-            },
-
-            {
-                id: 2,
-                title: "AI Prediction Ready",
-                message: "New AI race prediction has been generated.",
-                time: "10 min ago",
-                unread: true,
-            },
-
-            {
-                id: 3,
-                title: "Tournament Updated",
-                message: "Summer Cup registration is now open.",
-                time: "1 hour ago",
-                unread: false,
-            },
-
-            {
-                id: 4,
-                title: "Referee Alert",
-                message: "Track inspection required before next race.",
-                time: "2 hours ago",
-                unread: false,
-            },
-
-        ]);
-
-    // UNREAD COUNT
-    const unreadCount =
-        notifications.filter(
-            (item) => item.unread
-        ).length;
-
-    // MARK ALL READ
-    const markAllRead = () => {
-
-        const updated =
-            notifications.map((item) => ({
-                ...item,
-                unread: false,
-            }));
-
-        setNotifications(updated);
-    };
-
-    // CLEAR ALL
-    const clearAll = () => {
-        setNotifications([]);
-    };
+    const {
+        notifications,
+        unreadCount,
+        markAllRead,
+        clearAll,
+    } = useNotifications();
 
     return (
 
@@ -122,7 +69,6 @@ function NotificationPanel() {
 
                 <button
                     onClick={markAllRead}
-
                     className="
             flex-1
 
@@ -137,11 +83,6 @@ function NotificationPanel() {
 
             text-sm
             font-semibold
-
-            hover:bg-zinc-200
-            dark:hover:bg-zinc-700
-
-            transition-all
           "
                 >
                     Mark all read
@@ -149,7 +90,6 @@ function NotificationPanel() {
 
                 <button
                     onClick={clearAll}
-
                     className="
             flex-1
 
@@ -164,11 +104,6 @@ function NotificationPanel() {
 
             text-sm
             font-semibold
-
-            hover:bg-red-200
-            dark:hover:bg-red-900
-
-            transition-all
           "
                 >
                     Clear all
@@ -179,13 +114,7 @@ function NotificationPanel() {
             {/* EMPTY */}
             {notifications.length === 0 ? (
 
-                <div
-                    className="
-            text-center
-
-            py-16
-          "
-                >
+                <div className="text-center py-16">
 
                     <div className="text-6xl mb-4">
                         🔔
@@ -203,7 +132,6 @@ function NotificationPanel() {
 
             ) : (
 
-                /* LIST */
                 <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
 
                     {notifications.map((item) => (
