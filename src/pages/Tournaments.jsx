@@ -6,17 +6,24 @@ import {
   Trophy,
 } from "lucide-react";
 
-import { useState } from "react";
+import {
+  useState,
+  useEffect,
+} from "react";
 
 import CreateTournamentModal from "../components/modals/CreateTournamentModal";
 
 import TournamentDetailsDrawer from "../components/tournaments/TournamentDetailsDrawer";
 
+import TournamentCardSkeleton from "../components/skeletons/TournamentCardSkeleton";
+
 function Tournaments() {
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] =
+    useState("");
 
-  const [filter, setFilter] = useState("All");
+  const [filter, setFilter] =
+    useState("All");
 
   const [openModal, setOpenModal] =
     useState(false);
@@ -26,6 +33,19 @@ function Tournaments() {
 
   const [selectedTournament, setSelectedTournament] =
     useState(null);
+
+  const [loading, setLoading] =
+    useState(true);
+
+  useEffect(() => {
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+
+  }, []);
 
   const tournaments = [
 
@@ -183,7 +203,6 @@ function Tournaments() {
       {/* ANALYTICS */}
       <div className="grid grid-cols-4 gap-6 mb-8">
 
-        {/* CARD */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
 
           <div className="flex items-center justify-between">
@@ -206,23 +225,8 @@ function Tournaments() {
 
           </div>
 
-          <div className="mt-5">
-
-            <div className="w-full h-3 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-
-              <div className="w-[78%] h-full bg-yellow-400 rounded-full"></div>
-
-            </div>
-
-            <p className="text-sm text-zinc-500 mt-2">
-              +18% from last season
-            </p>
-
-          </div>
-
         </div>
 
-        {/* CARD */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
 
           <div className="flex items-center justify-between">
@@ -245,23 +249,8 @@ function Tournaments() {
 
           </div>
 
-          <div className="mt-5">
-
-            <div className="w-full h-3 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-
-              <div className="w-[62%] h-full bg-blue-500 rounded-full"></div>
-
-            </div>
-
-            <p className="text-sm text-zinc-500 mt-2">
-              +12% engagement growth
-            </p>
-
-          </div>
-
         </div>
 
-        {/* CARD */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
 
           <div className="flex items-center justify-between">
@@ -284,23 +273,8 @@ function Tournaments() {
 
           </div>
 
-          <div className="mt-5">
-
-            <div className="w-full h-3 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-
-              <div className="w-[85%] h-full bg-green-500 rounded-full"></div>
-
-            </div>
-
-            <p className="text-sm text-zinc-500 mt-2">
-              Stable sponsorship pipeline
-            </p>
-
-          </div>
-
         </div>
 
-        {/* CARD */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
 
           <div className="flex items-center justify-between">
@@ -320,20 +294,6 @@ function Tournaments() {
             <div className="w-14 h-14 rounded-2xl bg-red-100 text-red-500 flex items-center justify-center text-2xl">
               🧠
             </div>
-
-          </div>
-
-          <div className="mt-5">
-
-            <div className="w-full h-3 bg-zinc-200 dark:bg-zinc-700 rounded-full overflow-hidden">
-
-              <div className="w-[91%] h-full bg-red-500 rounded-full"></div>
-
-            </div>
-
-            <p className="text-sm text-zinc-500 mt-2">
-              AI prediction confidence
-            </p>
 
           </div>
 
@@ -380,37 +340,30 @@ function Tournaments() {
 
       </div>
 
-      {/* EMPTY */}
-      {filteredTournaments.length === 0 ? (
+      {/* CONTENT */}
+      <div className="grid grid-cols-2 gap-6">
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-20 text-center">
+        {loading ? (
 
-          <div className="text-7xl mb-5">
-            🏆
-          </div>
+          Array(4)
+            .fill(0)
+            .map((_, index) => (
 
-          <h2 className="text-3xl font-black dark:text-white">
-            No Tournaments Found
-          </h2>
+              <TournamentCardSkeleton
+                key={index}
+              />
 
-          <p className="text-zinc-500 mt-4">
-            Try changing your search or filters.
-          </p>
+            ))
 
-        </div>
+        ) : (
 
-      ) : (
-
-        <div className="grid grid-cols-2 gap-6">
-
-          {filteredTournaments.map((tournament) => (
+          filteredTournaments.map((tournament) => (
 
             <div
               key={tournament.id}
               className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 hover:scale-[1.02] transition-all duration-300"
             >
 
-              {/* TOP */}
               <div className="flex items-start justify-between mb-6">
 
                 <div>
@@ -438,7 +391,6 @@ function Tournaments() {
                     rounded-full
                     text-sm
                     font-semibold
-
                     ${tournament.status === "Live"
                       ? "bg-red-100 text-red-500"
                       : tournament.status === "Upcoming"
@@ -454,7 +406,6 @@ function Tournaments() {
 
               </div>
 
-              {/* INFO */}
               <div className="space-y-4">
 
                 <div className="flex items-center gap-3 text-zinc-500">
@@ -479,7 +430,6 @@ function Tournaments() {
 
               </div>
 
-              {/* BUTTONS */}
               <div className="flex gap-4 mt-8">
 
                 <button
@@ -499,13 +449,12 @@ function Tournaments() {
 
             </div>
 
-          ))}
+          ))
 
-        </div>
+        )}
 
-      )}
+      </div>
 
-      {/* MODAL */}
       <CreateTournamentModal
         open={openModal}
         onClose={() =>
@@ -513,7 +462,6 @@ function Tournaments() {
         }
       />
 
-      {/* DRAWER */}
       <TournamentDetailsDrawer
         open={openDrawer}
         onClose={() =>
