@@ -5,16 +5,30 @@ import {
   MapPin,
   Trophy,
 } from "lucide-react";
+
 import { useState } from "react";
+
 import CreateTournamentModal from "../components/modals/CreateTournamentModal";
+
+import TournamentDetailsDrawer from "../components/tournaments/TournamentDetailsDrawer";
 
 function Tournaments() {
 
   const [search, setSearch] = useState("");
+
   const [filter, setFilter] = useState("All");
-  const [openModal, setOpenModal] = useState(false);
+
+  const [openModal, setOpenModal] =
+    useState(false);
+
+  const [openDrawer, setOpenDrawer] =
+    useState(false);
+
+  const [selectedTournament, setSelectedTournament] =
+    useState(null);
 
   const tournaments = [
+
     {
       id: 1,
       name: "Golden Derby Championship",
@@ -50,6 +64,7 @@ function Tournaments() {
       prize: "$500,000",
       status: "Upcoming",
     },
+
   ];
 
   const filteredTournaments =
@@ -83,6 +98,14 @@ function Tournaments() {
     tournaments.filter(
       (item) => item.status === "Completed"
     ).length;
+
+  const handleViewDetails = (tournament) => {
+
+    setSelectedTournament(tournament);
+
+    setOpenDrawer(true);
+
+  };
 
   return (
 
@@ -160,7 +183,6 @@ function Tournaments() {
       {/* SEARCH + FILTER */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 mb-8 flex gap-4">
 
-        {/* SEARCH */}
         <div className="relative flex-1">
 
           <Search
@@ -180,7 +202,6 @@ function Tournaments() {
 
         </div>
 
-        {/* FILTER */}
         <select
           value={filter}
           onChange={(e) =>
@@ -249,7 +270,6 @@ function Tournaments() {
 
                 </div>
 
-                {/* STATUS */}
                 <div
                   className={`
                     px-4
@@ -301,7 +321,12 @@ function Tournaments() {
               {/* BUTTONS */}
               <div className="flex gap-4 mt-8">
 
-                <button className="flex-1 bg-yellow-400 hover:bg-yellow-500 py-3 rounded-2xl font-semibold transition-all">
+                <button
+                  onClick={() =>
+                    handleViewDetails(tournament)
+                  }
+                  className="flex-1 bg-yellow-400 hover:bg-yellow-500 py-3 rounded-2xl font-semibold transition-all"
+                >
                   View Details
                 </button>
 
@@ -327,9 +352,18 @@ function Tournaments() {
         }
       />
 
+      {/* DRAWER */}
+      <TournamentDetailsDrawer
+        open={openDrawer}
+        onClose={() =>
+          setOpenDrawer(false)
+        }
+        tournament={selectedTournament}
+      />
+
     </div>
 
   );
 }
 
-export default Tournaments; 
+export default Tournaments;
