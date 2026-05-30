@@ -62,6 +62,11 @@ function NotificationPanel() {
         p-5
 
         z-50
+
+        animate-in
+        fade-in
+        zoom-in-95
+        duration-200
       "
         >
 
@@ -87,7 +92,7 @@ function NotificationPanel() {
             </div>
 
             {/* LIST */}
-            <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
 
                 {notifications.map((item) => (
 
