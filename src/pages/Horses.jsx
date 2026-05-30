@@ -1,27 +1,13 @@
-import { useState } from "react";
-
-import toast from "react-hot-toast";
+import {
+    Pencil,
+    Trash2,
+} from "lucide-react";
 
 import PageHeader from "../components/ui/PageHeader";
-
-import Button from "../components/ui/Button";
-
-import Card from "../components/ui/Card";
-
-import Modal from "../components/ui/Modal";
-
-import Input from "../components/ui/Input";
+import Table from "../components/ui/Table";
+import StatusBadge from "../components/ui/StatusBadge";
 
 function Horses() {
-
-    const [isOpen, setIsOpen] =
-        useState(false);
-
-    const [horseName, setHorseName] =
-        useState("");
-
-    const [breed, setBreed] =
-        useState("");
 
     const horses = [
 
@@ -41,35 +27,20 @@ function Horses() {
             wins: 12,
         },
 
+        {
+            name: "Night Fury",
+            breed: "Mustang",
+            age: 6,
+            health: "Poor",
+            wins: 8,
+        },
+
     ];
-
-    const handleAddHorse = () => {
-
-        if (!horseName || !breed) {
-
-            toast.error(
-                "Please fill all fields."
-            );
-
-            return;
-        }
-
-        toast.success(
-            "Horse added successfully!"
-        );
-
-        setHorseName("");
-
-        setBreed("");
-
-        setIsOpen(false);
-    };
 
     return (
 
         <div>
 
-            {/* HEADER */}
             <PageHeader
                 title="Horses"
 
@@ -77,153 +48,111 @@ function Horses() {
           Manage race horses and
           performance information.
         "
-
-                action={
-                    <Button
-                        onClick={() =>
-                            setIsOpen(true)
-                        }
-                    >
-                        + Add Horse
-                    </Button>
-                }
             />
 
-            {/* TABLE */}
-            <Card className="overflow-hidden">
+            <Table
+                headers={[
+                    "Horse",
+                    "Breed",
+                    "Age",
+                    "Health",
+                    "Wins",
+                    "Actions",
+                ]}
+            >
 
-                {/* TABLE HEADER */}
-                <div
-                    className="
-            grid
-            grid-cols-5
+                {horses.map((horse, index) => (
 
-            px-8
-            py-6
+                    <div
+                        key={index}
 
-            border-b
-            border-zinc-200
+                        className="
+              grid
+              grid-cols-6
 
-            text-sm
-            uppercase
+              px-8
+              py-6
 
-            tracking-wider
+              border-b
+              border-zinc-100
+              dark:border-zinc-800
 
-            text-zinc-500
-            font-semibold
-          "
-                >
+              hover:bg-zinc-50
+              dark:hover:bg-zinc-800
 
-                    <p>Horse</p>
+              transition-all
+            "
+                    >
 
-                    <p>Breed</p>
+                        <h3 className="font-bold dark:text-white">
+                            {horse.name}
+                        </h3>
 
-                    <p>Age</p>
+                        <p className="dark:text-zinc-300">
+                            {horse.breed}
+                        </p>
 
-                    <p>Health</p>
+                        <p className="dark:text-zinc-300">
+                            {horse.age} yrs
+                        </p>
 
-                    <p>Wins</p>
+                        <StatusBadge
+                            status={horse.health}
+                        />
 
-                </div>
+                        <p className="font-bold dark:text-white">
+                            {horse.wins}
+                        </p>
 
-                {/* ROWS */}
-                <div>
+                        {/* ACTIONS */}
+                        <div className="flex gap-3">
 
-                    {horses.map((horse, index) => (
+                            <button
+                                className="
+                  w-10
+                  h-10
 
-                        <div
-                            key={index}
+                  rounded-xl
 
-                            className="
-                grid
-                grid-cols-5
+                  bg-zinc-100
+                  dark:bg-zinc-700
 
-                px-8
-                py-6
+                  flex
+                  items-center
+                  justify-center
+                "
+                            >
+                                <Pencil size={16} />
+                            </button>
 
-                border-b
-                border-zinc-100
+                            <button
+                                className="
+                  w-10
+                  h-10
 
-                hover:bg-zinc-50
-                dark:hover:bg-zinc-800
+                  rounded-xl
 
-                transition-all
-              "
-                        >
+                  bg-red-100
 
-                            <h3 className="font-bold">
-                                {horse.name}
-                            </h3>
+                  text-red-500
 
-                            <p>{horse.breed}</p>
-
-                            <p>{horse.age} yrs</p>
-
-                            <p>{horse.health}</p>
-
-                            <p className="font-bold">
-                                {horse.wins}
-                            </p>
+                  flex
+                  items-center
+                  justify-center
+                "
+                            >
+                                <Trash2 size={16} />
+                            </button>
 
                         </div>
 
-                    ))}
+                    </div>
 
-                </div>
+                ))}
 
-            </Card>
-
-            {/* MODAL */}
-            <Modal
-                isOpen={isOpen}
-
-                onClose={() =>
-                    setIsOpen(false)
-                }
-
-                title="Add New Horse"
-            >
-
-                <div className="space-y-5">
-
-                    <Input
-                        label="Horse Name"
-
-                        placeholder="Enter horse name"
-
-                        value={horseName}
-
-                        onChange={(e) =>
-                            setHorseName(e.target.value)
-                        }
-                    />
-
-                    <Input
-                        label="Breed"
-
-                        placeholder="Enter breed"
-
-                        value={breed}
-
-                        onChange={(e) =>
-                            setBreed(e.target.value)
-                        }
-                    />
-
-                    <Button
-                        fullWidth
-
-                        onClick={handleAddHorse}
-                    >
-                        Save Horse
-                    </Button>
-
-                </div>
-
-            </Modal>
+            </Table>
 
         </div>
-
     );
 }
 
