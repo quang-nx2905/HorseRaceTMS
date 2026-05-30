@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import toast from "react-hot-toast";
+
 import PageHeader from "../components/ui/PageHeader";
 
 import Button from "../components/ui/Button";
@@ -44,11 +46,17 @@ function Horses() {
     const handleAddHorse = () => {
 
         if (!horseName || !breed) {
-            alert("Please fill all fields.");
+
+            toast.error(
+                "Please fill all fields."
+            );
+
             return;
         }
 
-        alert("Horse Added Successfully!");
+        toast.success(
+            "Horse added successfully!"
+        );
 
         setHorseName("");
 
@@ -84,7 +92,7 @@ function Horses() {
             {/* TABLE */}
             <Card className="overflow-hidden">
 
-                {/* HEADER */}
+                {/* TABLE HEADER */}
                 <div
                     className="
             grid
