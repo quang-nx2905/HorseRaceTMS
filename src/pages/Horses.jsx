@@ -13,10 +13,15 @@ import StatusBadge from "../components/ui/StatusBadge";
 
 import SearchInput from "../components/ui/SearchInput";
 
+import Pagination from "../components/ui/Pagination";
+
 function Horses() {
 
     const [search, setSearch] =
         useState("");
+
+    const [currentPage, setCurrentPage] =
+        useState(1);
 
     const horses = [
 
@@ -44,6 +49,22 @@ function Horses() {
             wins: 8,
         },
 
+        {
+            name: "Silver Arrow",
+            breed: "Arabian",
+            age: 3,
+            health: "Excellent",
+            wins: 22,
+        },
+
+        {
+            name: "Storm Racer",
+            breed: "Quarter Horse",
+            age: 5,
+            health: "Good",
+            wins: 15,
+        },
+
     ];
 
     const filteredHorses =
@@ -51,6 +72,23 @@ function Horses() {
             horse.name
                 .toLowerCase()
                 .includes(search.toLowerCase())
+        );
+
+    // PAGINATION
+    const itemsPerPage = 3;
+
+    const totalPages =
+        Math.ceil(
+            filteredHorses.length / itemsPerPage
+        );
+
+    const startIndex =
+        (currentPage - 1) * itemsPerPage;
+
+    const currentHorses =
+        filteredHorses.slice(
+            startIndex,
+            startIndex + itemsPerPage
         );
 
     return (
@@ -101,7 +139,7 @@ function Horses() {
                 ]}
             >
 
-                {filteredHorses.map((horse, index) => (
+                {currentHorses.map((horse, index) => (
 
                     <div
                         key={index}
@@ -191,6 +229,15 @@ function Horses() {
                 ))}
 
             </Table>
+
+            {/* PAGINATION */}
+            <Pagination
+                currentPage={currentPage}
+
+                totalPages={totalPages}
+
+                onPageChange={setCurrentPage}
+            />
 
         </div>
 
