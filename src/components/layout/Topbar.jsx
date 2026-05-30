@@ -1,19 +1,31 @@
+import { useState } from "react";
+
 import {
     Bell,
     Menu,
 } from "lucide-react";
 
 import UserDropdown from "./UserDropdown";
+
+import NotificationPanel from "../notifications/NotificationPanel";
+
 import { useLayout } from "../../context/LayoutContext";
 
 function Topbar() {
+
     const { toggleSidebar } = useLayout();
 
+    const [openNotifications, setOpenNotifications] =
+        useState(false);
+
     return (
+
         <div className="h-[90px] bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-8 flex items-center justify-between transition-colors">
 
+            {/* LEFT */}
             <div className="flex items-center gap-4">
 
+                {/* SIDEBAR BUTTON */}
                 <button
                     onClick={toggleSidebar}
                     className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center"
@@ -21,6 +33,7 @@ function Topbar() {
                     <Menu size={20} />
                 </button>
 
+                {/* SEARCH */}
                 <input
                     type="text"
                     placeholder="Search races..."
@@ -29,21 +42,48 @@ function Topbar() {
 
             </div>
 
+            {/* RIGHT */}
             <div className="flex items-center gap-5">
 
+                {/* NEW RACE */}
                 <button className="bg-yellow-400 hover:bg-yellow-500 transition-all px-6 py-3 rounded-2xl font-semibold">
                     + New Race
                 </button>
 
-                <button className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                    <Bell size={20} />
-                </button>
+                {/* NOTIFICATION */}
+                <div className="relative">
 
+                    <button
+                        onClick={() =>
+                            setOpenNotifications(
+                                !openNotifications
+                            )
+                        }
+                        className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center relative"
+                    >
+
+                        <Bell size={20} />
+
+                        {/* BADGE */}
+                        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white text-xs flex items-center justify-center">
+                            2
+                        </div>
+
+                    </button>
+
+                    {openNotifications && (
+                        <NotificationPanel />
+                    )}
+
+                </div>
+
+                {/* USER */}
                 <UserDropdown />
 
             </div>
 
         </div>
+
     );
 }
 
