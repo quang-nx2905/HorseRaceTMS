@@ -1,70 +1,135 @@
 import { NavLink } from "react-router-dom";
 
+import {
+  LayoutDashboard,
+  Trophy,
+  Users,
+  BrainCircuit,
+  BarChart3,
+  Shield,
+  Eye,
+  Settings,
+  LogOut,
+  GanttChartSquare,
+} from "lucide-react";
+
+import { useLayout } from "../../context/LayoutContext";
+
 function Sidebar() {
+  const { sidebarOpen } = useLayout();
 
   const menus = [
-    { name: "Dashboard", path: "/" },
-    { name: "Tournaments", path: "/tournaments" },
-    { name: "Horses", path: "/horses" },
-    { name: "Jockeys", path: "/jockeys" },
-    { name: "Predictions", path: "/predictions" },
-    { name: "Leaderboard", path: "/leaderboard" },
-    { name: "Referee", path: "/referee" },
-    { name: "Spectator", path: "/spectator" },
+    {
+      name: "Dashboard",
+      path: "/",
+      icon: <LayoutDashboard size={20} />,
+    },
+    {
+      name: "Tournaments",
+      path: "/tournaments",
+      icon: <Trophy size={20} />,
+    },
+    {
+      name: "Horses",
+      path: "/horses",
+      icon: <GanttChartSquare size={20} />,
+    },
+    {
+      name: "Jockeys",
+      path: "/jockeys",
+      icon: <Users size={20} />,
+    },
+    {
+      name: "Predictions",
+      path: "/predictions",
+      icon: <BrainCircuit size={20} />,
+    },
+    {
+      name: "Leaderboard",
+      path: "/leaderboard",
+      icon: <BarChart3 size={20} />,
+    },
+    {
+      name: "Referee",
+      path: "/referee",
+      icon: <Shield size={20} />,
+    },
+    {
+      name: "Spectator",
+      path: "/spectator",
+      icon: <Eye size={20} />,
+    },
   ];
 
   return (
-    <div className="w-[260px] bg-white dark:bg-zinc-800 border-r border-zinc-200 dark:border-zinc-700 min-h-screen flex flex-col justify-between p-6 transition-colors">
-
+    <div
+      className={`
+      bg-white dark:bg-zinc-900
+      border-r border-zinc-200 dark:border-zinc-800
+      min-h-screen
+      flex flex-col justify-between
+      transition-all duration-300
+      ${sidebarOpen ? "w-[260px] p-6" : "w-[95px] p-4"}
+    `}
+    >
       <div>
+        <div className="mb-10 flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-yellow-400 flex items-center justify-center font-black text-black text-xl">
+            H
+          </div>
 
-        <div className="mb-12">
-          <h1 className="text-4xl font-black dark:text-white">
-            Horse Race
-          </h1>
+          {sidebarOpen && (
+            <div>
+              <h1 className="text-2xl font-black dark:text-white">
+                Horse Race
+              </h1>
 
-          <p className="text-zinc-500 dark:text-zinc-400 mt-2">
-            Premium Horse
-            <br />
-            Racing Platform
-          </p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Premium Horse Racing Platform
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="space-y-3">
-
           {menus.map((menu) => (
             <NavLink
               key={menu.path}
               to={menu.path}
               className={({ isActive }) =>
-                `block px-5 py-4 rounded-2xl transition-all font-medium ${isActive
+                `
+                flex items-center gap-4
+                px-4 py-4 rounded-2xl
+                transition-all duration-200
+                font-medium
+                ${isActive
                   ? "bg-yellow-400 text-black"
-                  : "hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300"
-                }`
+                  : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                }
+              `
               }
             >
-              {menu.name}
+              {menu.icon}
+
+              {sidebarOpen && <span>{menu.name}</span>}
             </NavLink>
           ))}
-
         </div>
-
       </div>
 
-      <div className="bg-yellow-50 dark:bg-yellow-950 rounded-3xl p-5 transition-colors">
-        <h3 className="text-xl font-bold dark:text-white mb-3">
-          Upgrade to Pro
-        </h3>
+      <div className="space-y-3">
+        <button className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
+          <Settings size={20} />
 
-        <p className="text-zinc-600 dark:text-zinc-300 text-sm mb-5">
-          Unlock advanced analytics and premium AI insights.
-        </p>
+          {sidebarOpen && <span>Settings</span>}
+        </button>
 
-        <button className="w-full bg-yellow-400 hover:bg-yellow-500 transition-all py-3 rounded-2xl font-semibold text-black">
-          Upgrade Now
+        <button className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-all">
+          <LogOut size={20} />
+
+          {sidebarOpen && <span>Logout</span>}
         </button>
       </div>
-
     </div>
   );
 }
