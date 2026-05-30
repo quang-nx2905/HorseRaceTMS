@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import {
     Pencil,
     Trash2,
+    Plus,
 } from "lucide-react";
 
 import PageHeader from "../components/ui/PageHeader";
@@ -40,8 +41,20 @@ function Horses() {
     const [editModal, setEditModal] =
         useState(false);
 
+    const [createModal, setCreateModal] =
+        useState(false);
+
     const [selectedHorse, setSelectedHorse] =
         useState(null);
+
+    const [newHorse, setNewHorse] =
+        useState({
+            name: "",
+            breed: "",
+            age: "",
+            health: "Good",
+            wins: 0,
+        });
 
     const [horses, setHorses] =
         useState([
@@ -129,6 +142,47 @@ function Horses() {
             startIndex,
             startIndex + itemsPerPage
         );
+
+    // CREATE
+    const handleCreateHorse = () => {
+
+        if (
+            !newHorse.name ||
+            !newHorse.breed ||
+            !newHorse.age
+        ) {
+
+            toast.error(
+                "Please fill all fields"
+            );
+
+            return;
+        }
+
+        const horse = {
+            id: Date.now(),
+            ...newHorse,
+        };
+
+        setHorses([
+            horse,
+            ...horses,
+        ]);
+
+        toast.success(
+            "Horse created successfully"
+        );
+
+        setCreateModal(false);
+
+        setNewHorse({
+            name: "",
+            breed: "",
+            age: "",
+            health: "Good",
+            wins: 0,
+        });
+    };
 
     // DELETE
     const handleDelete = () => {
@@ -223,6 +277,33 @@ function Horses() {
                             "Poor",
                         ]}
                     />
+
+                    {/* ADD BUTTON */}
+                    <button
+                        onClick={() =>
+                            setCreateModal(true)
+                        }
+
+                        className="
+              flex
+              items-center
+              gap-2
+
+              bg-yellow-400
+              hover:bg-yellow-500
+
+              px-5
+              py-4
+
+              rounded-2xl
+
+              font-semibold
+            "
+                    >
+                        <Plus size={18} />
+
+                        Add Horse
+                    </button>
 
                 </div>
 
@@ -383,7 +464,6 @@ function Horses() {
 
                 <div className="space-y-5">
 
-                    {/* NAME */}
                     <input
                         type="text"
 
@@ -398,24 +478,18 @@ function Horses() {
                             })
                         }
 
+                        placeholder="Horse Name"
+
                         className="
               w-full
-
-              bg-zinc-100
-              dark:bg-zinc-800
-
+              bg-zinc-100 dark:bg-zinc-800
               dark:text-white
-
               rounded-2xl
-
-              px-5
-              py-4
-
+              px-5 py-4
               outline-none
             "
                     />
 
-                    {/* BREED */}
                     <input
                         type="text"
 
@@ -430,41 +504,135 @@ function Horses() {
                             })
                         }
 
+                        placeholder="Breed"
+
                         className="
               w-full
-
-              bg-zinc-100
-              dark:bg-zinc-800
-
+              bg-zinc-100 dark:bg-zinc-800
               dark:text-white
-
               rounded-2xl
-
-              px-5
-              py-4
-
+              px-5 py-4
               outline-none
             "
                     />
 
-                    {/* SAVE */}
                     <button
                         onClick={handleEditSave}
 
                         className="
               w-full
-
               bg-yellow-400
               hover:bg-yellow-500
-
               py-4
-
               rounded-2xl
-
               font-semibold
             "
                     >
                         Save Changes
+                    </button>
+
+                </div>
+
+            </FormModal>
+
+            {/* CREATE MODAL */}
+            <FormModal
+                isOpen={createModal}
+
+                onClose={() =>
+                    setCreateModal(false)
+                }
+
+                title="Add Horse"
+            >
+
+                <div className="space-y-5">
+
+                    <input
+                        type="text"
+
+                        value={newHorse.name}
+
+                        onChange={(e) =>
+                            setNewHorse({
+                                ...newHorse,
+                                name: e.target.value,
+                            })
+                        }
+
+                        placeholder="Horse Name"
+
+                        className="
+              w-full
+              bg-zinc-100 dark:bg-zinc-800
+              dark:text-white
+              rounded-2xl
+              px-5 py-4
+              outline-none
+            "
+                    />
+
+                    <input
+                        type="text"
+
+                        value={newHorse.breed}
+
+                        onChange={(e) =>
+                            setNewHorse({
+                                ...newHorse,
+                                breed: e.target.value,
+                            })
+                        }
+
+                        placeholder="Breed"
+
+                        className="
+              w-full
+              bg-zinc-100 dark:bg-zinc-800
+              dark:text-white
+              rounded-2xl
+              px-5 py-4
+              outline-none
+            "
+                    />
+
+                    <input
+                        type="number"
+
+                        value={newHorse.age}
+
+                        onChange={(e) =>
+                            setNewHorse({
+                                ...newHorse,
+                                age: e.target.value,
+                            })
+                        }
+
+                        placeholder="Age"
+
+                        className="
+              w-full
+              bg-zinc-100 dark:bg-zinc-800
+              dark:text-white
+              rounded-2xl
+              px-5 py-4
+              outline-none
+            "
+                    />
+
+                    <button
+                        onClick={handleCreateHorse}
+
+                        className="
+              w-full
+              bg-yellow-400
+              hover:bg-yellow-500
+              py-4
+              rounded-2xl
+              font-semibold
+            "
+                    >
+                        Create Horse
                     </button>
 
                 </div>
