@@ -1,13 +1,22 @@
+import { useState } from "react";
+
 import {
     Pencil,
     Trash2,
 } from "lucide-react";
 
 import PageHeader from "../components/ui/PageHeader";
+
 import Table from "../components/ui/Table";
+
 import StatusBadge from "../components/ui/StatusBadge";
 
+import SearchInput from "../components/ui/SearchInput";
+
 function Horses() {
+
+    const [search, setSearch] =
+        useState("");
 
     const horses = [
 
@@ -37,19 +46,50 @@ function Horses() {
 
     ];
 
+    const filteredHorses =
+        horses.filter((horse) =>
+            horse.name
+                .toLowerCase()
+                .includes(search.toLowerCase())
+        );
+
     return (
 
         <div>
 
-            <PageHeader
-                title="Horses"
+            {/* HEADER */}
+            <div
+                className="
+          flex
+          items-center
+          justify-between
 
-                subtitle="
-          Manage race horses and
-          performance information.
+          mb-8
         "
-            />
+            >
 
+                <PageHeader
+                    title="Horses"
+
+                    subtitle="
+            Manage race horses and
+            performance information.
+          "
+                />
+
+                <SearchInput
+                    value={search}
+
+                    onChange={(e) =>
+                        setSearch(e.target.value)
+                    }
+
+                    placeholder="Search horse..."
+                />
+
+            </div>
+
+            {/* TABLE */}
             <Table
                 headers={[
                     "Horse",
@@ -61,7 +101,7 @@ function Horses() {
                 ]}
             >
 
-                {horses.map((horse, index) => (
+                {filteredHorses.map((horse, index) => (
 
                     <div
                         key={index}
@@ -153,6 +193,7 @@ function Horses() {
             </Table>
 
         </div>
+
     );
 }
 
