@@ -1,4 +1,25 @@
+import { useState } from "react";
+
+import PageHeader from "../components/ui/PageHeader";
+
+import Button from "../components/ui/Button";
+
+import Card from "../components/ui/Card";
+
+import Modal from "../components/ui/Modal";
+
+import Input from "../components/ui/Input";
+
 function Horses() {
+
+    const [isOpen, setIsOpen] =
+        useState(false);
+
+    const [horseName, setHorseName] =
+        useState("");
+
+    const [breed, setBreed] =
+        useState("");
 
     const horses = [
 
@@ -18,101 +39,52 @@ function Horses() {
             wins: 12,
         },
 
-        {
-            name: "Night Fury",
-            breed: "Quarter Horse",
-            age: 3,
-            health: "Excellent",
-            wins: 9,
-        },
-
-        {
-            name: "Silver Storm",
-            breed: "Mustang",
-            age: 6,
-            health: "Average",
-            wins: 5,
-        },
-
     ];
+
+    const handleAddHorse = () => {
+
+        if (!horseName || !breed) {
+            alert("Please fill all fields.");
+            return;
+        }
+
+        alert("Horse Added Successfully!");
+
+        setHorseName("");
+
+        setBreed("");
+
+        setIsOpen(false);
+    };
 
     return (
 
         <div>
 
             {/* HEADER */}
-            <div
-                className="
-          flex
-          items-center
-          justify-between
-          mb-10
+            <PageHeader
+                title="Horses"
+
+                subtitle="
+          Manage race horses and
+          performance information.
         "
-            >
 
-                <div>
-
-                    <h1 className="page-title">
-                        Horses
-                    </h1>
-
-                    <p className="page-subtitle">
-                        Manage race horses and
-                        performance information.
-                    </p>
-
-                </div>
-
-                <button
-                    className="
-            bg-yellow-400
-            hover:bg-yellow-500
-            transition-all
-
-            px-6
-            py-4
-
-            rounded-2xl
-            font-semibold
-          "
-                >
-                    + Add Horse
-                </button>
-
-            </div>
-
-            {/* SEARCH */}
-            <div className="card p-5 mb-6">
-
-                <input
-                    type="text"
-                    placeholder="Search horses..."
-                    className="
-            w-full
-
-            bg-zinc-100
-            dark:bg-zinc-800
-
-            rounded-2xl
-
-            px-5
-            py-4
-
-            outline-none
-          "
-                />
-
-            </div>
+                action={
+                    <Button
+                        onClick={() =>
+                            setIsOpen(true)
+                        }
+                    >
+                        + Add Horse
+                    </Button>
+                }
+            />
 
             {/* TABLE */}
-            <div
-                className="
-          card
-          overflow-hidden
-        "
-            >
+            <Card className="overflow-hidden">
 
-                {/* TABLE HEADER */}
+                {/* HEADER */}
                 <div
                     className="
             grid
@@ -126,6 +98,7 @@ function Horses() {
 
             text-sm
             uppercase
+
             tracking-wider
 
             text-zinc-500
@@ -152,6 +125,7 @@ function Horses() {
 
                         <div
                             key={index}
+
                             className="
                 grid
                 grid-cols-5
@@ -169,52 +143,16 @@ function Horses() {
               "
                         >
 
-                            {/* NAME */}
-                            <div>
+                            <h3 className="font-bold">
+                                {horse.name}
+                            </h3>
 
-                                <h3 className="font-bold text-lg">
-                                    {horse.name}
-                                </h3>
+                            <p>{horse.breed}</p>
 
-                            </div>
+                            <p>{horse.age} yrs</p>
 
-                            {/* BREED */}
-                            <p className="text-zinc-600 dark:text-zinc-300">
-                                {horse.breed}
-                            </p>
+                            <p>{horse.health}</p>
 
-                            {/* AGE */}
-                            <p className="text-zinc-600 dark:text-zinc-300">
-                                {horse.age} yrs
-                            </p>
-
-                            {/* HEALTH */}
-                            <div>
-
-                                <span
-                                    className={`
-                    px-4
-                    py-2
-
-                    rounded-full
-
-                    text-sm
-                    font-semibold
-
-                    ${horse.health === "Excellent"
-                                            ? "bg-green-100 text-green-600"
-                                            : horse.health === "Good"
-                                                ? "bg-yellow-100 text-yellow-700"
-                                                : "bg-red-100 text-red-500"
-                                        }
-                  `}
-                                >
-                                    {horse.health}
-                                </span>
-
-                            </div>
-
-                            {/* WINS */}
                             <p className="font-bold">
                                 {horse.wins}
                             </p>
@@ -225,7 +163,56 @@ function Horses() {
 
                 </div>
 
-            </div>
+            </Card>
+
+            {/* MODAL */}
+            <Modal
+                isOpen={isOpen}
+
+                onClose={() =>
+                    setIsOpen(false)
+                }
+
+                title="Add New Horse"
+            >
+
+                <div className="space-y-5">
+
+                    <Input
+                        label="Horse Name"
+
+                        placeholder="Enter horse name"
+
+                        value={horseName}
+
+                        onChange={(e) =>
+                            setHorseName(e.target.value)
+                        }
+                    />
+
+                    <Input
+                        label="Breed"
+
+                        placeholder="Enter breed"
+
+                        value={breed}
+
+                        onChange={(e) =>
+                            setBreed(e.target.value)
+                        }
+                    />
+
+                    <Button
+                        fullWidth
+
+                        onClick={handleAddHorse}
+                    >
+                        Save Horse
+                    </Button>
+
+                </div>
+
+            </Modal>
 
         </div>
 

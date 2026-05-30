@@ -1,45 +1,114 @@
 function Modal({
+
     isOpen,
+
     onClose,
+
     title,
+
     children,
+
 }) {
+
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center">
 
-            {/* Overlay */}
+        <div
+            className="
+        fixed
+        inset-0
+
+        bg-black/40
+
+        flex
+        items-center
+        justify-center
+
+        z-50
+
+        p-4
+      "
+        >
+
+            {/* BACKDROP */}
             <div
                 onClick={onClose}
-                className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+
+                className="
+          absolute
+          inset-0
+        "
             ></div>
 
-            {/* Modal */}
-            <div className="relative bg-white w-full max-w-[700px] rounded-[36px] p-10 shadow-2xl animate-fadeIn">
+            {/* MODAL */}
+            <div
+                className="
+          relative
 
-                {/* Header */}
-                <div className="flex justify-between items-center mb-10">
+          bg-white
+          dark:bg-zinc-900
 
-                    <h2 className="text-4xl font-bold">
+          rounded-[32px]
+
+          w-full
+          max-w-2xl
+
+          p-8
+
+          shadow-2xl
+        "
+            >
+
+                {/* HEADER */}
+                <div
+                    className="
+            flex
+            items-center
+            justify-between
+
+            mb-8
+          "
+                >
+
+                    <h2
+                        className="
+              text-4xl
+              font-black
+
+              dark:text-white
+            "
+                    >
                         {title}
                     </h2>
 
                     <button
                         onClick={onClose}
-                        className="text-3xl"
+
+                        className="
+              w-12
+              h-12
+
+              rounded-2xl
+
+              bg-zinc-100
+              dark:bg-zinc-800
+
+              text-xl
+            "
                     >
                         ✕
                     </button>
 
                 </div>
 
-                {/* Content */}
+                {/* CONTENT */}
                 {children}
 
             </div>
 
         </div>
+
     );
 }
 

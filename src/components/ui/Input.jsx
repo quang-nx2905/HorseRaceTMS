@@ -1,60 +1,72 @@
 function Input({
+
     label,
+
     placeholder,
-    type = "text",
-    error,
-    name,
-    required = false,
+
     value,
+
     onChange,
+
+    type = "text",
+
 }) {
+
     return (
+
         <div>
 
-            {/* Label */}
-            {label && (
-                <label className="block mb-3 font-semibold">
+            <label
+                className="
+          block
 
-                    {label}
-                    {required && <span className="text-red-500">*</span>}
+          text-sm
+          font-semibold
 
-                </label>
-            )}
+          mb-3
 
-            {/* Input */}
+          dark:text-white
+        "
+            >
+                {label}
+            </label>
+
             <input
-                name={name}
                 type={type}
-                placeholder={placeholder}
-                required={required}
-                value={value}
-                onChange={onChange}
-                className={`
-          w-full
-          border
-          rounded-2xl
-          px-6
-          py-4
-          outline-none
-          transition-all
 
-          ${error
-                    ? "border-red-300 focus:border-red-500"
-                    : "border-zinc-200 focus:border-yellow-400"
-                }
-        `}
+                placeholder={placeholder}
+
+                value={value}
+
+                onChange={onChange}
+
+                className="
+          w-full
+
+          bg-zinc-100
+          dark:bg-zinc-800
+
+          dark:text-white
+
+          rounded-2xl
+
+          px-5
+          py-4
+
+          outline-none
+
+          border
+          border-transparent
+
+          focus:ring-2
+          focus:ring-yellow-400
+
+          transition-all
+        "
             />
 
-            {/* Error */}
-            {error && (
-                <p className="text-red-500 mt-2 text-sm">
-
-                    {error}
-
-                </p>
-            )}
-
         </div>
+
     );
 }
 
