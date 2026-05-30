@@ -15,10 +15,15 @@ import SearchInput from "../components/ui/SearchInput";
 
 import Pagination from "../components/ui/Pagination";
 
+import FilterSelect from "../components/ui/FilterSelect";
+
 function Horses() {
 
     const [search, setSearch] =
         useState("");
+
+    const [filter, setFilter] =
+        useState("All");
 
     const [currentPage, setCurrentPage] =
         useState(1);
@@ -67,12 +72,25 @@ function Horses() {
 
     ];
 
+    // SEARCH + FILTER
     const filteredHorses =
-        horses.filter((horse) =>
-            horse.name
-                .toLowerCase()
-                .includes(search.toLowerCase())
-        );
+        horses.filter((horse) => {
+
+            const matchesSearch =
+                horse.name
+                    .toLowerCase()
+                    .includes(search.toLowerCase());
+
+            const matchesFilter =
+                filter === "All"
+                    ? true
+                    : horse.health === filter;
+
+            return (
+                matchesSearch &&
+                matchesFilter
+            );
+        });
 
     // PAGINATION
     const itemsPerPage = 3;
@@ -115,15 +133,35 @@ function Horses() {
           "
                 />
 
-                <SearchInput
-                    value={search}
+                {/* ACTIONS */}
+                <div className="flex gap-4">
 
-                    onChange={(e) =>
-                        setSearch(e.target.value)
-                    }
+                    <SearchInput
+                        value={search}
 
-                    placeholder="Search horse..."
-                />
+                        onChange={(e) =>
+                            setSearch(e.target.value)
+                        }
+
+                        placeholder="Search horse..."
+                    />
+
+                    <FilterSelect
+                        value={filter}
+
+                        onChange={(e) =>
+                            setFilter(e.target.value)
+                        }
+
+                        options={[
+                            "All",
+                            "Excellent",
+                            "Good",
+                            "Poor",
+                        ]}
+                    />
+
+                </div>
 
             </div>
 
