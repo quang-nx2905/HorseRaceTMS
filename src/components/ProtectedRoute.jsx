@@ -1,12 +1,14 @@
 import { Navigate } from "react-router-dom";
-
 import { useAuth } from "../context/AuthContext";
 
 export function ProtectedRoute({ children }) {
-
   const { user } = useAuth();
 
-  if (!user) {
+  // ĐỌC THÊM TOKEN TỪ LOCALSTORAGE
+  const token = localStorage.getItem("token");
+
+  // Nếu cả biến hệ thống (user) và token trong trình duyệt đều không có -> Mới bắt đăng nhập
+  if (!user && !token) {
     return <Navigate to="/login" replace />;
   }
 
