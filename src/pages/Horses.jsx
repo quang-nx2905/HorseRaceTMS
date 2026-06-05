@@ -11,6 +11,7 @@ import HorseDetailsModal from "../components/horses/HorseDetailsModal";
 
 import CreateHorseModal from "../components/horses/CreateHorseModal";
 
+import EditHorseModal from "../components/horses/EditHorseModal";
 function Horses() {
 
   const [search, setSearch] =
@@ -20,6 +21,9 @@ function Horses() {
     useState(false);
 
   const [openCreate, setOpenCreate] =
+    useState(false);
+
+  const [openEdit, setOpenEdit] =
     useState(false);
 
   const [selectedHorse, setSelectedHorse] =
@@ -92,18 +96,26 @@ function Horses() {
           </button>
 
           <button
-            className="
-          w-10
-          h-10
-          rounded-xl
-          bg-zinc-100
-          dark:bg-zinc-700
-          flex
-          items-center
-          justify-center
-        "
+            onClick={() => {
 
-            Pencil size={16} />
+              setSelectedHorse(horse);
+
+              setOpenEdit(true);
+
+            }}
+            className="
+    w-10
+    h-10
+    rounded-xl
+    bg-zinc-100
+    dark:bg-zinc-700
+    flex
+    items-center
+    justify-center
+  "
+          >
+            <Pencil size={16} />
+          </button>
           <button
             onClick={() =>
               handleDeleteHorse(
@@ -111,20 +123,20 @@ function Horses() {
               )
             }
             className="
-    w-10
-    h-10
-    rounded-xl
-    bg-red-100
-    text-red-500
-    flex
-    items-center
-    justify-center
-  "
+          w-10
+          h-10
+          rounded-xl
+          bg-red-100
+          text-red-500
+          flex
+          items-center
+          justify-center
+          "
           >
             <Trash2 size={16} />
           </button>
 
-        </div>
+        </div >
 
       ),
     },
@@ -138,6 +150,20 @@ function Horses() {
       horse,
       ...prev,
     ]);
+
+  };
+
+  const handleUpdateHorse = (
+    updatedHorse
+  ) => {
+
+    setHorses((prev) =>
+      prev.map((horse) =>
+        horse.id === updatedHorse.id
+          ? updatedHorse
+          : horse
+      )
+    );
 
   };
 
@@ -258,6 +284,15 @@ function Horses() {
             setOpenCreate(false)
           }
           onCreate={handleCreateHorse}
+        />
+
+        <EditHorseModal
+          open={openEdit}
+          onClose={() =>
+            setOpenEdit(false)
+          }
+          horse={selectedHorse}
+          onSave={handleUpdateHorse}
         />
       </>
 
