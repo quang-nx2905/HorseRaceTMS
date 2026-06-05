@@ -21,6 +21,8 @@ import Pagination from "../components/common/Pagination";
 
 import usePagination from "../hooks/usePagination";
 
+import EmptyState from "../components/common/EmptyState";
+
 function Tournaments() {
 
   const [search, setSearch] =
@@ -407,6 +409,17 @@ function Tournaments() {
               />
 
             ))
+
+        ) : paginatedData.length === 0 ? (
+
+          <div className="col-span-2">
+
+            <EmptyState
+              title="No Tournament Found"
+              description="Try adjusting your search keyword or filter."
+            />
+
+          </div>
 
         ) : (
           paginatedData.map((tournament) => (
