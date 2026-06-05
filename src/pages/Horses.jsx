@@ -12,6 +12,9 @@ import HorseDetailsModal from "../components/horses/HorseDetailsModal";
 import CreateHorseModal from "../components/horses/CreateHorseModal";
 
 import EditHorseModal from "../components/horses/EditHorseModal";
+
+import ConfirmModal from "../components/common/ConfirmModal";
+
 function Horses() {
 
   const [search, setSearch] =
@@ -24,6 +27,9 @@ function Horses() {
     useState(false);
 
   const [openEdit, setOpenEdit] =
+    useState(false);
+
+  const [openDelete, setOpenDelete] =
     useState(false);
 
   const [selectedHorse, setSelectedHorse] =
@@ -116,22 +122,25 @@ function Horses() {
           >
             <Pencil size={16} />
           </button>
+
           <button
-            onClick={() =>
-              handleDeleteHorse(
-                horse.id
-              )
-            }
+            onClick={() => {
+
+              setSelectedHorse(horse);
+
+              setOpenDelete(true);
+
+            }}
             className="
-          w-10
-          h-10
-          rounded-xl
-          bg-red-100
-          text-red-500
-          flex
-          items-center
-          justify-center
-          "
+    w-10
+    h-10
+    rounded-xl
+    bg-red-100
+    text-red-500
+    flex
+    items-center
+    justify-center
+  "
           >
             <Trash2 size={16} />
           </button>
@@ -177,6 +186,20 @@ function Horses() {
           horse.id !== horseId
       )
     );
+
+  };
+
+  const handleConfirmDelete = () => {
+
+    if (!selectedHorse) return;
+
+    handleDeleteHorse(
+      selectedHorse.id
+    );
+
+    setOpenDelete(false);
+
+    setSelectedHorse(null);
 
   };
 
@@ -293,6 +316,16 @@ function Horses() {
           }
           horse={selectedHorse}
           onSave={handleUpdateHorse}
+        />
+
+        <ConfirmModal
+          open={openDelete}
+          onClose={() =>
+            setOpenDelete(false)
+          }
+          onConfirm={handleConfirmDelete}
+          title="Delete Horse"
+          message="This action cannot be undone."
         />
       </>
 
