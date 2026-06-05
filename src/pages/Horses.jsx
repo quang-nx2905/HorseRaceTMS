@@ -102,21 +102,24 @@ function Horses() {
           items-center
           justify-center
         "
-          >
-            <Pencil size={16} />
-          </button>
 
+            Pencil size={16} />
           <button
+            onClick={() =>
+              handleDeleteHorse(
+                horse.id
+              )
+            }
             className="
-          w-10
-          h-10
-          rounded-xl
-          bg-red-100
-          text-red-500
-          flex
-          items-center
-          justify-center
-        "
+    w-10
+    h-10
+    rounded-xl
+    bg-red-100
+    text-red-500
+    flex
+    items-center
+    justify-center
+  "
           >
             <Trash2 size={16} />
           </button>
@@ -135,6 +138,19 @@ function Horses() {
       horse,
       ...prev,
     ]);
+
+  };
+
+  const handleDeleteHorse = (
+    horseId
+  ) => {
+
+    setHorses((prev) =>
+      prev.filter(
+        (horse) =>
+          horse.id !== horseId
+      )
+    );
 
   };
 
