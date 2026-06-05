@@ -17,6 +17,10 @@ import TournamentDetailsDrawer from "../components/tournaments/TournamentDetails
 
 import TournamentCardSkeleton from "../components/skeletons/TournamentCardSkeleton";
 
+import Pagination from "../components/common/Pagination";
+
+import usePagination from "../hooks/usePagination";
+
 function Tournaments() {
 
   const [search, setSearch] =
@@ -46,6 +50,12 @@ function Tournaments() {
     return () => clearTimeout(timer);
 
   }, []);
+
+  useEffect(() => {
+
+    setCurrentPage(1);
+
+  }, [search, filter]);
 
   const tournaments = [
 
@@ -85,6 +95,39 @@ function Tournaments() {
       status: "Upcoming",
     },
 
+    {
+      id: 5,
+      name: "Spring Derby",
+      location: "Sydney",
+      date: "28 Jul 2026",
+      prize: "$120,000",
+      status: "Upcoming",
+    },
+    {
+      id: 6,
+      name: "Autumn Cup",
+      location: "Paris",
+      date: "03 Aug 2026",
+      prize: "$210,000",
+      status: "Live",
+    },
+    {
+      id: 7,
+      name: "World Racing Championship",
+      location: "Singapore",
+      date: "11 Aug 2026",
+      prize: "$650,000",
+      status: "Upcoming",
+    },
+    {
+      id: 8,
+      name: "Thunder Cup",
+      location: "Berlin",
+      date: "20 Aug 2026",
+      prize: "$175,000",
+      status: "Completed",
+    },
+
   ];
 
   const filteredTournaments =
@@ -103,6 +146,16 @@ function Tournaments() {
       return matchesSearch && matchesFilter;
 
     });
+
+  const {
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    paginatedData,
+  } = usePagination(
+    filteredTournaments,
+    4
+  );
 
   const totalLive =
     tournaments.filter(
@@ -356,8 +409,8 @@ function Tournaments() {
             ))
 
         ) : (
+          paginatedData.map((tournament) => (
 
-          filteredTournaments.map((tournament) => (
 
             <div
               key={tournament.id}
@@ -454,6 +507,12 @@ function Tournaments() {
         )}
 
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
 
       <CreateTournamentModal
         open={openModal}
