@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import DataTable from "../components/common/DataTable";
 import {
   Pencil,
   Trash2,
@@ -21,7 +21,6 @@ function Horses() {
         health: "Excellent",
         wins: 18,
       },
-
       {
         id: 2,
         name: "Golden Sprint",
@@ -30,7 +29,6 @@ function Horses() {
         health: "Good",
         wins: 12,
       },
-
       {
         id: 3,
         name: "Night Fury",
@@ -48,11 +46,90 @@ function Horses() {
         .includes(search.toLowerCase())
     );
 
+  const columns = [
+    {
+      key: "name",
+      title: "Horse",
+    },
+    {
+      key: "breed",
+      title: "Breed",
+    },
+    {
+      key: "age",
+      title: "Age",
+      render: (horse) => (
+        <span>
+          {horse.age} yrs
+        </span>
+      ),
+    },
+    {
+      key: "health",
+      title: "Health",
+      render: (horse) => (
+        <span
+          className={
+            horse.health === "Excellent"
+              ? "px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-600"
+              : horse.health === "Good"
+                ? "px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-700"
+                : "px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-500"
+          }
+        >
+          {horse.health}
+        </span>
+      ),
+    },
+    {
+      key: "wins",
+      title: "Wins",
+    },
+    {
+      key: "actions",
+      title: "Actions",
+      render: () => (
+        <div className="flex gap-3">
+
+          <button
+            className="
+              w-10
+              h-10
+              rounded-xl
+              bg-zinc-100
+              dark:bg-zinc-700
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Pencil size={16} />
+          </button>
+
+          <button
+            className="
+              w-10
+              h-10
+              rounded-xl
+              bg-red-100
+              text-red-500
+              flex
+              items-center
+              justify-center
+            "
+          >
+            <Trash2 size={16} />
+          </button>
+
+        </div>
+      ),
+    },
+  ];
+
   return (
 
     <div>
 
-      {/* HEADER */}
       <div
         className="
           flex
@@ -86,60 +163,43 @@ function Horses() {
 
         </div>
 
-        {/* ACTIONS */}
         <div className="flex gap-4">
 
-          {/* SEARCH */}
           <input
             type="text"
-
             value={search}
-
             onChange={(e) =>
               setSearch(e.target.value)
             }
-
             placeholder="Search horse..."
-
             className="
               bg-white
               dark:bg-zinc-900
-
               border
               border-zinc-200
               dark:border-zinc-800
-
               rounded-2xl
-
               px-5
               py-4
-
               outline-none
-
               dark:text-white
             "
           />
 
-          {/* BUTTON */}
           <button
             className="
               flex
               items-center
               gap-2
-
               bg-yellow-400
               hover:bg-yellow-500
-
               px-5
               py-4
-
               rounded-2xl
-
               font-semibold
             "
           >
             <Plus size={18} />
-
             Add Horse
           </button>
 
@@ -147,179 +207,10 @@ function Horses() {
 
       </div>
 
-      {/* TABLE */}
-      <div
-        className="
-          bg-white
-          dark:bg-zinc-900
-
-          border
-          border-zinc-200
-          dark:border-zinc-800
-
-          rounded-3xl
-
-          overflow-hidden
-        "
-      >
-
-        {/* TABLE HEADER */}
-        <div
-          className="
-            grid
-            grid-cols-6
-
-            px-8
-            py-6
-
-            border-b
-            border-zinc-200
-            dark:border-zinc-800
-
-            text-sm
-            uppercase
-
-            tracking-wider
-
-            text-zinc-500
-            font-semibold
-          "
-        >
-
-          <p>Horse</p>
-
-          <p>Breed</p>
-
-          <p>Age</p>
-
-          <p>Health</p>
-
-          <p>Wins</p>
-
-          <p>Actions</p>
-
-        </div>
-
-        {/* ROWS */}
-        {filteredHorses.map((horse) => (
-
-          <div
-            key={horse.id}
-
-            className="
-              grid
-              grid-cols-6
-
-              px-8
-              py-6
-
-              border-b
-              border-zinc-100
-              dark:border-zinc-800
-
-              hover:bg-zinc-50
-              dark:hover:bg-zinc-800
-
-              transition-all
-            "
-          >
-
-            {/* NAME */}
-            <h3
-              className="
-                font-bold
-                dark:text-white
-              "
-            >
-              {horse.name}
-            </h3>
-
-            {/* BREED */}
-            <p className="dark:text-zinc-300">
-              {horse.breed}
-            </p>
-
-            {/* AGE */}
-            <p className="dark:text-zinc-300">
-              {horse.age} yrs
-            </p>
-
-            {/* HEALTH */}
-            <div>
-
-              <span
-                className={
-                  horse.health === "Excellent"
-                    ? "px-4 py-2 rounded-full text-sm font-semibold bg-green-100 text-green-600"
-                    : horse.health === "Good"
-                      ? "px-4 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-700"
-                      : "px-4 py-2 rounded-full text-sm font-semibold bg-red-100 text-red-500"
-                }
-              >
-                {horse.health}
-              </span>
-
-            </div>
-
-            {/* WINS */}
-            <p
-              className="
-                font-bold
-                dark:text-white
-              "
-            >
-              {horse.wins}
-            </p>
-
-            {/* ACTIONS */}
-            <div className="flex gap-3">
-
-              {/* EDIT */}
-              <button
-                className="
-                  w-10
-                  h-10
-
-                  rounded-xl
-
-                  bg-zinc-100
-                  dark:bg-zinc-700
-
-                  flex
-                  items-center
-                  justify-center
-                "
-              >
-                <Pencil size={16} />
-              </button>
-
-              {/* DELETE */}
-              <button
-                className="
-                  w-10
-                  h-10
-
-                  rounded-xl
-
-                  bg-red-100
-
-                  text-red-500
-
-                  flex
-                  items-center
-                  justify-center
-                "
-              >
-                <Trash2 size={16} />
-              </button>
-
-            </div>
-
-          </div>
-
-        ))}
-
-      </div>
+      <DataTable
+        columns={columns}
+        data={filteredHorses}
+      />
 
     </div>
 
@@ -327,4 +218,3 @@ function Horses() {
 }
 
 export default Horses;
-
