@@ -9,6 +9,8 @@ import {
 
 import HorseDetailsModal from "../components/horses/HorseDetailsModal";
 
+import CreateHorseModal from "../components/horses/CreateHorseModal";
+
 function Horses() {
 
   const [search, setSearch] =
@@ -17,10 +19,13 @@ function Horses() {
   const [openDetails, setOpenDetails] =
     useState(false);
 
+  const [openCreate, setOpenCreate] =
+    useState(false);
+
   const [selectedHorse, setSelectedHorse] =
     useState(null);
 
-  const [horses] =
+  const [horses, setHorses] =
     useState([
       {
         id: 1,
@@ -122,6 +127,17 @@ function Horses() {
     },
   ];
 
+  const handleCreateHorse = (
+    horse
+  ) => {
+
+    setHorses((prev) => [
+      horse,
+      ...prev,
+    ]);
+
+  };
+
   return (
 
     <div>
@@ -183,17 +199,20 @@ function Horses() {
           />
 
           <button
+            onClick={() =>
+              setOpenCreate(true)
+            }
             className="
-              flex
-              items-center
-              gap-2
-              bg-yellow-400
-              hover:bg-yellow-500
-              px-5
-              py-4
-              rounded-2xl
-              font-semibold
-            "
+    flex
+    items-center
+    gap-2
+    bg-yellow-400
+    hover:bg-yellow-500
+    px-5
+    py-4
+    rounded-2xl
+    font-semibold
+  "
           >
             <Plus size={18} />
             Add Horse
@@ -215,6 +234,14 @@ function Horses() {
             setOpenDetails(false)
           }
           horse={selectedHorse}
+        />
+
+        <CreateHorseModal
+          open={openCreate}
+          onClose={() =>
+            setOpenCreate(false)
+          }
+          onCreate={handleCreateHorse}
         />
       </>
 
