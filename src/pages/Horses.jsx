@@ -1,15 +1,24 @@
 import { useState } from "react";
 import DataTable from "../components/common/DataTable";
 import {
+  Eye,
   Pencil,
   Trash2,
   Plus,
 } from "lucide-react";
 
+import HorseDetailsModal from "../components/horses/HorseDetailsModal";
+
 function Horses() {
 
   const [search, setSearch] =
     useState("");
+
+  const [openDetails, setOpenDetails] =
+    useState(false);
+
+  const [selectedHorse, setSelectedHorse] =
+    useState(null);
 
   const [horses] =
     useState([
@@ -48,80 +57,67 @@ function Horses() {
 
   const columns = [
     {
-      key: "name",
-      title: "Horse",
-    },
-    {
-      key: "breed",
-      title: "Breed",
-    },
-    {
-      key: "age",
-      title: "Age",
-      render: (horse) => (
-        <span>
-          {horse.age} yrs
-        </span>
-      ),
-    },
-    {
-      key: "health",
-      title: "Health",
-      render: (horse) => (
-        <span
-          className={
-            horse.health === "Excellent"
-              ? "px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-600"
-              : horse.health === "Good"
-                ? "px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-700"
-                : "px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-500"
-          }
-        >
-          {horse.health}
-        </span>
-      ),
-    },
-    {
-      key: "wins",
-      title: "Wins",
-    },
-    {
       key: "actions",
       title: "Actions",
-      render: () => (
+
+      render: (horse) => (
+
         <div className="flex gap-3">
 
           <button
+            onClick={() => {
+
+              setSelectedHorse(horse);
+
+              setOpenDetails(true);
+
+            }}
             className="
-              w-10
-              h-10
-              rounded-xl
-              bg-zinc-100
-              dark:bg-zinc-700
-              flex
-              items-center
-              justify-center
-            "
+          w-10
+          h-10
+          rounded-xl
+          bg-blue-100
+          text-blue-500
+          flex
+          items-center
+          justify-center
+        "
+          >
+            <Eye size={16} />
+          </button>
+
+          <button
+            className="
+          w-10
+          h-10
+          rounded-xl
+          bg-zinc-100
+          dark:bg-zinc-700
+          flex
+          items-center
+          justify-center
+        "
           >
             <Pencil size={16} />
           </button>
 
           <button
             className="
-              w-10
-              h-10
-              rounded-xl
-              bg-red-100
-              text-red-500
-              flex
-              items-center
-              justify-center
-            "
+          w-10
+          h-10
+          rounded-xl
+          bg-red-100
+          text-red-500
+          flex
+          items-center
+          justify-center
+        "
           >
             <Trash2 size={16} />
           </button>
 
         </div>
+
       ),
     },
   ];
@@ -207,10 +203,20 @@ function Horses() {
 
       </div>
 
-      <DataTable
-        columns={columns}
-        data={filteredHorses}
-      />
+      <>
+        <DataTable
+          columns={columns}
+          data={filteredHorses}
+        />
+
+        <HorseDetailsModal
+          open={openDetails}
+          onClose={() =>
+            setOpenDetails(false)
+          }
+          horse={selectedHorse}
+        />
+      </>
 
     </div>
 
