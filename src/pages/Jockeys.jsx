@@ -1,4 +1,15 @@
+import { useState } from "react";
+import Pagination from "../components/common/Pagination";
+
 function Jockeys() {
+
+  const [search, setSearch] =
+    useState("");
+
+  const [currentPage, setCurrentPage] =
+    useState(1);
+
+  const itemsPerPage = 4;
 
   const jockeys = [
 
@@ -35,6 +46,29 @@ function Jockeys() {
     },
 
   ];
+
+  const filteredJockeys =
+    jockeys.filter((jockey) =>
+      jockey.name
+        .toLowerCase()
+        .includes(
+          search.toLowerCase()
+        )
+    );
+
+  const totalPages =
+    Math.ceil(
+      filteredJockeys.length /
+      itemsPerPage
+    );
+
+  const paginatedJockeys =
+    filteredJockeys.slice(
+      (currentPage - 1) *
+      itemsPerPage,
+      currentPage *
+      itemsPerPage
+    );
 
   return (
 
@@ -77,7 +111,43 @@ function Jockeys() {
             font-semibold
           "
         >
-          + Add Jockey
+          <div className="flex gap-4">
+
+            <input
+              type="text"
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+              placeholder="Search jockey..."
+              className="
+      bg-white
+      dark:bg-zinc-900
+      border
+      border-zinc-200
+      dark:border-zinc-800
+      rounded-2xl
+      px-5
+      py-4
+      dark:text-white
+    "
+            />
+
+            <button
+              className="
+      bg-yellow-400
+      hover:bg-yellow-500
+      transition-all
+      px-6
+      py-4
+      rounded-2xl
+      font-semibold
+    "
+            >
+              + Add Jockey
+            </button>
+
+          </div>
         </button>
 
       </div>
@@ -94,11 +164,12 @@ function Jockeys() {
         "
       >
 
-        {jockeys.map((jockey, index) => (
+        {paginatedJockeys.map(
+          (jockey, index) => (
 
-          <div
-            key={index}
-            className="
+            <div
+              key={index}
+              className="
               card
               p-7
 
@@ -108,11 +179,11 @@ function Jockeys() {
               transition-all
               duration-300
             "
-          >
+            >
 
-            {/* AVATAR */}
-            <div
-              className="
+              {/* AVATAR */}
+              <div
+                className="
                 w-20
                 h-20
 
@@ -129,77 +200,77 @@ function Jockeys() {
 
                 mb-6
               "
-            >
-              {jockey.name.charAt(0)}
-            </div>
+              >
+                {jockey.name.charAt(0)}
+              </div>
 
-            {/* NAME */}
-            <h2
-              className="
+              {/* NAME */}
+              <h2
+                className="
                 text-3xl
                 font-bold
                 mb-2
               "
-            >
-              {jockey.name}
-            </h2>
+              >
+                {jockey.name}
+              </h2>
 
-            {/* COUNTRY */}
-            <p
-              className="
+              {/* COUNTRY */}
+              <p
+                className="
                 text-zinc-500
                 mb-8
               "
-            >
-              {jockey.country}
-            </p>
+              >
+                {jockey.country}
+              </p>
 
-            {/* STATS */}
-            <div className="space-y-5 mb-8">
+              {/* STATS */}
+              <div className="space-y-5 mb-8">
 
-              <div
-                className="
+                <div
+                  className="
                   flex
                   items-center
                   justify-between
                 "
-              >
+                >
 
-                <p className="text-zinc-500">
-                  Wins
-                </p>
+                  <p className="text-zinc-500">
+                    Wins
+                  </p>
 
-                <p className="font-bold text-xl">
-                  {jockey.wins}
-                </p>
+                  <p className="font-bold text-xl">
+                    {jockey.wins}
+                  </p>
 
-              </div>
+                </div>
 
-              <div
-                className="
+                <div
+                  className="
                   flex
                   items-center
                   justify-between
                 "
-              >
+                >
 
-                <p className="text-zinc-500">
-                  Experience
-                </p>
+                  <p className="text-zinc-500">
+                    Experience
+                  </p>
 
-                <p className="font-bold">
-                  {jockey.experience}
-                </p>
+                  <p className="font-bold">
+                    {jockey.experience}
+                  </p>
+
+                </div>
 
               </div>
 
-            </div>
+              {/* STATUS */}
+              <div className="mb-8">
 
-            {/* STATUS */}
-            <div className="mb-8">
-
-              <span
-                className={`
+                <span
+                  className={`
                   px-4
                   py-2
 
@@ -209,21 +280,21 @@ function Jockeys() {
                   font-semibold
 
                   ${jockey.status === "Elite"
-                    ? "bg-green-100 text-green-600"
-                    : jockey.status === "Professional"
-                      ? "bg-yellow-100 text-yellow-700"
-                      : "bg-blue-100 text-blue-600"
-                  }
+                      ? "bg-green-100 text-green-600"
+                      : jockey.status === "Professional"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-blue-100 text-blue-600"
+                    }
                 `}
-              >
-                {jockey.status}
-              </span>
+                >
+                  {jockey.status}
+                </span>
 
-            </div>
+              </div>
 
-            {/* BUTTON */}
-            <button
-              className="
+              {/* BUTTON */}
+              <button
+                className="
                 w-full
 
                 bg-zinc-900
@@ -239,13 +310,23 @@ function Jockeys() {
 
                 transition-all
               "
-            >
-              View Profile
-            </button>
+              >
+                View Profile
+              </button>
 
-          </div>
+            </div>
 
-        ))}
+          ))}
+
+      </div>
+
+      <div className="mt-8">
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
 
       </div>
 
