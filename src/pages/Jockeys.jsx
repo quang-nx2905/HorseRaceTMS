@@ -1,5 +1,6 @@
 import { useState } from "react";
 import Pagination from "../components/common/Pagination";
+import JockeyDetailsModal from "../components/jockeys/JockeyDetailsModal";
 
 function Jockeys() {
 
@@ -8,6 +9,12 @@ function Jockeys() {
 
   const [currentPage, setCurrentPage] =
     useState(1);
+
+  const [openDetails, setOpenDetails] =
+    useState(false);
+
+  const [selectedJockey, setSelectedJockey] =
+    useState(null);
 
   const itemsPerPage = 4;
 
@@ -294,22 +301,23 @@ function Jockeys() {
 
               {/* BUTTON */}
               <button
+                onClick={() => {
+
+                  setSelectedJockey(jockey);
+
+                  setOpenDetails(true);
+
+                }}
                 className="
-                w-full
-
-                bg-zinc-900
-                hover:bg-black
-
-                text-white
-
-                py-4
-
-                rounded-2xl
-
-                font-semibold
-
-                transition-all
-              "
+    w-full
+    bg-zinc-900
+    hover:bg-black
+    text-white
+    py-4
+    rounded-2xl
+    font-semibold
+    transition-all
+  "
               >
                 View Profile
               </button>
@@ -326,6 +334,14 @@ function Jockeys() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
+        />
+
+        <JockeyDetailsModal
+          open={openDetails}
+          onClose={() =>
+            setOpenDetails(false)
+          }
+          jockey={selectedJockey}
         />
 
       </div>
