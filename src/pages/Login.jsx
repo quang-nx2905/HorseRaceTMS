@@ -22,10 +22,17 @@ function Login() {
         import.meta.env.VITE_API_BASE_URL || "https://localhost:7179";
 
       // Gọi API Đăng nhập sang ASP.NET Core
-      const response = await axios.post(`${apiBaseUrl}/api/auth/login`, {
-        email: email, // Hoặc username: email tùy thuộc vào Backend bạn thiết kế nhận gì nhé
-        password: password,
-      });
+      // CHANGED: thêm withCredentials
+      const response = await axios.post(
+        `${apiBaseUrl}/api/auth/login`,
+        {
+          email: email,
+          password: password,
+        },
+        {
+          withCredentials: true,
+        },
+      );
 
       // Nếu Backend trả về dữ liệu thành công kèm Token
       if (response.data && response.data.accessToken) {
