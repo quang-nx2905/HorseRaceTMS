@@ -1,25 +1,18 @@
-import {
-  createContext,
-  useContext,
-  useState,
-} from "react";
+import { createContext, useContext, useState } from "react";
+
+import axios from "axios";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-
   const [user, setUser] = useState(() => {
-
     const savedUser = localStorage.getItem("user");
 
-    return savedUser
-      ? JSON.parse(savedUser)
-      : null;
+    return savedUser ? JSON.parse(savedUser) : null;
   });
 
   // LOGIN
   const login = (email, password) => {
-
     // DEMO LOGIN
     const fakeUser = {
       email,
@@ -28,18 +21,32 @@ export function AuthProvider({ children }) {
 
     setUser(fakeUser);
 
-    localStorage.setItem(
-      "user",
-      JSON.stringify(fakeUser)
-    );
+    localStorage.setItem("user", JSON.stringify(fakeUser));
   };
 
   // LOGOUT
-  const logout = () => {
+  const logout = async () => {
+    try {
+      const apiBaseUrl =
+        import.meta.env.VITE_API_BASE_URL || "https://localhost:7179";
 
-    setUser(null);
+      await axios.post(
+        `${apiBaseUrl}/api/auth/logout`,
+        {},
+        {
+          withCredentials: true,
+        },
+      );
+    } catch (error) {
+      console.error("Logout API Error:", error);
+    } finally {
+      setUser(null);
 
-    localStorage.removeItem("user");
+      localStorage.removeItem("user");
+
+      // Xóa access token nếu đang lưu
+      localStorage.removeItem("token");
+    }
   };
 
   return (
