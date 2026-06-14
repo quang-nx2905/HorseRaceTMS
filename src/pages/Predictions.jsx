@@ -1,9 +1,18 @@
 import { useState } from "react";
+import PredictionDetailsModal
+    from "../components/predictions/PredictionDetailsModal";
 
 function Predictions() {
 
     const [search, setSearch] =
         useState("");
+
+    const [openDetails, setOpenDetails] =
+        useState(false);
+
+    const [selectedPrediction,
+        setSelectedPrediction] =
+        useState(null);
 
     const [predictions] = useState([
 
@@ -312,6 +321,35 @@ function Predictions() {
 
                         </div>
 
+                        <div className="mb-6">
+
+                            <button
+                                onClick={() => {
+
+                                    setSelectedPrediction(
+                                        item
+                                    );
+
+                                    setOpenDetails(true);
+
+                                }}
+                                className="
+            px-5
+            py-3
+
+            bg-yellow-400
+            hover:bg-yellow-500
+
+            rounded-2xl
+
+            font-semibold
+        "
+                            >
+                                View Details
+                            </button>
+
+                        </div>
+
                         {/* STATS */}
                         <div
                             className="
@@ -376,6 +414,16 @@ function Predictions() {
                 ))}
 
             </div>
+
+            <PredictionDetailsModal
+                open={openDetails}
+                onClose={() =>
+                    setOpenDetails(false)
+                }
+                prediction={
+                    selectedPrediction
+                }
+            />
 
         </div>
 
