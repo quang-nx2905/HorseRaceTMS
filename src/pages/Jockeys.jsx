@@ -1,6 +1,9 @@
 import { useState } from "react";
 import Pagination from "../components/common/Pagination";
 import JockeyDetailsModal from "../components/jockeys/JockeyDetailsModal";
+import CreateJockeyModal from "../components/jockeys/CreateJockeyModal";
+import EditJockeyModal from "../components/jockeys/EditJockeyModal";
+import ConfirmModal from "../components/common/ConfirmModal";
 
 function Jockeys() {
 
@@ -16,43 +19,93 @@ function Jockeys() {
   const [selectedJockey, setSelectedJockey] =
     useState(null);
 
+  const [openCreate, setOpenCreate] =
+    useState(false);
+
+  const [openEdit, setOpenEdit] =
+    useState(false);
+
+  const [openDelete, setOpenDelete] =
+    useState(false);
+
   const itemsPerPage = 4;
 
-  const jockeys = [
+  const [jockeys, setJockeys] =
+    useState([
 
-    {
-      name: "James Carter",
-      country: "United Kingdom",
-      wins: 48,
-      experience: "8 Years",
-      status: "Elite",
-    },
+      {
+        name: "James Carter",
+        country: "United Kingdom",
+        wins: 48,
+        experience: "8 Years",
+        status: "Elite",
+      },
 
-    {
-      name: "Ryan Cooper",
-      country: "United States",
-      wins: 36,
-      experience: "5 Years",
-      status: "Professional",
-    },
+      {
+        name: "Ryan Cooper",
+        country: "United States",
+        wins: 36,
+        experience: "5 Years",
+        status: "Professional",
+      },
 
-    {
-      name: "Akira Sato",
-      country: "Japan",
-      wins: 52,
-      experience: "10 Years",
-      status: "Elite",
-    },
+      {
+        name: "Akira Sato",
+        country: "Japan",
+        wins: 52,
+        experience: "10 Years",
+        status: "Elite",
+      },
 
-    {
-      name: "Lucas Fernandez",
-      country: "Spain",
-      wins: 21,
-      experience: "3 Years",
-      status: "Rising Star",
-    },
+      {
+        name: "Lucas Fernandez",
+        country: "Spain",
+        wins: 21,
+        experience: "3 Years",
+        status: "Rising Star",
+      },
 
-  ];
+    ]);
+
+  const handleCreateJockey = (
+    jockey
+  ) => {
+
+    setJockeys((prev) => [
+      jockey,
+      ...prev,
+    ]);
+
+  };
+
+  const handleUpdateJockey = (
+    updatedJockey
+  ) => {
+
+    setJockeys((prev) =>
+      prev.map((jockey) =>
+        jockey.id ===
+          updatedJockey.id
+          ? updatedJockey
+          : jockey
+      )
+    );
+
+  };
+
+  const handleDeleteJockey = () => {
+
+    setJockeys((prev) =>
+      prev.filter(
+        (jockey) =>
+          jockey.id !==
+          selectedJockey.id
+      )
+    );
+
+    setOpenDelete(false);
+
+  };
 
   const filteredJockeys =
     jockeys.filter((jockey) =>
@@ -141,15 +194,21 @@ function Jockeys() {
             />
 
             <button
+              onClick={() =>
+                setOpenCreate(true)
+              }
               className="
-      bg-yellow-400
-      hover:bg-yellow-500
-      transition-all
-      px-6
-      py-4
-      rounded-2xl
-      font-semibold
-    "
+    bg-yellow-400
+    hover:bg-yellow-500
+
+    transition-all
+
+    px-6
+    py-4
+
+    rounded-2xl
+    font-semibold
+  "
             >
               + Add Jockey
             </button>
@@ -299,6 +358,58 @@ function Jockeys() {
 
               </div>
 
+              <button
+                onClick={() => {
+
+                  setSelectedJockey(jockey);
+
+                  setOpenEdit(true);
+
+                }}
+                className="
+    w-full
+    mb-3
+
+    bg-yellow-400
+    hover:bg-yellow-500
+
+    py-4
+
+    rounded-2xl
+
+    font-semibold
+  "
+              >
+                Edit
+              </button>
+
+              <button
+                onClick={() => {
+
+                  setSelectedJockey(jockey);
+
+                  setOpenDelete(true);
+
+                }}
+                className="
+    w-full
+    mb-3
+
+    bg-red-500
+    hover:bg-red-600
+
+    text-white
+
+    py-4
+
+    rounded-2xl
+
+    font-semibold
+  "
+              >
+                Delete
+              </button>
+
               {/* BUTTON */}
               <button
                 onClick={() => {
@@ -342,6 +453,39 @@ function Jockeys() {
             setOpenDetails(false)
           }
           jockey={selectedJockey}
+        />
+
+        <CreateJockeyModal
+          open={openCreate}
+          onClose={() =>
+            setOpenCreate(false)
+          }
+          onCreate={
+            handleCreateJockey
+          }
+        />
+
+        <EditJockeyModal
+          open={openEdit}
+          onClose={() =>
+            setOpenEdit(false)
+          }
+          jockey={selectedJockey}
+          onUpdate={
+            handleUpdateJockey
+          }
+        />
+
+        <ConfirmModal
+          open={openDelete}
+          onClose={() =>
+            setOpenDelete(false)
+          }
+          onConfirm={
+            handleDeleteJockey
+          }
+          title="Delete Jockey"
+          message="Are you sure you want to delete this jockey?"
         />
 
       </div>
