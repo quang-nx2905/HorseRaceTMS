@@ -1,6 +1,11 @@
+import { useState } from "react";
+
 function Predictions() {
 
-    const predictions = [
+    const [search, setSearch] =
+        useState("");
+
+    const [predictions] = useState([
 
         {
             horse: "Thunder Bolt",
@@ -26,7 +31,16 @@ function Predictions() {
             status: "Risky",
         },
 
-    ];
+    ]);
+
+    const filteredPredictions =
+        predictions.filter((item) =>
+            item.horse
+                .toLowerCase()
+                .includes(
+                    search.toLowerCase()
+                )
+        );
 
     return (
 
@@ -55,8 +69,30 @@ function Predictions() {
 
                 </div>
 
-                <button
-                    className="
+                <div className="flex gap-4">
+
+                    <input
+                        type="text"
+                        placeholder="Search horse..."
+                        value={search}
+                        onChange={(e) =>
+                            setSearch(
+                                e.target.value
+                            )
+                        }
+                        className="
+            px-4
+            py-3
+
+            border
+            border-zinc-200
+
+            rounded-2xl
+        "
+                    />
+
+                    <button
+                        className="
             bg-yellow-400
             hover:bg-yellow-500
 
@@ -67,10 +103,12 @@ function Predictions() {
 
             rounded-2xl
             font-semibold
-          "
-                >
-                    Generate Prediction
-                </button>
+        "
+                    >
+                        Generate Prediction
+                    </button>
+
+                </div>
 
             </div>
 
@@ -166,7 +204,7 @@ function Predictions() {
             {/* PREDICTION LIST */}
             <div className="space-y-6">
 
-                {predictions.map((item, index) => (
+                {filteredPredictions.map((item, index) => (
 
                     <div
                         key={index}
@@ -227,6 +265,50 @@ function Predictions() {
                             >
                                 {item.status}
                             </span>
+
+                        </div>
+
+                        <div className="mb-6">
+
+                            <div
+                                className="
+            flex
+            justify-between
+            mb-2
+        "
+                            >
+
+                                <span>
+                                    Win Probability
+                                </span>
+
+                                <span>
+                                    {item.confidence}
+                                </span>
+
+                            </div>
+
+                            <div
+                                className="
+            h-3
+            bg-zinc-100
+            rounded-full
+            overflow-hidden
+        "
+                            >
+
+                                <div
+                                    className="
+                h-full
+                bg-yellow-400
+            "
+                                    style={{
+                                        width:
+                                            item.confidence,
+                                    }}
+                                />
+
+                            </div>
 
                         </div>
 
