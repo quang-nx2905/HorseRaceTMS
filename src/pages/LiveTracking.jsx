@@ -1,33 +1,69 @@
-const liveRaces = [
-    {
-        horse: "Thunderbolt",
-        jockey: "Alex Carter",
-        speed: "68 km/h",
-        lap: "Final Lap",
-        progress: "92%",
-        status: "Leading",
-    },
-
-    {
-        horse: "Golden Arrow",
-        jockey: "Michael Reeves",
-        speed: "64 km/h",
-        lap: "Lap 5",
-        progress: "78%",
-        status: "Chasing",
-    },
-
-    {
-        horse: "Black Phantom",
-        jockey: "Daniel Foster",
-        speed: "59 km/h",
-        lap: "Lap 4",
-        progress: "66%",
-        status: "Stable",
-    },
-];
+import { useEffect, useState } from "react";
 
 function LiveTracking() {
+
+    const [liveRaces, setLiveRaces] =
+        useState([
+            {
+                horse: "Thunderbolt",
+                jockey: "Alex Carter",
+                speed: 68,
+                lap: "Final Lap",
+                progress: 92,
+                status: "Leading",
+            },
+
+            {
+                horse: "Golden Arrow",
+                jockey: "Michael Reeves",
+                speed: 64,
+                lap: "Lap 5",
+                progress: 78,
+                status: "Chasing",
+            },
+
+            {
+                horse: "Black Phantom",
+                jockey: "Daniel Foster",
+                speed: 59,
+                lap: "Lap 4",
+                progress: 66,
+                status: "Stable",
+            },
+        ]);
+
+    useEffect(() => {
+
+        const interval =
+            setInterval(() => {
+           
+
+                setLiveRaces((prev) =>
+                    prev.map((race) => ({
+
+                        ...race,
+
+                        speed:
+                            race.speed +
+                            Math.floor(
+                                Math.random() * 3
+                            ) - 1,
+
+                        progress:
+                            race.progress >= 100
+                                ? 100
+                                : race.progress + 1,
+
+                    }))
+                );
+
+            }, 3000);
+
+        return () =>
+            clearInterval(interval);
+
+    }, []);
+
     return (
         <>
 
@@ -139,7 +175,7 @@ function LiveTracking() {
 
                                     <Metric
                                         label="Speed"
-                                        value={race.speed}
+                                        value={`${race.speed} km/h`}
                                     />
 
                                     <Metric
@@ -149,7 +185,7 @@ function LiveTracking() {
 
                                     <Metric
                                         label="Progress"
-                                        value={race.progress}
+                                        value={`${race.progress}%`}
                                     />
 
                                 </div>
@@ -160,7 +196,7 @@ function LiveTracking() {
                                     <div
                                         className="h-full bg-yellow-400 rounded-full"
                                         style={{
-                                            width: race.progress,
+                                            width: `${race.progress}%`,
                                         }}
                                     ></div>
 
