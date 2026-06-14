@@ -1,4 +1,25 @@
+import { useState } from "react";
+import RaceMonitorModal
+    from "../components/referee/RaceMonitorModal";
+import IncidentReportModal
+    from "../components/referee/IncidentReportModal";
+
 function Referee() {
+
+    const [search, setSearch] =
+        useState("");
+
+    const [openMonitor,
+        setOpenMonitor] =
+        useState(false);
+
+    const [selectedRace,
+        setSelectedRace] =
+        useState(null);
+
+    const [openIncident,
+        setOpenIncident] =
+        useState(false);
 
     const races = [
 
@@ -24,6 +45,15 @@ function Referee() {
         },
 
     ];
+
+    const filteredRaces =
+        races.filter((race) =>
+            race.race
+                .toLowerCase()
+                .includes(
+                    search.toLowerCase()
+                )
+        );
 
     return (
 
@@ -52,8 +82,30 @@ function Referee() {
 
                 </div>
 
-                <button
-                    className="
+                <div className="flex gap-4">
+
+                    <input
+                        type="text"
+                        placeholder="Search race..."
+                        value={search}
+                        onChange={(e) =>
+                            setSearch(
+                                e.target.value
+                            )
+                        }
+                        className="
+            px-4
+            py-3
+
+            border
+            border-zinc-200
+
+            rounded-2xl
+        "
+                    />
+
+                    <button
+                        className="
             bg-red-500
             hover:bg-red-600
 
@@ -65,12 +117,12 @@ function Referee() {
             rounded-2xl
 
             font-semibold
+        "
+                    >
+                        Emergency Stop
+                    </button>
 
-            transition-all
-          "
-                >
-                    Emergency Stop
-                </button>
+                </div>
 
             </div>
 
@@ -146,7 +198,7 @@ function Referee() {
             {/* RACE CONTROL */}
             <div className="space-y-6">
 
-                {races.map((item, index) => (
+                {filteredRaces.map((item, index) => (
 
                     <div
                         key={index}
@@ -243,21 +295,59 @@ function Referee() {
                             >
 
                                 <button
+                                    onClick={() => {
+
+                                        setSelectedRace(
+                                            item
+                                        );
+
+                                        setOpenMonitor(true);
+
+                                    }}
                                     className="
-                    bg-yellow-400
-                    hover:bg-yellow-500
+        bg-yellow-400
+        hover:bg-yellow-500
 
-                    px-5
-                    py-3
+        px-5
+        py-3
 
-                    rounded-2xl
+        rounded-2xl
 
-                    font-semibold
+        font-semibold
 
-                    transition-all
-                  "
+        transition-all
+    "
                                 >
                                     Monitor
+                                </button>
+
+                                <button
+                                    onClick={() => {
+
+                                        setSelectedRace(
+                                            item
+                                        );
+
+                                        setOpenIncident(
+                                            true
+                                        );
+
+                                    }}
+                                    className="
+        bg-orange-500
+        hover:bg-orange-600
+
+        text-white
+
+        px-5
+        py-3
+
+        rounded-2xl
+
+        font-semibold
+    "
+                                >
+                                    Report
                                 </button>
 
                                 <button
@@ -289,6 +379,22 @@ function Referee() {
                 ))}
 
             </div>
+
+            <RaceMonitorModal
+                open={openMonitor}
+                onClose={() =>
+                    setOpenMonitor(false)
+                }
+                race={selectedRace}
+            />
+
+            <IncidentReportModal
+                open={openIncident}
+                onClose={() =>
+                    setOpenIncident(false)
+                }
+                race={selectedRace}
+            />
 
         </div>
 
