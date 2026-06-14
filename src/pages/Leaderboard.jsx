@@ -1,4 +1,21 @@
+import { useState } from "react";
+import RankingDetailsModal from "../components/leaderboard/RankingDetailsModal";
+
 function Leaderboard() {
+
+  const [search, setSearch] =
+    useState("");
+
+  const [openDetails, setOpenDetails] =
+    useState(false);
+
+  const [selectedRanking, setSelectedRanking] =
+    useState(null);
+
+  const [currentPage, setCurrentPage] =
+    useState(1);
+
+  const itemsPerPage = 3;
 
   const rankings = [
 
@@ -36,21 +53,183 @@ function Leaderboard() {
 
   ];
 
+  const filteredRankings =
+    rankings.filter(
+      (item) =>
+        item.horse
+          .toLowerCase()
+          .includes(
+            search.toLowerCase()
+          ) ||
+        item.jockey
+          .toLowerCase()
+          .includes(
+            search.toLowerCase()
+          )
+    );
+
+  const totalPages =
+    Math.ceil(
+      filteredRankings.length /
+      itemsPerPage
+    );
+
+  const paginatedRankings =
+    filteredRankings.slice(
+      (currentPage - 1) *
+      itemsPerPage,
+      currentPage *
+      itemsPerPage
+    );
+
+  const totalPoints =
+    rankings.reduce(
+      (sum, item) =>
+        sum + item.points,
+      0
+    );
+
+  const totalWins =
+    rankings.reduce(
+      (sum, item) =>
+        sum + item.wins,
+      0
+    );
+
+  const topHorse =
+    rankings[0]?.horse;
+
+  const topJockey =
+    rankings[0]?.jockey;
+
   return (
 
     <div>
 
       {/* HEADER */}
-      <div className="mb-10">
+      <div
+        className="
+    flex
+    items-center
+    justify-between
+    mb-10
+  "
+      >
 
-        <h1 className="page-title">
-          Leaderboard
-        </h1>
+        <div>
 
-        <p className="page-subtitle">
-          Global horse racing rankings
-          and championship standings.
-        </p>
+          <h1 className="page-title">
+            Leaderboard
+          </h1>
+
+          <p className="page-subtitle">
+            Global horse racing rankings
+            and championship standings.
+          </p>
+
+        </div>
+
+        <input
+          type="text"
+          placeholder="Search horse or jockey..."
+          value={search}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
+          className="
+      px-4
+      py-3
+
+      border
+      border-zinc-200
+
+      rounded-2xl
+
+      outline-none
+    "
+        />
+
+      </div>
+
+      {/* STATS */}
+      <div
+        className="
+    grid
+    grid-cols-1
+    md:grid-cols-2
+    xl:grid-cols-4
+    gap-6
+    mb-10
+  "
+      >
+
+        <div className="card p-6">
+
+          <p className="text-zinc-500 mb-2">
+            Total Points
+          </p>
+
+          <h2
+            className="
+        text-4xl
+        font-black
+      "
+          >
+            {totalPoints}
+          </h2>
+
+        </div>
+
+        <div className="card p-6">
+
+          <p className="text-zinc-500 mb-2">
+            Total Wins
+          </p>
+
+          <h2
+            className="
+        text-4xl
+        font-black
+      "
+          >
+            {totalWins}
+          </h2>
+
+        </div>
+
+        <div className="card p-6">
+
+          <p className="text-zinc-500 mb-2">
+            Top Horse
+          </p>
+
+          <h2
+            className="
+        text-2xl
+        font-black
+      "
+          >
+            {topHorse}
+          </h2>
+
+        </div>
+
+        <div className="card p-6">
+
+          <p className="text-zinc-500 mb-2">
+            Top Jockey
+          </p>
+
+          <h2
+            className="
+        text-2xl
+        font-black
+      "
+          >
+            {topJockey}
+          </h2>
+
+        </div>
 
       </div>
 
@@ -271,10 +450,72 @@ function Leaderboard() {
 
         </div>
 
+        <div
+          className="
+    flex
+    justify-center
+    gap-3
+    mt-8
+  "
+        >
+
+          <button
+            disabled={
+              currentPage === 1
+            }
+            onClick={() =>
+              setCurrentPage(
+                currentPage - 1
+              )
+            }
+            className="
+      px-4
+      py-2
+      rounded-xl
+      border
+      disabled:opacity-50
+    "
+          >
+            Previous
+          </button>
+
+          <span
+            className="
+      flex
+      items-center
+      font-semibold
+    "
+          >
+            {currentPage} / {totalPages}
+          </span>
+
+          <button
+            disabled={
+              currentPage ===
+              totalPages
+            }
+            onClick={() =>
+              setCurrentPage(
+                currentPage + 1
+              )
+            }
+            className="
+      px-4
+      py-2
+      rounded-xl
+      border
+      disabled:opacity-50
+    "
+          >
+            Next
+          </button>
+
+        </div>
+
         {/* ROWS */}
         <div>
 
-          {rankings.map((item, index) => (
+          {paginatedRankings.map((item, index) => (
 
             <div
               key={index}
@@ -308,9 +549,45 @@ function Leaderboard() {
 
               <p>{item.wins}</p>
 
-              <p className="font-black">
-                {item.points}
-              </p>
+              <div
+                className="
+    flex
+    items-center
+    justify-between
+  "
+              >
+
+                <p className="font-black">
+                  {item.points}
+                </p>
+
+                <button
+                  onClick={() => {
+
+                    setSelectedRanking(
+                      item
+                    );
+
+                    setOpenDetails(true);
+
+                  }}
+                  className="
+      px-3
+      py-1
+
+      bg-yellow-400
+      hover:bg-yellow-500
+
+      rounded-xl
+
+      text-sm
+      font-semibold
+    "
+                >
+                  View
+                </button>
+
+              </div>
 
             </div>
 
@@ -320,6 +597,13 @@ function Leaderboard() {
 
       </div>
 
+      <RankingDetailsModal
+        open={openDetails}
+        onClose={() =>
+          setOpenDetails(false)
+        }
+        ranking={selectedRanking}
+      />
     </div>
 
   );
