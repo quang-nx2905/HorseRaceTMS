@@ -23,6 +23,10 @@ import usePagination from "../hooks/usePagination";
 
 import EmptyState from "../components/common/EmptyState";
 
+import ConfirmModal from "../components/common/ConfirmModal";
+
+import EditTournamentModal from "../components/modals/EditTournamentModal";
+
 function Tournaments() {
 
   const [search, setSearch] =
@@ -39,6 +43,12 @@ function Tournaments() {
 
   const [selectedTournament, setSelectedTournament] =
     useState(null);
+
+  const [openDelete, setOpenDelete] =
+    useState(false);
+
+  const [openEdit, setOpenEdit] =
+    useState(false);
 
   const [loading, setLoading] =
     useState(true);
@@ -59,78 +69,79 @@ function Tournaments() {
 
   }, [search, filter]);
 
-  const tournaments = [
+  const [tournaments, setTournaments] =
+    useState([
 
-    {
-      id: 1,
-      name: "Golden Derby Championship",
-      location: "Tokyo Arena",
-      date: "12 Jun 2026",
-      prize: "$250,000",
-      status: "Live",
-    },
+      {
+        id: 1,
+        name: "Golden Derby Championship",
+        location: "Tokyo Arena",
+        date: "12 Jun 2026",
+        prize: "$250,000",
+        status: "Live",
+      },
 
-    {
-      id: 2,
-      name: "Royal Horse Cup",
-      location: "London Stadium",
-      date: "20 Jun 2026",
-      prize: "$180,000",
-      status: "Upcoming",
-    },
+      {
+        id: 2,
+        name: "Royal Horse Cup",
+        location: "London Stadium",
+        date: "20 Jun 2026",
+        prize: "$180,000",
+        status: "Upcoming",
+      },
 
-    {
-      id: 3,
-      name: "Thunder Racing League",
-      location: "New York Track",
-      date: "02 Jul 2026",
-      prize: "$320,000",
-      status: "Completed",
-    },
+      {
+        id: 3,
+        name: "Thunder Racing League",
+        location: "New York Track",
+        date: "02 Jul 2026",
+        prize: "$320,000",
+        status: "Completed",
+      },
 
-    {
-      id: 4,
-      name: "Equine Masters",
-      location: "Dubai Racing Club",
-      date: "18 Jul 2026",
-      prize: "$500,000",
-      status: "Upcoming",
-    },
+      {
+        id: 4,
+        name: "Equine Masters",
+        location: "Dubai Racing Club",
+        date: "18 Jul 2026",
+        prize: "$500,000",
+        status: "Upcoming",
+      },
 
-    {
-      id: 5,
-      name: "Spring Derby",
-      location: "Sydney",
-      date: "28 Jul 2026",
-      prize: "$120,000",
-      status: "Upcoming",
-    },
-    {
-      id: 6,
-      name: "Autumn Cup",
-      location: "Paris",
-      date: "03 Aug 2026",
-      prize: "$210,000",
-      status: "Live",
-    },
-    {
-      id: 7,
-      name: "World Racing Championship",
-      location: "Singapore",
-      date: "11 Aug 2026",
-      prize: "$650,000",
-      status: "Upcoming",
-    },
-    {
-      id: 8,
-      name: "Thunder Cup",
-      location: "Berlin",
-      date: "20 Aug 2026",
-      prize: "$175,000",
-      status: "Completed",
-    },
+      {
+        id: 5,
+        name: "Spring Derby",
+        location: "Sydney",
+        date: "28 Jul 2026",
+        prize: "$120,000",
+        status: "Upcoming",
+      },
+      {
+        id: 6,
+        name: "Autumn Cup",
+        location: "Paris",
+        date: "03 Aug 2026",
+        prize: "$210,000",
+        status: "Live",
+      },
+      {
+        id: 7,
+        name: "World Racing Championship",
+        location: "Singapore",
+        date: "11 Aug 2026",
+        prize: "$650,000",
+        status: "Upcoming",
+      },
+      {
+        id: 8,
+        name: "Thunder Cup",
+        location: "Berlin",
+        date: "20 Aug 2026",
+        prize: "$175,000",
+        status: "Completed",
+      },
 
-  ];
+    ]);
 
   const filteredTournaments =
     tournaments.filter((item) => {
@@ -179,6 +190,35 @@ function Tournaments() {
     setSelectedTournament(tournament);
 
     setOpenDrawer(true);
+
+  };
+
+  const handleDeleteTournament = () => {
+
+    setTournaments((prev) =>
+      prev.filter(
+        (item) =>
+          item.id !==
+          selectedTournament.id
+      )
+    );
+
+    setOpenDelete(false);
+
+  };
+
+  const handleUpdateTournament = (
+    updatedTournament
+  ) => {
+
+    setTournaments((prev) =>
+      prev.map((item) =>
+        item.id ===
+          updatedTournament.id
+          ? updatedTournament
+          : item
+      )
+    );
 
   };
 
@@ -496,7 +536,7 @@ function Tournaments() {
 
               </div>
 
-              <div className="flex gap-4 mt-8">
+              <div className="flex gap-3 mt-8">
 
                 <button
                   onClick={() =>
@@ -504,11 +544,46 @@ function Tournaments() {
                   }
                   className="flex-1 bg-yellow-400 hover:bg-yellow-500 py-3 rounded-2xl font-semibold transition-all"
                 >
-                  View Details
+                  View
                 </button>
 
-                <button className="flex-1 bg-zinc-100 dark:bg-zinc-800 dark:text-white py-3 rounded-2xl font-semibold transition-all">
+                <button
+                  onClick={() => {
+
+                    setSelectedTournament(
+                      tournament
+                    );
+
+                    setOpenEdit(true);
+
+                  }}
+                  className="
+    flex-1
+    bg-zinc-100
+    dark:bg-zinc-800
+    dark:text-white
+    py-3
+    rounded-2xl
+    font-semibold
+    transition-all
+  "
+                >
                   Edit
+                </button>
+
+                <button
+                  onClick={() => {
+
+                    setSelectedTournament(
+                      tournament
+                    );
+
+                    setOpenDelete(true);
+
+                  }}
+                  className="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-2xl font-semibold transition-all"
+                >
+                  Delete
                 </button>
 
               </div>
@@ -540,6 +615,31 @@ function Tournaments() {
           setOpenDrawer(false)
         }
         tournament={selectedTournament}
+      />
+
+      <ConfirmModal
+        open={openDelete}
+        onClose={() =>
+          setOpenDelete(false)
+        }
+        onConfirm={
+          handleDeleteTournament
+        }
+        title="Delete Tournament"
+        message="Are you sure you want to delete this tournament?"
+      />
+
+      <EditTournamentModal
+        open={openEdit}
+        onClose={() =>
+          setOpenEdit(false)
+        }
+        tournament={
+          selectedTournament
+        }
+        onUpdate={
+          handleUpdateTournament
+        }
       />
 
     </div>
