@@ -249,6 +249,174 @@ function Profile() {
 
                         </div>
 
+                        {/* STATS */}
+
+                        <div
+                            className="
+        grid
+        grid-cols-1
+        md:grid-cols-4
+        gap-6
+    "
+                        >
+
+                            <div className="card p-6">
+
+                                <p className="text-zinc-500">
+                                    Total Races
+                                </p>
+
+                                <h2 className="text-4xl font-black mt-3">
+                                    128
+                                </h2>
+
+                            </div>
+
+                            <div className="card p-6">
+
+                                <p className="text-zinc-500">
+                                    Horses Managed
+                                </p>
+
+                                <h2 className="text-4xl font-black mt-3">
+                                    56
+                                </h2>
+
+                            </div>
+
+                            <div className="card p-6">
+
+                                <p className="text-zinc-500">
+                                    Jockeys
+                                </p>
+
+                                <h2 className="text-4xl font-black mt-3">
+                                    24
+                                </h2>
+
+                            </div>
+
+                            <div className="card p-6">
+
+                                <p className="text-zinc-500">
+                                    Win Rate
+                                </p>
+
+                                <h2 className="text-4xl font-black mt-3">
+                                    86%
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+                        {/* RECENT ACTIVITIES */}
+
+                        <div
+                            className="
+        bg-white
+        dark:bg-zinc-900
+
+        border
+        border-zinc-200
+        dark:border-zinc-800
+
+        rounded-[32px]
+
+        p-8
+    "
+                        >
+
+                            <h2
+                                className="
+            text-3xl
+            font-bold
+            dark:text-white
+
+            mb-8
+        "
+                            >
+                                Recent Activities
+                            </h2>
+
+                            <div className="space-y-5">
+
+                                <div
+                                    className="
+                border-b
+                border-zinc-200
+                dark:border-zinc-800
+
+                pb-4
+            "
+                                >
+
+                                    <p className="font-semibold dark:text-white">
+                                        Updated horse profile
+                                    </p>
+
+                                    <p className="text-zinc-500 text-sm mt-1">
+                                        5 minutes ago
+                                    </p>
+
+                                </div>
+
+                                <div
+                                    className="
+                border-b
+                border-zinc-200
+                dark:border-zinc-800
+
+                pb-4
+            "
+                                >
+
+                                    <p className="font-semibold dark:text-white">
+                                        Created new tournament
+                                    </p>
+
+                                    <p className="text-zinc-500 text-sm mt-1">
+                                        20 minutes ago
+                                    </p>
+
+                                </div>
+
+                                <div
+                                    className="
+                border-b
+                border-zinc-200
+                dark:border-zinc-800
+
+                pb-4
+            "
+                                >
+
+                                    <p className="font-semibold dark:text-white">
+                                        Added new jockey
+                                    </p>
+
+                                    <p className="text-zinc-500 text-sm mt-1">
+                                        1 hour ago
+                                    </p>
+
+                                </div>
+
+                                <div>
+
+                                    <p className="font-semibold dark:text-white">
+                                        Updated race results
+                                    </p>
+
+                                    <p className="text-zinc-500 text-sm mt-1">
+                                        Yesterday
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
                     </div>
 
                 </div>
