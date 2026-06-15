@@ -19,6 +19,7 @@ import Predictions from "./pages/Predictions";
 import Leaderboard from "./pages/Leaderboard";
 import Referee from "./pages/Referee";
 import Spectator from "./pages/Spectator";
+import Settings from "./pages/Settings";
 
 function App() {
   return (
@@ -111,6 +112,17 @@ function App() {
               <ProtectedRoute>
                 <DashboardLayout>
                   <Spectator />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <Settings />
                 </DashboardLayout>
               </ProtectedRoute>
             }

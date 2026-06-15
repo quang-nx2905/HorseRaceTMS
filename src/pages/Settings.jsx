@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
     useTheme,
 } from "../context/ThemeContext";
@@ -6,8 +8,16 @@ function Settings() {
 
     const {
         darkMode,
-        setDarkMode,
+        toggleTheme,
     } = useTheme();
+
+    const [emailNotification,
+        setEmailNotification] =
+        useState(true);
+
+    const [smsNotification,
+        setSmsNotification] =
+        useState(false);
 
     return (
 
@@ -89,7 +99,7 @@ function Settings() {
 
                         <button
                             onClick={() =>
-                                setDarkMode(!darkMode)
+                                toggleTheme()
                             }
                             className={`
                 w-[80px]
@@ -124,6 +134,88 @@ function Settings() {
 
                     </div>
 
+                    {/* NOTIFICATIONS */}
+
+                    <div
+                        className="
+        pt-8
+        pb-8
+
+        border-b
+        border-zinc-200
+        dark:border-zinc-800
+    "
+                    >
+
+                        <h2
+                            className="
+            text-2xl
+            font-bold
+            dark:text-white
+            mb-6
+        "
+                        >
+                            Notifications
+                        </h2>
+
+                        <div className="space-y-5">
+
+                            <div
+                                className="
+                flex
+                justify-between
+                items-center
+            "
+                            >
+
+                                <p className="dark:text-white">
+                                    Email Notifications
+                                </p>
+
+                                <input
+                                    type="checkbox"
+                                    checked={
+                                        emailNotification
+                                    }
+                                    onChange={() =>
+                                        setEmailNotification(
+                                            !emailNotification
+                                        )
+                                    }
+                                />
+
+                            </div>
+
+                            <div
+                                className="
+                flex
+                justify-between
+                items-center
+            "
+                            >
+
+                                <p className="dark:text-white">
+                                    SMS Notifications
+                                </p>
+
+                                <input
+                                    type="checkbox"
+                                    checked={
+                                        smsNotification
+                                    }
+                                    onChange={() =>
+                                        setSmsNotification(
+                                            !smsNotification
+                                        )
+                                    }
+                                />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                     {/* ACCOUNT */}
                     <div className="pt-8">
 
@@ -137,6 +229,75 @@ function Settings() {
                         >
                             Account Preferences
                         </h2>
+
+                        <div className="pt-8">
+
+                            <h2
+                                className="
+            text-2xl
+            font-bold
+            dark:text-white
+            mb-6
+        "
+                            >
+                                Security
+                            </h2>
+
+                            <div className="space-y-5">
+
+                                <input
+                                    type="password"
+                                    placeholder="Current Password"
+                                    className="
+                w-full
+                h-[60px]
+
+                bg-zinc-100
+                dark:bg-zinc-800
+
+                rounded-2xl
+                px-5
+
+                dark:text-white
+            "
+                                />
+
+                                <input
+                                    type="password"
+                                    placeholder="New Password"
+                                    className="
+                w-full
+                h-[60px]
+
+                bg-zinc-100
+                dark:bg-zinc-800
+
+                rounded-2xl
+                px-5
+
+                dark:text-white
+            "
+                                />
+
+                                <button
+                                    className="
+                bg-red-500
+                hover:bg-red-600
+
+                text-white
+
+                px-8
+                py-4
+
+                rounded-2xl
+            "
+                                >
+                                    Change Password
+                                </button>
+
+                            </div>
+
+                        </div>
 
                         <div className="space-y-5">
 
