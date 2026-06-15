@@ -1,19 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
-
+import { useState } from "react";
+import axios from "axios";
 import toast from "react-hot-toast";
 
 import AuthLayout from "../layouts/AuthLayout";
 
 import Input from "../components/ui/Input";
 import Button from "../components/ui/Button";
-import { useAuth } from "../context/AuthContext";
 
 function Register() {
-
     const navigate = useNavigate();
-    const { register } = useAuth();
+    const [loading, setLoading] = useState(false);
 
-    const handleRegister = (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
 
         const fullName = e.target.fullName.value;
@@ -26,8 +25,13 @@ function Register() {
             return;
         }
 
-        if (password.length < 6) {
-            toast.error("Password must be at least 6 characters");
+        if (fullName.length >= 20) {
+            toast.error("Full Name must be shorter than 20 characters");
+            return;
+        }
+
+        if (password.length < 9 || password.length > 19) {
+            toast.error("Password must be between 9 and 19 characters");
             return;
         }
 
@@ -36,16 +40,34 @@ function Register() {
             return;
         }
 
-        register(fullName, email, password);
+        setLoading(true);
 
-        toast.success("Account created successfully");
+        try {
+            const apiBaseUrl =
+                import.meta.env.VITE_API_BASE_URL || "https://localhost:7179";
 
-        navigate("/");
+            await axios.post(`${apiBaseUrl}/api/auth/register`, {
+                fullName,
+                email,
+                password,
+                confirmPassword,
+            });
+
+            toast.success("Account created successfully");
+            navigate("/login");
+        } catch (error) {
+            console.error("Register Error:", error);
+            const errorMessage =
+                error.response?.data?.message ||
+                "Cannot connect to server. Please check Backend!";
+            toast.error(`Registration Failed: ${errorMessage}`);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <AuthLayout>
-
             <div
                 className="
           w-full
@@ -57,10 +79,8 @@ function Register() {
           p-10
         "
             >
-
                 {/* Header */}
                 <div className="mb-10">
-
                     <h1
                         className="
               text-5xl
@@ -70,21 +90,19 @@ function Register() {
                     >
                         Create Account
                     </h1>
-
                     <p className="text-zinc-500 text-lg">
                         Register to access the
                         horse racing tournament platform.
                     </p>
-
                 </div>
 
                 {/* Form */}
                 <form onSubmit={handleRegister} className="space-y-6">
-
                     <Input
                         name="fullName"
                         label="Full Name"
                         placeholder="Enter your full name"
+                        disabled={loading}
                         required
                     />
 
@@ -93,6 +111,7 @@ function Register() {
                         type="email"
                         label="Email"
                         placeholder="Enter your email"
+                        disabled={loading}
                         required
                     />
 
@@ -101,6 +120,7 @@ function Register() {
                         type="password"
                         label="Password"
                         placeholder="Create password"
+                        disabled={loading}
                         required
                     />
 
@@ -109,13 +129,13 @@ function Register() {
                         type="password"
                         label="Confirm Password"
                         placeholder="Confirm password"
+                        disabled={loading}
                         required
                     />
 
-                    <Button type="submit">
-                        Create Account
+                    <Button type="submit" disabled={loading} fullWidth>
+                        {loading ? "Creating Account..." : "Create Account"}
                     </Button>
-
                 </form>
 
                 {/* Footer */}
@@ -127,7 +147,6 @@ function Register() {
           "
                 >
                     Already have an account?
-
                     <Link
                         to="/login"
                         className="
@@ -139,11 +158,8 @@ function Register() {
                     >
                         Sign In
                     </Link>
-
                 </p>
-
             </div>
-
         </AuthLayout>
     );
 }
