@@ -149,12 +149,7 @@ function Jockeys() {
 
       {/* HEADER */}
       <div
-        className="
-          flex
-          items-center
-          justify-between
-          mb-10
-        "
+        className="flex items-center justify-between mb-10"
       >
 
         <div>
@@ -171,18 +166,7 @@ function Jockeys() {
         </div>
 
         <button
-          className="
-            bg-yellow-400
-            hover:bg-yellow-500
-
-            transition-all
-
-            px-6
-            py-4
-
-            rounded-2xl
-            font-semibold
-          "
+          className="bg-yellow-400 hover:bg-yellow-500 transition-all px-6 py-4 rounded-2xl font-semibold"
         >
           <div className="flex gap-4">
 
@@ -193,35 +177,14 @@ function Jockeys() {
                 setSearch(e.target.value)
               }
               placeholder="Search jockey..."
-              className="
-      bg-white
-      dark:bg-zinc-900
-      border
-      border-zinc-200
-      dark:border-zinc-800
-      rounded-2xl
-      px-5
-      py-4
-      dark:text-white
-    "
+              className="bg-white border border-zinc-200 rounded-2xl px-5 py-4"
             />
 
             <button
               onClick={() =>
                 setOpenCreate(true)
               }
-              className="
-    bg-yellow-400
-    hover:bg-yellow-500
-
-    transition-all
-
-    px-6
-    py-4
-
-    rounded-2xl
-    font-semibold
-  "
+              className="bg-yellow-400 hover:bg-yellow-500 transition-all px-6 py-4 rounded-2xl font-semibold"
             >
               + Add Jockey
             </button>
@@ -233,14 +196,7 @@ function Jockeys() {
 
       {/* GRID */}
       <div
-        className="
-          grid
-          grid-cols-1
-          md:grid-cols-2
-          xl:grid-cols-4
-
-          gap-6
-        "
+        className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6"
       >
 
         {paginatedJockeys.map(
@@ -248,58 +204,26 @@ function Jockeys() {
 
             <div
               key={index}
-              className="
-              card
-              p-7
-
-              hover:shadow-xl
-              hover:-translate-y-1
-
-              transition-all
-              duration-300
-            "
+              className="card p-7 hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
             >
 
               {/* AVATAR */}
               <div
-                className="
-                w-20
-                h-20
-
-                rounded-full
-
-                bg-yellow-400
-
-                flex
-                items-center
-                justify-center
-
-                text-3xl
-                font-black
-
-                mb-6
-              "
+                className="w-20 h-20 rounded-full bg-yellow-400 flex items-center justify-center text-3xl font-black mb-6"
               >
                 {jockey.name.charAt(0)}
               </div>
 
               {/* NAME */}
               <h2
-                className="
-                text-3xl
-                font-bold
-                mb-2
-              "
+                className="text-3xl font-bold mb-2"
               >
                 {jockey.name}
               </h2>
 
               {/* COUNTRY */}
               <p
-                className="
-                text-zinc-500
-                mb-8
-              "
+                className="text-zinc-500 mb-8"
               >
                 {jockey.country}
               </p>
@@ -308,11 +232,7 @@ function Jockeys() {
               <div className="space-y-5 mb-8">
 
                 <div
-                  className="
-                  flex
-                  items-center
-                  justify-between
-                "
+                  className="flex items-center justify-between"
                 >
 
                   <p className="text-zinc-500">
@@ -326,11 +246,7 @@ function Jockeys() {
                 </div>
 
                 <div
-                  className="
-                  flex
-                  items-center
-                  justify-between
-                "
+                  className="flex items-center justify-between"
                 >
 
                   <p className="text-zinc-500">
@@ -350,21 +266,18 @@ function Jockeys() {
 
                 <span
                   className={`
-                  px-4
-                  py-2
-
-                  rounded-full
-
-                  text-sm
-                  font-semibold
-
-                  ${jockey.status === "Elite"
-                      ? "bg-green-100 text-green-600"
-                      : jockey.status === "Professional"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-blue-100 text-blue-600"
-                    }
-                `}
+  px-4
+  py-2
+  rounded-full
+  text-sm
+  font-semibold
+                    ${jockey.status === "Elite"
+  ? "bg-green-100 text-green-600"
+  : jockey.status === "Professional"
+  ? "bg-yellow-100 text-yellow-700"
+  : "bg-blue-100 text-blue-600"
+  }
+`} 
                 >
                   {jockey.status}
                 </span>
@@ -379,19 +292,7 @@ function Jockeys() {
                   setOpenEdit(true);
 
                 }}
-                className="
-    w-full
-    mb-3
-
-    bg-yellow-400
-    hover:bg-yellow-500
-
-    py-4
-
-    rounded-2xl
-
-    font-semibold
-  "
+                className="w-full mb-3 bg-yellow-400 hover:bg-yellow-500 py-4 rounded-2xl font-semibold"
               >
                 Edit
               </button>
@@ -404,21 +305,7 @@ function Jockeys() {
                   setOpenDelete(true);
 
                 }}
-                className="
-    w-full
-    mb-3
-
-    bg-red-500
-    hover:bg-red-600
-
-    text-white
-
-    py-4
-
-    rounded-2xl
-
-    font-semibold
-  "
+                className="w-full mb-3 bg-red-500 hover:bg-red-600 text-white py-4 rounded-2xl font-semibold"
               >
                 Delete
               </button>
@@ -432,16 +319,7 @@ function Jockeys() {
                   setOpenDetails(true);
 
                 }}
-                className="
-    w-full
-    bg-zinc-900
-    hover:bg-black
-    text-white
-    py-4
-    rounded-2xl
-    font-semibold
-    transition-all
-  "
+                className="w-full bg-zinc-900 hover:bg-black text-white py-4 rounded-2xl font-semibold transition-all"
               >
                 View Profile
               </button>

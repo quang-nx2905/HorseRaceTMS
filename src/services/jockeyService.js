@@ -6,6 +6,7 @@ import {
 
 const API_URL =
     `${API_BASE_URL}/jockeys`;
+    
 export const getAllJockeys =
     () => axios.get(API_URL);
 

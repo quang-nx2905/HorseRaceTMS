@@ -6,11 +6,11 @@ function Dashboard() {
   return (
     <div>
 
-      <h1 className="text-6xl font-black dark:text-white">
+      <h1 className="text-6xl font-black">
         Dashboard
       </h1>
 
-      <p className="text-zinc-500 dark:text-zinc-400 mt-5 text-xl">
+      <p className="text-zinc-500 mt-5 text-xl">
         Welcome back to the Horse Race Tournament Management System.
       </p>
 

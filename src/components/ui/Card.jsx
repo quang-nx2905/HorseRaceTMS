@@ -10,19 +10,13 @@ function Card({
 
         <div
             className={`
-        bg-white
-        dark:bg-zinc-900
-
-        rounded-3xl
-
-        border
-        border-zinc-200
-        dark:border-zinc-800
-
-        shadow-sm
-
-        ${className}
-      `}
+  bg-white
+  rounded-3xl
+  border
+  border-zinc-200
+  shadow-sm
+          ${className}
+`} 
         >
 
             {children}

@@ -3,13 +3,13 @@ function AnalyticsChart() {
     const bars = [40, 65, 45, 78, 70, 92];
 
     return (
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 h-[420px]">
+        <div className="bg-white border border-zinc-200 rounded-3xl p-8 h-[420px]">
 
-            <h2 className="text-4xl font-black dark:text-white">
+            <h2 className="text-4xl font-black">
                 Weekly Analytics
             </h2>
 
-            <p className="text-zinc-500 dark:text-zinc-400 mt-2">
+            <p className="text-zinc-500 mt-2">
                 Tournament performance overview
             </p>
 

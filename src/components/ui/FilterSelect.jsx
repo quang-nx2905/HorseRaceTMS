@@ -11,23 +11,7 @@ function FilterSelect({
 
             onChange={onChange}
 
-            className="
-        bg-white
-        dark:bg-zinc-900
-
-        border
-        border-zinc-200
-        dark:border-zinc-800
-
-        rounded-2xl
-
-        px-5
-        py-4
-
-        outline-none
-
-        dark:text-white
-      "
+            className="bg-white border border-zinc-200 rounded-2xl px-5 py-4 outline-none"
         >
 
             {options.map((option, index) => (

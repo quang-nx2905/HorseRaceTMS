@@ -14,33 +14,7 @@ function NotificationPanel() {
     return (
 
         <div
-            className="
-        absolute
-        right-0
-        top-16
-
-        w-[380px]
-
-        bg-white
-        dark:bg-zinc-900
-
-        border
-        border-zinc-200
-        dark:border-zinc-800
-
-        rounded-3xl
-
-        shadow-2xl
-
-        p-5
-
-        z-50
-
-        animate-in
-        fade-in
-        zoom-in-95
-        duration-200
-      "
+            className="absolute right-0 top-16 w-[380px] bg-white border border-zinc-200 rounded-3xl shadow-2xl p-5 z-50 animate-in fade-in zoom-in-95 duration-200"
         >
 
             {/* HEADER */}
@@ -48,7 +22,7 @@ function NotificationPanel() {
 
                 <div>
 
-                    <h2 className="text-xl font-black dark:text-white">
+                    <h2 className="text-xl font-black">
                         Notifications
                     </h2>
 
@@ -69,42 +43,14 @@ function NotificationPanel() {
 
                 <button
                     onClick={markAllRead}
-                    className="
-            flex-1
-
-            bg-zinc-100
-            dark:bg-zinc-800
-
-            dark:text-white
-
-            py-3
-
-            rounded-2xl
-
-            text-sm
-            font-semibold
-          "
+                    className="flex-1 bg-zinc-100 py-3 rounded-2xl text-sm font-semibold"
                 >
                     Mark all read
                 </button>
 
                 <button
                     onClick={clearAll}
-                    className="
-            flex-1
-
-            bg-red-100
-            dark:bg-red-950
-
-            text-red-500
-
-            py-3
-
-            rounded-2xl
-
-            text-sm
-            font-semibold
-          "
+                    className="flex-1 bg-red-100 text-red-500 py-3 rounded-2xl text-sm font-semibold"
                 >
                     Clear all
                 </button>
@@ -120,7 +66,7 @@ function NotificationPanel() {
                         🔔
                     </div>
 
-                    <h3 className="text-xl font-bold dark:text-white">
+                    <h3 className="text-xl font-bold">
                         No Notifications
                     </h3>
 

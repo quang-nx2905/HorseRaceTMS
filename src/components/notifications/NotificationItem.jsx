@@ -9,27 +9,26 @@ function NotificationItem({
 
         <div
             className={`
-        p-4
-        rounded-2xl
-        transition-all
-        cursor-pointer
-
-        ${unread
-                    ? "bg-yellow-50 dark:bg-yellow-950"
-                    : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                }
-      `}
+  p-4
+  rounded-2xl
+  transition-all
+  cursor-pointer
+          ${unread
+  ? "bg-yellow-50 "
+  : "hover:bg-zinc-100 "
+  }
+`} 
         >
 
             <div className="flex items-start justify-between">
 
                 <div>
 
-                    <h3 className="font-semibold dark:text-white">
+                    <h3 className="font-semibold">
                         {title}
                     </h3>
 
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
+                    <p className="text-sm text-zinc-500 mt-1">
                         {message}
                     </p>
 

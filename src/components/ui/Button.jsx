@@ -21,15 +21,15 @@ function Button({
             onClick={onClick}
             {...props}
             className={`
-        px-6
-        py-4
-        rounded-2xl
-        font-semibold
-        transition-all
-        duration-200
-        ${variants[variant]}
-        ${fullWidth ? "w-full" : ""}
-      `}
+  px-6
+  py-4
+  rounded-2xl
+  font-semibold
+  transition-all
+  duration-200
+          ${variants[variant]}
+          ${fullWidth ? "w-full" : ""}
+`} 
         >
             {children}
         </button>

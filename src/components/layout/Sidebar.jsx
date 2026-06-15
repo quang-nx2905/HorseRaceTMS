@@ -64,13 +64,13 @@ function Sidebar() {
   return (
     <div
       className={`
-      bg-white dark:bg-zinc-900
-      border-r border-zinc-200 dark:border-zinc-800
-      min-h-screen
-      flex flex-col justify-between
-      transition-all duration-300
-      ${sidebarOpen ? "w-[260px] p-6" : "w-[95px] p-4"}
-    `}
+  bg-white
+  border-r border-zinc-200
+  min-h-screen
+  flex flex-col justify-between
+  transition-all duration-300
+        ${sidebarOpen ? "w-[260px] p-6" : "w-[95px] p-4"}
+`} 
     >
       <div>
         <div className="mb-10 flex items-center gap-3">
@@ -80,11 +80,11 @@ function Sidebar() {
 
           {sidebarOpen && (
             <div>
-              <h1 className="text-2xl font-black dark:text-white">
+              <h1 className="text-2xl font-black">
                 Horse Race
               </h1>
 
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="text-sm text-zinc-500">
                 Premium Horse Racing Platform
               </p>
             </div>
@@ -104,7 +104,7 @@ function Sidebar() {
                 font-medium
                 ${isActive
                   ? "bg-yellow-400 text-black"
-                  : "text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  : "text-zinc-700  hover:bg-zinc-100 "
                 }
               `
               }
@@ -118,13 +118,13 @@ function Sidebar() {
       </div>
 
       <div className="space-y-3">
-        <button className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
+        <button className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl hover:bg-zinc-100 transition-all">
           <Settings size={20} />
 
           {sidebarOpen && <span>Settings</span>}
         </button>
 
-        <button className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-red-500 hover:bg-red-50 dark:hover:bg-red-950 transition-all">
+        <button className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-red-500 hover:bg-red-50 transition-all">
           <LogOut size={20} />
 
           {sidebarOpen && <span>Logout</span>}

@@ -24,7 +24,7 @@ function JockeyDetailsModal({
                         Name
                     </p>
 
-                    <h2 className="text-2xl font-bold dark:text-white">
+                    <h2 className="text-2xl font-bold">
                         {jockey.name}
                     </h2>
 
@@ -36,7 +36,7 @@ function JockeyDetailsModal({
                         Country
                     </p>
 
-                    <h3 className="font-semibold dark:text-white">
+                    <h3 className="font-semibold">
                         {jockey.country}
                     </h3>
 
@@ -48,7 +48,7 @@ function JockeyDetailsModal({
                         Wins
                     </p>
 
-                    <h3 className="font-semibold dark:text-white">
+                    <h3 className="font-semibold">
                         {jockey.wins}
                     </h3>
 
@@ -60,7 +60,7 @@ function JockeyDetailsModal({
                         Experience
                     </p>
 
-                    <h3 className="font-semibold dark:text-white">
+                    <h3 className="font-semibold">
                         {jockey.experience}
                     </h3>
 
@@ -72,7 +72,7 @@ function JockeyDetailsModal({
                         Status
                     </p>
 
-                    <h3 className="font-semibold dark:text-white">
+                    <h3 className="font-semibold">
                         {jockey.status}
                     </h3>
 

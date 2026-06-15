@@ -22,12 +22,7 @@ function Profile() {
                 <div>
 
                     <h1
-                        className="
-              text-5xl
-              font-bold
-              dark:text-white
-              mb-3
-            "
+                        className="text-5xl font-bold mb-3"
                     >
                         Profile
                     </h1>
@@ -41,54 +36,17 @@ function Profile() {
 
                 {/* PROFILE CARD */}
                 <div
-                    className="
-            bg-white
-            dark:bg-zinc-900
-
-            border
-            border-zinc-200
-            dark:border-zinc-800
-
-            rounded-[32px]
-
-            p-10
-
-            max-w-[900px]
-          "
+                    className="bg-white border border-zinc-200 rounded-[32px] p-10 max-w-[900px]"
                 >
 
                     {/* TOP */}
                     <div
-                        className="
-              flex
-              flex-col
-              md:flex-row
-              md:items-center
-              gap-8
-              pb-10
-              border-b
-              border-zinc-200
-              dark:border-zinc-800
-            "
+                        className="flex flex-col md:flex-row md:items-center gap-8 pb-10 border-b border-zinc-200"
                     >
 
                         {/* Avatar */}
                         <div
-                            className="
-                w-[120px]
-                h-[120px]
-
-                rounded-full
-
-                bg-yellow-400
-
-                flex
-                items-center
-                justify-center
-
-                text-5xl
-                font-bold
-              "
+                            className="w-[120px] h-[120px] rounded-full bg-yellow-400 flex items-center justify-center text-5xl font-bold"
                         >
                             {profile.name.charAt(0)}
                         </div>
@@ -97,12 +55,7 @@ function Profile() {
                         <div>
 
                             <h2
-                                className="
-                  text-4xl
-                  font-bold
-                  dark:text-white
-                  mb-3
-                "
+                                className="text-4xl font-bold mb-3"
                             >
                                 {profile.name}
                             </h2>
@@ -112,18 +65,7 @@ function Profile() {
                             </p>
 
                             <div
-                                className="
-                  inline-flex
-                  px-4
-                  py-2
-                  rounded-full
-
-                  bg-yellow-100
-                  text-yellow-700
-
-                  text-sm
-                  font-semibold
-                "
+                                className="inline-flex px-4 py-2 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold"
                             >
                                 Tournament Director
                             </div>
@@ -136,12 +78,7 @@ function Profile() {
                     <div className="pt-10">
 
                         <div
-                            className="
-                grid
-                grid-cols-1
-                md:grid-cols-2
-                gap-6
-              "
+                            className="grid grid-cols-1 md:grid-cols-2 gap-6"
                         >
 
                             <input
@@ -153,15 +90,7 @@ function Profile() {
                                         name: e.target.value,
                                     })
                                 }
-                                className="
-        h-[60px]
-        bg-zinc-100
-        dark:bg-zinc-800
-        rounded-2xl
-        px-5
-        outline-none
-        dark:text-white
-    "
+                                className="h-[60px] bg-zinc-100 rounded-2xl px-5 outline-none"
                             />
 
                             <input
@@ -173,15 +102,7 @@ function Profile() {
                                         email: e.target.value,
                                     })
                                 }
-                                className="
-        h-[60px]
-        bg-zinc-100
-        dark:bg-zinc-800
-        rounded-2xl
-        px-5
-        outline-none
-        dark:text-white
-    "
+                                className="h-[60px] bg-zinc-100 rounded-2xl px-5 outline-none"
                             />
 
                             <input
@@ -193,15 +114,7 @@ function Profile() {
                                         phone: e.target.value,
                                     })
                                 }
-                                className="
-        h-[60px]
-        bg-zinc-100
-        dark:bg-zinc-800
-        rounded-2xl
-        px-5
-        outline-none
-        dark:text-white
-    "
+                                className="h-[60px] bg-zinc-100 rounded-2xl px-5 outline-none"
                             />
 
                             <input
@@ -214,15 +127,7 @@ function Profile() {
                                             e.target.value,
                                     })
                                 }
-                                className="
-        h-[60px]
-        bg-zinc-100
-        dark:bg-zinc-800
-        rounded-2xl
-        px-5
-        outline-none
-        dark:text-white
-    "
+                                className="h-[60px] bg-zinc-100 rounded-2xl px-5 outline-none"
                             />
 
                         </div>
@@ -236,15 +141,7 @@ function Profile() {
                                         "Profile updated successfully!"
                                     );
                                 }}
-                                className="
-        bg-yellow-400
-        hover:bg-yellow-300
-        px-8
-        py-4
-        rounded-2xl
-        font-semibold
-        transition-all
-    "
+                                className="bg-yellow-400 hover:bg-yellow-300 px-8 py-4 rounded-2xl font-semibold transition-all"
                             >
                                 Update Profile
                             </button>
@@ -254,12 +151,7 @@ function Profile() {
                         {/* STATS */}
 
                         <div
-                            className="
-        grid
-        grid-cols-1
-        md:grid-cols-4
-        gap-6
-    "
+                            className="grid grid-cols-1 md:grid-cols-4 gap-6"
                         >
 
                             <div className="card p-6">
@@ -315,28 +207,11 @@ function Profile() {
                         {/* RECENT ACTIVITIES */}
 
                         <div
-                            className="
-        bg-white
-        dark:bg-zinc-900
-
-        border
-        border-zinc-200
-        dark:border-zinc-800
-
-        rounded-[32px]
-
-        p-8
-    "
+                            className="bg-white border border-zinc-200 rounded-[32px] p-8"
                         >
 
                             <h2
-                                className="
-            text-3xl
-            font-bold
-            dark:text-white
-
-            mb-8
-        "
+                                className="text-3xl font-bold mb-8"
                             >
                                 Recent Activities
                             </h2>
@@ -344,16 +219,10 @@ function Profile() {
                             <div className="space-y-5">
 
                                 <div
-                                    className="
-                border-b
-                border-zinc-200
-                dark:border-zinc-800
-
-                pb-4
-            "
+                                    className="border-b border-zinc-200 pb-4"
                                 >
 
-                                    <p className="font-semibold dark:text-white">
+                                    <p className="font-semibold">
                                         Updated horse profile
                                     </p>
 
@@ -364,16 +233,10 @@ function Profile() {
                                 </div>
 
                                 <div
-                                    className="
-                border-b
-                border-zinc-200
-                dark:border-zinc-800
-
-                pb-4
-            "
+                                    className="border-b border-zinc-200 pb-4"
                                 >
 
-                                    <p className="font-semibold dark:text-white">
+                                    <p className="font-semibold">
                                         Created new tournament
                                     </p>
 
@@ -384,16 +247,10 @@ function Profile() {
                                 </div>
 
                                 <div
-                                    className="
-                border-b
-                border-zinc-200
-                dark:border-zinc-800
-
-                pb-4
-            "
+                                    className="border-b border-zinc-200 pb-4"
                                 >
 
-                                    <p className="font-semibold dark:text-white">
+                                    <p className="font-semibold">
                                         Added new jockey
                                     </p>
 
@@ -405,7 +262,7 @@ function Profile() {
 
                                 <div>
 
-                                    <p className="font-semibold dark:text-white">
+                                    <p className="font-semibold">
                                         Updated race results
                                     </p>
 

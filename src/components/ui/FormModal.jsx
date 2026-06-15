@@ -10,18 +10,7 @@ function FormModal({
     return (
 
         <div
-            className="
-        fixed
-        inset-0
-
-        bg-black/40
-
-        flex
-        items-center
-        justify-center
-
-        z-50
-      "
+            className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
         >
 
             {/* BACKDROP */}
@@ -32,43 +21,16 @@ function FormModal({
 
             {/* MODAL */}
             <div
-                className="
-          relative
-
-          bg-white
-          dark:bg-zinc-900
-
-          rounded-3xl
-
-          w-full
-          max-w-2xl
-
-          p-8
-
-          border
-          border-zinc-200
-          dark:border-zinc-800
-        "
+                className="relative bg-white rounded-3xl w-full max-w-2xl p-8 border border-zinc-200"
             >
 
                 {/* HEADER */}
                 <div
-                    className="
-            flex
-            items-center
-            justify-between
-
-            mb-8
-          "
+                    className="flex items-center justify-between mb-8"
                 >
 
                     <h2
-                        className="
-              text-4xl
-              font-black
-
-              dark:text-white
-            "
+                        className="text-4xl font-black"
                     >
                         {title}
                     </h2>
@@ -76,17 +38,7 @@ function FormModal({
                     <button
                         onClick={onClose}
 
-                        className="
-              w-12
-              h-12
-
-              rounded-2xl
-
-              bg-zinc-100
-              dark:bg-zinc-800
-
-              dark:text-white
-            "
+                        className="w-12 h-12 rounded-2xl bg-zinc-100"
                     >
                         ✕
                     </button>

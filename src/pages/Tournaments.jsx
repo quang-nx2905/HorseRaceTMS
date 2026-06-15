@@ -231,11 +231,11 @@ function Tournaments() {
 
         <div>
 
-          <h1 className="text-5xl font-black dark:text-white">
+          <h1 className="text-5xl font-black">
             Tournaments
           </h1>
 
-          <p className="text-zinc-500 dark:text-zinc-400 mt-3">
+          <p className="text-zinc-500 mt-3">
             Manage all racing tournaments and competitions.
           </p>
 
@@ -257,7 +257,7 @@ function Tournaments() {
       {/* STATS */}
       <div className="grid grid-cols-3 gap-6 mb-8">
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+        <div className="bg-white border border-zinc-200 rounded-3xl p-6">
 
           <p className="text-zinc-500">
             Live Tournaments
@@ -269,7 +269,7 @@ function Tournaments() {
 
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+        <div className="bg-white border border-zinc-200 rounded-3xl p-6">
 
           <p className="text-zinc-500">
             Upcoming
@@ -281,7 +281,7 @@ function Tournaments() {
 
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+        <div className="bg-white border border-zinc-200 rounded-3xl p-6">
 
           <p className="text-zinc-500">
             Completed
@@ -298,7 +298,7 @@ function Tournaments() {
       {/* ANALYTICS */}
       <div className="grid grid-cols-4 gap-6 mb-8">
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+        <div className="bg-white border border-zinc-200 rounded-3xl p-6">
 
           <div className="flex items-center justify-between">
 
@@ -308,7 +308,7 @@ function Tournaments() {
                 Total Revenue
               </p>
 
-              <h2 className="text-4xl font-black mt-3 dark:text-white">
+              <h2 className="text-4xl font-black mt-3">
                 $4.8M
               </h2>
 
@@ -322,7 +322,7 @@ function Tournaments() {
 
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+        <div className="bg-white border border-zinc-200 rounded-3xl p-6">
 
           <div className="flex items-center justify-between">
 
@@ -332,7 +332,7 @@ function Tournaments() {
                 Audience Reach
               </p>
 
-              <h2 className="text-4xl font-black mt-3 dark:text-white">
+              <h2 className="text-4xl font-black mt-3">
                 82K
               </h2>
 
@@ -346,7 +346,7 @@ function Tournaments() {
 
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+        <div className="bg-white border border-zinc-200 rounded-3xl p-6">
 
           <div className="flex items-center justify-between">
 
@@ -356,7 +356,7 @@ function Tournaments() {
                 Sponsors
               </p>
 
-              <h2 className="text-4xl font-black mt-3 dark:text-white">
+              <h2 className="text-4xl font-black mt-3">
                 34
               </h2>
 
@@ -370,7 +370,7 @@ function Tournaments() {
 
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6">
+        <div className="bg-white border border-zinc-200 rounded-3xl p-6">
 
           <div className="flex items-center justify-between">
 
@@ -380,7 +380,7 @@ function Tournaments() {
                 AI Accuracy
               </p>
 
-              <h2 className="text-4xl font-black mt-3 dark:text-white">
+              <h2 className="text-4xl font-black mt-3">
                 91%
               </h2>
 
@@ -397,7 +397,7 @@ function Tournaments() {
       </div>
 
       {/* SEARCH + FILTER */}
-      <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-5 mb-8 flex gap-4">
+      <div className="bg-white border border-zinc-200 rounded-3xl p-5 mb-8 flex gap-4">
 
         <div className="relative flex-1">
 
@@ -413,7 +413,7 @@ function Tournaments() {
               setSearch(e.target.value)
             }
             placeholder="Search tournaments..."
-            className="w-full bg-zinc-100 dark:bg-zinc-800 dark:text-white rounded-2xl pl-12 pr-5 py-4 outline-none"
+            className="w-full bg-zinc-100 rounded-2xl pl-12 pr-5 py-4 outline-none"
           />
 
         </div>
@@ -423,7 +423,7 @@ function Tournaments() {
           onChange={(e) =>
             setFilter(e.target.value)
           }
-          className="bg-zinc-100 dark:bg-zinc-800 dark:text-white rounded-2xl px-5 outline-none"
+          className="bg-zinc-100 rounded-2xl px-5 outline-none"
         >
 
           <option>All</option>
@@ -467,14 +467,14 @@ function Tournaments() {
 
             <div
               key={tournament.id}
-              className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 hover:scale-[1.02] transition-all duration-300"
+              className="bg-white border border-zinc-200 rounded-3xl p-6 hover:scale-[1.02] transition-all duration-300"
             >
 
               <div className="flex items-start justify-between mb-6">
 
                 <div>
 
-                  <h2 className="text-2xl font-bold dark:text-white">
+                  <h2 className="text-2xl font-bold">
                     {tournament.name}
                   </h2>
 
@@ -492,18 +492,18 @@ function Tournaments() {
 
                 <div
                   className={`
-                    px-4
-                    py-2
-                    rounded-full
-                    text-sm
-                    font-semibold
-                    ${tournament.status === "Live"
-                      ? "bg-red-100 text-red-500"
-                      : tournament.status === "Upcoming"
-                        ? "bg-yellow-100 text-yellow-600"
-                        : "bg-green-100 text-green-600"
-                    }
-                  `}
+  px-4
+  py-2
+  rounded-full
+  text-sm
+  font-semibold
+                      ${tournament.status === "Live"
+  ? "bg-red-100 text-red-500"
+  : tournament.status === "Upcoming"
+  ? "bg-yellow-100 text-yellow-600"
+  : "bg-green-100 text-green-600"
+  }
+`} 
                 >
 
                   {tournament.status}
@@ -557,16 +557,7 @@ function Tournaments() {
                     setOpenEdit(true);
 
                   }}
-                  className="
-    flex-1
-    bg-zinc-100
-    dark:bg-zinc-800
-    dark:text-white
-    py-3
-    rounded-2xl
-    font-semibold
-    transition-all
-  "
+                  className="flex-1 bg-zinc-100 py-3 rounded-2xl font-semibold transition-all"
                 >
                   Edit
                 </button>

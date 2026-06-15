@@ -24,20 +24,7 @@ function Pagination({
                 onClick={() =>
                     onPageChange(currentPage - 1)
                 }
-                className="
-          w-10
-          h-10
-          rounded-xl
-
-          bg-zinc-100
-          dark:bg-zinc-800
-
-          flex
-          items-center
-          justify-center
-
-          disabled:opacity-40
-        "
+                className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center disabled:opacity-40"
             >
 
                 <ChevronLeft size={18} />
@@ -52,18 +39,15 @@ function Pagination({
                         onPageChange(page)
                     }
                     className={`
-            w-10
-            h-10
-
-            rounded-xl
-
-            font-semibold
-
-            ${currentPage === page
-                            ? "bg-yellow-400 text-black"
-                            : "bg-zinc-100 dark:bg-zinc-800 dark:text-white"
-                        }
-          `}
+  w-10
+  h-10
+  rounded-xl
+  font-semibold
+              ${currentPage === page
+  ? "bg-yellow-400 text-black"
+  : "bg-zinc-100 "
+  }
+`} 
                 >
 
                     {page}
@@ -79,20 +63,7 @@ function Pagination({
                 onClick={() =>
                     onPageChange(currentPage + 1)
                 }
-                className="
-          w-10
-          h-10
-          rounded-xl
-
-          bg-zinc-100
-          dark:bg-zinc-800
-
-          flex
-          items-center
-          justify-center
-
-          disabled:opacity-40
-        "
+                className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center disabled:opacity-40"
             >
 
                 <ChevronRight size={18} />

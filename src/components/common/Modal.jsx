@@ -10,52 +10,26 @@ function Modal({
     return (
 
         <div
-            className="
-        fixed
-        inset-0
-        bg-black/50
-        flex
-        items-center
-        justify-center
-        z-50
-      "
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
         >
 
             <div
-                className="
-          bg-white
-          dark:bg-zinc-900
-          rounded-3xl
-          p-8
-          w-[600px]
-          max-w-[95%]
-        "
+                className="bg-white rounded-3xl p-8 w-[600px] max-w-[95%]"
             >
 
                 <div
-                    className="
-            flex
-            items-center
-            justify-between
-            mb-6
-          "
+                    className="flex items-center justify-between mb-6"
                 >
 
                     <h2
-                        className="
-              text-2xl
-              font-bold
-              dark:text-white
-            "
+                        className="text-2xl font-bold"
                     >
                         {title}
                     </h2>
 
                     <button
                         onClick={onClose}
-                        className="
-              text-zinc-500
-            "
+                        className="text-zinc-500"
                     >
                         ✕
                     </button>

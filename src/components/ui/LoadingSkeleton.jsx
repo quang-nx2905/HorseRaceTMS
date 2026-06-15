@@ -10,16 +10,7 @@ function LoadingSkeleton() {
         <div
           key={item}
 
-          className="
-            h-20
-
-            rounded-3xl
-
-            bg-zinc-200
-            dark:bg-zinc-800
-
-            animate-pulse
-          "
+          className="h-20 rounded-3xl bg-zinc-200 animate-pulse"
         ></div>
 
       ))}

@@ -5,11 +5,11 @@ function DataTable({
 
     return (
 
-        <div className="overflow-hidden rounded-3xl border border-zinc-200 dark:border-zinc-800">
+        <div className="overflow-hidden rounded-3xl border border-zinc-200">
 
             <table className="w-full">
 
-                <thead className="bg-zinc-100 dark:bg-zinc-800">
+                <thead className="bg-zinc-100">
 
                     <tr>
 
@@ -17,7 +17,7 @@ function DataTable({
 
                             <th
                                 key={column.key}
-                                className="px-6 py-4 text-left font-semibold dark:text-white"
+                                className="px-6 py-4 text-left font-semibold"
                             >
                                 {column.title}
                             </th>
@@ -34,14 +34,14 @@ function DataTable({
 
                         <tr
                             key={item.id}
-                            className="border-t border-zinc-200 dark:border-zinc-800"
+                            className="border-t border-zinc-200"
                         >
 
                             {columns.map((column) => (
 
                                 <td
                                     key={column.key}
-                                    className="px-6 py-4 dark:text-zinc-300"
+                                    className="px-6 py-4"
                                 >
 
                                     {column.render

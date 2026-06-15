@@ -7,13 +7,7 @@ function Pagination({
     return (
 
         <div
-            className="
-        flex
-        items-center
-        justify-between
-
-        mt-8
-      "
+            className="flex items-center justify-between mt-8"
         >
 
             <p className="text-zinc-500">
@@ -30,19 +24,7 @@ function Pagination({
 
                     disabled={currentPage === 1}
 
-                    className="
-            px-5
-            py-3
-
-            rounded-2xl
-
-            bg-zinc-100
-            dark:bg-zinc-800
-
-            disabled:opacity-50
-
-            dark:text-white
-          "
+                    className="px-5 py-3 rounded-2xl bg-zinc-100 disabled:opacity-50"
                 >
                     Previous
                 </button>
@@ -57,17 +39,7 @@ function Pagination({
                         currentPage === totalPages
                     }
 
-                    className="
-            px-5
-            py-3
-
-            rounded-2xl
-
-            bg-yellow-400
-            hover:bg-yellow-500
-
-            disabled:opacity-50
-          "
+                    className="px-5 py-3 rounded-2xl bg-yellow-400 hover:bg-yellow-500 disabled:opacity-50"
                 >
                     Next
                 </button>

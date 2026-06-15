@@ -6,8 +6,6 @@ import App from "./App";
 
 import "./index.css";
 
-import { ThemeProvider } from "./context/ThemeContext";
-
 import { LayoutProvider } from "./context/LayoutContext";
 
 import { Toaster } from "react-hot-toast";
@@ -19,8 +17,6 @@ ReactDOM.createRoot(
 ).render(
 
   <React.StrictMode>
-
-    <ThemeProvider>
 
       <LayoutProvider>
 
@@ -48,8 +44,6 @@ ReactDOM.createRoot(
         </NotificationProvider>
 
       </LayoutProvider>
-
-    </ThemeProvider>
 
   </React.StrictMode>
 

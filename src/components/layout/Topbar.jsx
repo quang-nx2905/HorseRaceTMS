@@ -59,7 +59,7 @@ function Topbar() {
 
     return (
 
-        <div className="h-[90px] bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 px-8 flex items-center justify-between transition-colors">
+        <div className="h-[90px] bg-white border-b border-zinc-200 px-8 flex items-center justify-between transition-colors">
 
             {/* LEFT */}
             <div className="flex items-center gap-4">
@@ -67,7 +67,7 @@ function Topbar() {
                 {/* SIDEBAR BUTTON */}
                 <button
                     onClick={toggleSidebar}
-                    className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center"
+                    className="w-12 h-12 rounded-2xl bg-zinc-100 flex items-center justify-center"
                 >
                     <Menu size={20} />
                 </button>
@@ -76,7 +76,7 @@ function Topbar() {
                 <input
                     type="text"
                     placeholder="Search races..."
-                    className="w-[320px] bg-zinc-100 dark:bg-zinc-800 dark:text-white rounded-2xl px-5 py-3 outline-none border border-transparent dark:border-zinc-700"
+                    className="w-[320px] bg-zinc-100 rounded-2xl px-5 py-3 outline-none border border-transparent"
                 />
 
             </div>
@@ -102,7 +102,7 @@ function Topbar() {
                             )
                         }
 
-                        className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center relative"
+                        className="w-12 h-12 rounded-2xl bg-zinc-100 flex items-center justify-center relative"
                     >
 
                         <Bell size={20} />

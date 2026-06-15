@@ -1,15 +1,6 @@
 import { useState } from "react";
 
-import {
-    useTheme,
-} from "../context/ThemeContext";
-
 function Settings() {
-
-    const {
-        darkMode,
-        toggleTheme,
-    } = useTheme();
 
     const [emailNotification,
         setEmailNotification] =
@@ -64,81 +55,10 @@ function Settings() {
           "
                 >
 
-                    {/* THEME */}
-                    <div
-                        className="
-              flex
-              items-center
-              justify-between
-              pb-8
-              border-b
-              border-zinc-200
-              dark:border-zinc-800
-            "
-                    >
-
-                        <div>
-
-                            <h2
-                                className="
-                  text-2xl
-                  font-bold
-                  dark:text-white
-                  mb-2
-                "
-                            >
-                                Dark Mode
-                            </h2>
-
-                            <p className="text-zinc-500">
-                                Enable dark appearance
-                                for the dashboard.
-                            </p>
-
-                        </div>
-
-                        <button
-                            onClick={() =>
-                                toggleTheme()
-                            }
-                            className={`
-                w-[80px]
-                h-[44px]
-                rounded-full
-                transition-all
-                relative
-
-                ${darkMode
-                                    ? "bg-yellow-400"
-                                    : "bg-zinc-300"}
-              `}
-                        >
-
-                            <div
-                                className={`
-                  absolute
-                  top-1
-                  w-[36px]
-                  h-[36px]
-                  rounded-full
-                  bg-white
-                  transition-all
-
-                  ${darkMode
-                                        ? "left-[40px]"
-                                        : "left-1"}
-                `}
-                            />
-
-                        </button>
-
-                    </div>
-
                     {/* NOTIFICATIONS */}
 
                     <div
                         className="
-        pt-8
         pb-8
 
         border-b

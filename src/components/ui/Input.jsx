@@ -6,34 +6,14 @@ function Input({
     return (
         <div>
             <label
-                className="
-          block
-          text-sm
-          font-semibold
-          mb-3
-          dark:text-white
-        "
+                className="block text-sm font-semibold mb-3"
             >
                 {label}
             </label>
             <input
                 type={type}
                 {...props}
-                className="
-          w-full
-          bg-zinc-100
-          dark:bg-zinc-800
-          dark:text-white
-          rounded-2xl
-          px-5
-          py-4
-          outline-none
-          border
-          border-transparent
-          focus:ring-2
-          focus:ring-yellow-400
-          transition-all
-        "
+                className="w-full bg-zinc-100 rounded-2xl px-5 py-4 outline-none border border-transparent focus:ring-2 focus:ring-yellow-400 transition-all"
             />
         </div>
     );

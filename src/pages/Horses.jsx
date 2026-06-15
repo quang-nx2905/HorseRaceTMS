@@ -89,16 +89,7 @@ function Horses() {
               setOpenDetails(true);
 
             }}
-            className="
-          w-10
-          h-10
-          rounded-xl
-          bg-blue-100
-          text-blue-500
-          flex
-          items-center
-          justify-center
-        "
+            className="w-10 h-10 rounded-xl bg-blue-100 text-blue-500 flex items-center justify-center"
           >
             <Eye size={16} />
           </button>
@@ -111,16 +102,7 @@ function Horses() {
               setOpenEdit(true);
 
             }}
-            className="
-    w-10
-    h-10
-    rounded-xl
-    bg-zinc-100
-    dark:bg-zinc-700
-    flex
-    items-center
-    justify-center
-  "
+            className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center"
           >
             <Pencil size={16} />
           </button>
@@ -133,16 +115,7 @@ function Horses() {
               setOpenDelete(true);
 
             }}
-            className="
-    w-10
-    h-10
-    rounded-xl
-    bg-red-100
-    text-red-500
-    flex
-    items-center
-    justify-center
-  "
+            className="w-10 h-10 rounded-xl bg-red-100 text-red-500 flex items-center justify-center"
           >
             <Trash2 size={16} />
           </button>
@@ -222,32 +195,19 @@ function Horses() {
     <div>
 
       <div
-        className="
-          flex
-          items-center
-          justify-between
-          mb-8
-        "
+        className="flex items-center justify-between mb-8"
       >
 
         <div>
 
           <h1
-            className="
-              text-5xl
-              font-black
-              dark:text-white
-            "
+            className="text-5xl font-black"
           >
             Horses
           </h1>
 
           <p
-            className="
-              text-zinc-500
-              dark:text-zinc-400
-              mt-3
-            "
+            className="text-zinc-500 mt-3"
           >
             Manage horse information
           </p>
@@ -263,35 +223,14 @@ function Horses() {
               setSearch(e.target.value)
             }
             placeholder="Search horse..."
-            className="
-              bg-white
-              dark:bg-zinc-900
-              border
-              border-zinc-200
-              dark:border-zinc-800
-              rounded-2xl
-              px-5
-              py-4
-              outline-none
-              dark:text-white
-            "
+            className="bg-white border border-zinc-200 rounded-2xl px-5 py-4 outline-none"
           />
 
           <button
             onClick={() =>
               setOpenCreate(true)
             }
-            className="
-    flex
-    items-center
-    gap-2
-    bg-yellow-400
-    hover:bg-yellow-500
-    px-5
-    py-4
-    rounded-2xl
-    font-semibold
-  "
+            className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 px-5 py-4 rounded-2xl font-semibold"
           >
             <Plus size={18} />
             Add Horse

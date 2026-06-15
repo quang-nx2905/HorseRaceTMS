@@ -24,7 +24,7 @@ function HorseDetailsModal({
                         Horse Name
                     </p>
 
-                    <h3 className="text-xl font-bold dark:text-white">
+                    <h3 className="text-xl font-bold">
                         {horse.name}
                     </h3>
 
@@ -36,7 +36,7 @@ function HorseDetailsModal({
                         Breed
                     </p>
 
-                    <h3 className="font-semibold dark:text-white">
+                    <h3 className="font-semibold">
                         {horse.breed}
                     </h3>
 
@@ -48,7 +48,7 @@ function HorseDetailsModal({
                         Age
                     </p>
 
-                    <h3 className="font-semibold dark:text-white">
+                    <h3 className="font-semibold">
                         {horse.age} Years
                     </h3>
 
@@ -60,7 +60,7 @@ function HorseDetailsModal({
                         Health
                     </p>
 
-                    <h3 className="font-semibold dark:text-white">
+                    <h3 className="font-semibold">
                         {horse.health}
                     </h3>
 
@@ -72,7 +72,7 @@ function HorseDetailsModal({
                         Wins
                     </p>
 
-                    <h3 className="font-semibold dark:text-white">
+                    <h3 className="font-semibold">
                         {horse.wins}
                     </h3>
 

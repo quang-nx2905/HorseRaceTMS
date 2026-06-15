@@ -18,23 +18,7 @@ function SearchInput({
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}
-                className="
-          w-[320px]
-
-          bg-white dark:bg-zinc-900
-
-          border border-zinc-200 dark:border-zinc-800
-
-          rounded-2xl
-
-          pl-12
-          pr-5
-          py-4
-
-          outline-none
-
-          dark:text-white
-        "
+                className="w-[320px] bg-white border border-zinc-200 rounded-2xl pl-12 pr-5 py-4 outline-none"
             />
 
         </div>
