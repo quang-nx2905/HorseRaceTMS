@@ -103,7 +103,7 @@ function Profile() {
                   mb-3
                 "
                             >
-                                Admin User
+                                {profile.name}
                             </h2>
 
                             <p className="text-zinc-500 mb-2">
