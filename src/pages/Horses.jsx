@@ -15,6 +15,8 @@ import EditHorseModal from "../components/horses/EditHorseModal";
 
 import ConfirmModal from "../components/common/ConfirmModal";
 
+import toast from "react-hot-toast";
+
 function Horses() {
 
   const [search, setSearch] =
@@ -160,6 +162,10 @@ function Horses() {
       ...prev,
     ]);
 
+    toast.success(
+      "Horse created successfully!"
+    );
+
   };
 
   const handleUpdateHorse = (
@@ -174,6 +180,10 @@ function Horses() {
       )
     );
 
+    toast.success(
+      "Horse updated successfully!"
+    );
+
   };
 
   const handleDeleteHorse = (
@@ -185,6 +195,10 @@ function Horses() {
         (horse) =>
           horse.id !== horseId
       )
+    );
+
+    toast.success(
+      "Horse deleted successfully!"
     );
 
   };

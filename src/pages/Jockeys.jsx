@@ -4,6 +4,7 @@ import JockeyDetailsModal from "../components/jockeys/JockeyDetailsModal";
 import CreateJockeyModal from "../components/jockeys/CreateJockeyModal";
 import EditJockeyModal from "../components/jockeys/EditJockeyModal";
 import ConfirmModal from "../components/common/ConfirmModal";
+import toast from "react-hot-toast";
 
 function Jockeys() {
 
@@ -76,6 +77,10 @@ function Jockeys() {
       ...prev,
     ]);
 
+    toast.success(
+      "Jockey created successfully!"
+    );
+
   };
 
   const handleUpdateJockey = (
@@ -91,6 +96,10 @@ function Jockeys() {
       )
     );
 
+    toast.success(
+      "Jockey updated successfully!"
+    );
+
   };
 
   const handleDeleteJockey = () => {
@@ -104,6 +113,10 @@ function Jockeys() {
     );
 
     setOpenDelete(false);
+
+    toast.success(
+      "Jockey deleted successfully!"
+    );
 
   };
 

@@ -37,7 +37,13 @@ ReactDOM.createRoot(
             }}
           />
 
-          <App />
+          <>
+            <App />
+            <Toaster
+              position="top-right"
+              reverseOrder={false}
+            />
+          </>
 
         </NotificationProvider>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
+import toast from "react-hot-toast";
 
 function Profile() {
     const [profile, setProfile] =
@@ -230,19 +231,20 @@ function Profile() {
                         <div className="mt-8">
 
                             <button
+                                onClick={() => {
+                                    toast.success(
+                                        "Profile updated successfully!"
+                                    );
+                                }}
                                 className="
-                  bg-yellow-400
-                  hover:bg-yellow-300
-
-                  px-8
-                  py-4
-
-                  rounded-2xl
-
-                  font-semibold
-
-                  transition-all
-                "
+        bg-yellow-400
+        hover:bg-yellow-300
+        px-8
+        py-4
+        rounded-2xl
+        font-semibold
+        transition-all
+    "
                             >
                                 Update Profile
                             </button>
