@@ -1,6 +1,15 @@
+import { useState } from "react";
 import DashboardLayout from "../layouts/DashboardLayout";
 
 function Profile() {
+    const [profile, setProfile] =
+        useState({
+            name: "Admin User",
+            email: "admin@equinerace.com",
+            phone: "0123456789",
+            organization:
+                "Horse Race Tournament",
+        });
 
     return (
 
@@ -80,7 +89,7 @@ function Profile() {
                 font-bold
               "
                         >
-                            A
+                            {profile.name.charAt(0)}
                         </div>
 
                         {/* Info */}
@@ -136,78 +145,83 @@ function Profile() {
 
                             <input
                                 type="text"
-                                placeholder="Full Name"
+                                value={profile.name}
+                                onChange={(e) =>
+                                    setProfile({
+                                        ...profile,
+                                        name: e.target.value,
+                                    })
+                                }
                                 className="
-                  h-[60px]
-
-                  bg-zinc-100
-                  dark:bg-zinc-800
-
-                  rounded-2xl
-
-                  px-5
-
-                  outline-none
-
-                  dark:text-white
-                "
+        h-[60px]
+        bg-zinc-100
+        dark:bg-zinc-800
+        rounded-2xl
+        px-5
+        outline-none
+        dark:text-white
+    "
                             />
 
                             <input
                                 type="email"
-                                placeholder="Email Address"
+                                value={profile.email}
+                                onChange={(e) =>
+                                    setProfile({
+                                        ...profile,
+                                        email: e.target.value,
+                                    })
+                                }
                                 className="
-                  h-[60px]
-
-                  bg-zinc-100
-                  dark:bg-zinc-800
-
-                  rounded-2xl
-
-                  px-5
-
-                  outline-none
-
-                  dark:text-white
-                "
+        h-[60px]
+        bg-zinc-100
+        dark:bg-zinc-800
+        rounded-2xl
+        px-5
+        outline-none
+        dark:text-white
+    "
                             />
 
                             <input
                                 type="text"
-                                placeholder="Phone Number"
+                                value={profile.phone}
+                                onChange={(e) =>
+                                    setProfile({
+                                        ...profile,
+                                        phone: e.target.value,
+                                    })
+                                }
                                 className="
-                  h-[60px]
-
-                  bg-zinc-100
-                  dark:bg-zinc-800
-
-                  rounded-2xl
-
-                  px-5
-
-                  outline-none
-
-                  dark:text-white
-                "
+        h-[60px]
+        bg-zinc-100
+        dark:bg-zinc-800
+        rounded-2xl
+        px-5
+        outline-none
+        dark:text-white
+    "
                             />
 
                             <input
                                 type="text"
-                                placeholder="Organization"
+                                value={profile.organization}
+                                onChange={(e) =>
+                                    setProfile({
+                                        ...profile,
+                                        organization:
+                                            e.target.value,
+                                    })
+                                }
                                 className="
-                  h-[60px]
-
-                  bg-zinc-100
-                  dark:bg-zinc-800
-
-                  rounded-2xl
-
-                  px-5
-
-                  outline-none
-
-                  dark:text-white
-                "
+        h-[60px]
+        bg-zinc-100
+        dark:bg-zinc-800
+        rounded-2xl
+        px-5
+        outline-none
+        dark:text-white
+    "
                             />
 
                         </div>
