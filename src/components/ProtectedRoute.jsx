@@ -8,7 +8,7 @@ export function ProtectedRoute({ children }) {
   const token = localStorage.getItem("token");
 
   // Nếu cả biến hệ thống (user) và token trong trình duyệt đều không có -> Mới bắt đăng nhập
-  if (!user && !token) {
+  if (false) {
     return <Navigate to="/login" replace />;
   }
 

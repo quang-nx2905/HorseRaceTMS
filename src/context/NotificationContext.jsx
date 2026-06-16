@@ -21,6 +21,7 @@ export function NotificationProvider({
                     "Thunder Bolt won the Spring Championship.",
                 time: "2 min ago",
                 unread: true,
+                type: "race",
             },
 
             {
@@ -30,6 +31,7 @@ export function NotificationProvider({
                     "New AI race prediction has been generated.",
                 time: "10 min ago",
                 unread: true,
+                type: "prediction",
             },
 
             {
@@ -39,6 +41,7 @@ export function NotificationProvider({
                     "Summer Cup registration is now open.",
                 time: "1 hour ago",
                 unread: false,
+                type: "tournament",
             },
 
         ]);
@@ -48,6 +51,20 @@ export function NotificationProvider({
         notifications.filter(
             (item) => item.unread
         ).length;
+
+    // MARK AS READ (SINGLE)
+    const markAsRead = (id) => {
+        const updated = notifications.map((item) =>
+            item.id === id ? { ...item, unread: false } : item
+        );
+        setNotifications(updated);
+    };
+
+    // DELETE NOTIFICATION (SINGLE)
+    const deleteNotification = (id) => {
+        const updated = notifications.filter((item) => item.id !== id);
+        setNotifications(updated);
+    };
 
     // MARK ALL READ
     const markAllRead = () => {
@@ -72,11 +89,10 @@ export function NotificationProvider({
             value={{
                 notifications,
                 setNotifications,
-
                 unreadCount,
-
+                markAsRead,
+                deleteNotification,
                 markAllRead,
-
                 clearAll,
             }}
         >

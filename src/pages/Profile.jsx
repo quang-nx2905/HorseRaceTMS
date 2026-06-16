@@ -1,289 +1,310 @@
 import { useState } from "react";
-import DashboardLayout from "../layouts/DashboardLayout";
 import toast from "react-hot-toast";
+import {
+    User,
+    Mail,
+    Phone,
+    Building,
+    Camera,
+    Trophy,
+    Users,
+    TrendingUp,
+    Zap,
+    Clock,
+    Activity,
+    ShieldCheck,
+    CalendarDays,
+} from "lucide-react";
 
 function Profile() {
-    const [profile, setProfile] =
-        useState({
-            name: "Admin User",
-            email: "admin@equinerace.com",
-            phone: "0123456789",
-            organization:
-                "Horse Race Tournament",
-        });
+    const [profile, setProfile] = useState({
+        name: "Admin User",
+        email: "admin@equinerace.com",
+        phone: "0123456789",
+        organization: "Horse Race Tournament",
+    });
+
+    const [isSaving, setIsSaving] = useState(false);
+
+    const handleUpdate = () => {
+        setIsSaving(true);
+        setTimeout(() => {
+            setIsSaving(false);
+            toast.success("Profile updated successfully!");
+        }, 800);
+    };
 
     return (
-
-        <>
-
-            <div className="space-y-10">
-
-                {/* HEADER */}
-                <div>
-
-                    <h1
-                        className="text-5xl font-bold mb-3"
-                    >
-                        Profile
-                    </h1>
-
-                    <p className="text-zinc-500 text-lg">
-                        Manage your personal information
-                        and account details.
-                    </p>
-
-                </div>
-
-                {/* PROFILE CARD */}
-                <div
-                    className="bg-white border border-zinc-200 rounded-[32px] p-10 max-w-[900px]"
-                >
-
-                    {/* TOP */}
-                    <div
-                        className="flex flex-col md:flex-row md:items-center gap-8 pb-10 border-b border-zinc-200"
-                    >
-
-                        {/* Avatar */}
-                        <div
-                            className="w-[120px] h-[120px] rounded-full bg-yellow-400 flex items-center justify-center text-5xl font-bold"
-                        >
-                            {profile.name.charAt(0)}
-                        </div>
-
-                        {/* Info */}
-                        <div>
-
-                            <h2
-                                className="text-4xl font-bold mb-3"
-                            >
-                                {profile.name}
-                            </h2>
-
-                            <p className="text-zinc-500 mb-2">
-                                admin@equinerace.com
-                            </p>
-
-                            <div
-                                className="inline-flex px-4 py-2 rounded-full bg-yellow-100 text-yellow-700 text-sm font-semibold"
-                            >
-                                Tournament Director
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    {/* FORM */}
-                    <div className="pt-10">
-
-                        <div
-                            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                        >
-
-                            <input
-                                type="text"
-                                value={profile.name}
-                                onChange={(e) =>
-                                    setProfile({
-                                        ...profile,
-                                        name: e.target.value,
-                                    })
-                                }
-                                className="h-[60px] bg-zinc-100 rounded-2xl px-5 outline-none"
-                            />
-
-                            <input
-                                type="email"
-                                value={profile.email}
-                                onChange={(e) =>
-                                    setProfile({
-                                        ...profile,
-                                        email: e.target.value,
-                                    })
-                                }
-                                className="h-[60px] bg-zinc-100 rounded-2xl px-5 outline-none"
-                            />
-
-                            <input
-                                type="text"
-                                value={profile.phone}
-                                onChange={(e) =>
-                                    setProfile({
-                                        ...profile,
-                                        phone: e.target.value,
-                                    })
-                                }
-                                className="h-[60px] bg-zinc-100 rounded-2xl px-5 outline-none"
-                            />
-
-                            <input
-                                type="text"
-                                value={profile.organization}
-                                onChange={(e) =>
-                                    setProfile({
-                                        ...profile,
-                                        organization:
-                                            e.target.value,
-                                    })
-                                }
-                                className="h-[60px] bg-zinc-100 rounded-2xl px-5 outline-none"
-                            />
-
-                        </div>
-
-                        {/* BUTTON */}
-                        <div className="mt-8">
-
-                            <button
-                                onClick={() => {
-                                    toast.success(
-                                        "Profile updated successfully!"
-                                    );
-                                }}
-                                className="bg-yellow-400 hover:bg-yellow-300 px-8 py-4 rounded-2xl font-semibold transition-all"
-                            >
-                                Update Profile
-                            </button>
-
-                        </div>
-
-                        {/* STATS */}
-
-                        <div
-                            className="grid grid-cols-1 md:grid-cols-4 gap-6"
-                        >
-
-                            <div className="card p-6">
-
-                                <p className="text-zinc-500">
-                                    Total Races
-                                </p>
-
-                                <h2 className="text-4xl font-black mt-3">
-                                    128
-                                </h2>
-
-                            </div>
-
-                            <div className="card p-6">
-
-                                <p className="text-zinc-500">
-                                    Horses Managed
-                                </p>
-
-                                <h2 className="text-4xl font-black mt-3">
-                                    56
-                                </h2>
-
-                            </div>
-
-                            <div className="card p-6">
-
-                                <p className="text-zinc-500">
-                                    Jockeys
-                                </p>
-
-                                <h2 className="text-4xl font-black mt-3">
-                                    24
-                                </h2>
-
-                            </div>
-
-                            <div className="card p-6">
-
-                                <p className="text-zinc-500">
-                                    Win Rate
-                                </p>
-
-                                <h2 className="text-4xl font-black mt-3">
-                                    86%
-                                </h2>
-
-                            </div>
-
-                        </div>
-
-                        {/* RECENT ACTIVITIES */}
-
-                        <div
-                            className="bg-white border border-zinc-200 rounded-[32px] p-8"
-                        >
-
-                            <h2
-                                className="text-3xl font-bold mb-8"
-                            >
-                                Recent Activities
-                            </h2>
-
-                            <div className="space-y-5">
-
-                                <div
-                                    className="border-b border-zinc-200 pb-4"
-                                >
-
-                                    <p className="font-semibold">
-                                        Updated horse profile
-                                    </p>
-
-                                    <p className="text-zinc-500 text-sm mt-1">
-                                        5 minutes ago
-                                    </p>
-
-                                </div>
-
-                                <div
-                                    className="border-b border-zinc-200 pb-4"
-                                >
-
-                                    <p className="font-semibold">
-                                        Created new tournament
-                                    </p>
-
-                                    <p className="text-zinc-500 text-sm mt-1">
-                                        20 minutes ago
-                                    </p>
-
-                                </div>
-
-                                <div
-                                    className="border-b border-zinc-200 pb-4"
-                                >
-
-                                    <p className="font-semibold">
-                                        Added new jockey
-                                    </p>
-
-                                    <p className="text-zinc-500 text-sm mt-1">
-                                        1 hour ago
-                                    </p>
-
-                                </div>
-
-                                <div>
-
-                                    <p className="font-semibold">
-                                        Updated race results
-                                    </p>
-
-                                    <p className="text-zinc-500 text-sm mt-1">
-                                        Yesterday
-                                    </p>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
+        <div className="space-y-8 max-w-[1200px] mx-auto pb-12 animate-in fade-in duration-300">
+            {/* HEADER */}
+            <div className="flex flex-col gap-1.5">
+                <h1 className="text-4xl font-extrabold text-zinc-900 tracking-tight">
+                    Account Profile
+                </h1>
+                <p className="text-zinc-500 text-sm">
+                    Manage your personal details, credentials, and track tournament achievements.
+                </p>
             </div>
 
-        </>
+            {/* MAIN GRID */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* LEFT COLUMN: OVERVIEW */}
+                <div className="lg:col-span-1 space-y-6">
+                    <div className="bg-white border border-zinc-200/80 rounded-3xl p-8 flex flex-col items-center text-center shadow-sm relative overflow-hidden">
+                        {/* Decorative background accent */}
+                        <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-amber-400/20 to-orange-500/20" />
 
+                        {/* Avatar */}
+                        <div className="relative mt-8 mb-4">
+                            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-black text-zinc-950 text-3xl shadow-lg border-4 border-white relative z-10">
+                                {profile.name.charAt(0)}
+                            </div>
+                            <button className="absolute bottom-[-6px] right-[-6px] w-8 h-8 rounded-xl bg-zinc-900 border-2 border-white flex items-center justify-center text-white hover:scale-105 active:scale-95 transition-all shadow-md z-20">
+                                <Camera size={14} />
+                            </button>
+                        </div>
+
+                        {/* Profile Info */}
+                        <h2 className="text-xl font-bold text-zinc-900">{profile.name}</h2>
+                        <p className="text-xs text-zinc-400 mt-1 font-medium">{profile.email}</p>
+                        
+                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold mt-4">
+                            <ShieldCheck size={12} className="text-amber-500" />
+                            Tournament Director
+                        </div>
+
+                        {/* Divider */}
+                        <div className="w-full h-px bg-zinc-100 my-6" />
+
+                        {/* Metadata items */}
+                        <div className="w-full space-y-3.5 text-left text-sm">
+                            <div className="flex justify-between items-center">
+                                <span className="text-zinc-400 font-medium">Status</span>
+                                <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">
+                                    Active Account
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-zinc-400 font-medium">Joined Date</span>
+                                <span className="text-zinc-700 font-semibold flex items-center gap-1">
+                                    <CalendarDays size={13} className="text-zinc-400" />
+                                    June 2026
+                                </span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-zinc-400 font-medium">Security Clearance</span>
+                                <span className="text-zinc-700 font-semibold">Admin (Lvl 3)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* RIGHT COLUMN: DETAILS FORM */}
+                <div className="lg:col-span-2 space-y-8">
+                    <div className="bg-white border border-zinc-200/80 rounded-3xl p-8 shadow-sm flex flex-col gap-6">
+                        <h3 className="text-lg font-bold text-zinc-900 border-b border-zinc-100 pb-3 flex items-center gap-2">
+                            <User size={18} className="text-amber-500" />
+                            Personal Details
+                        </h3>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            {/* Full Name */}
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                                    Full Name
+                                </label>
+                                <div className="relative">
+                                    <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                    <input
+                                        type="text"
+                                        value={profile.name}
+                                        onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                                        className="w-full pl-11 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
+                                        placeholder="Enter full name"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Email */}
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                                    Email Address
+                                </label>
+                                <div className="relative">
+                                    <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                    <input
+                                        type="email"
+                                        value={profile.email}
+                                        onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                                        className="w-full pl-11 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
+                                        placeholder="Enter email address"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Phone */}
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                                    Phone Number
+                                </label>
+                                <div className="relative">
+                                    <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                    <input
+                                        type="text"
+                                        value={profile.phone}
+                                        onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                                        className="w-full pl-11 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
+                                        placeholder="Enter phone number"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Organization */}
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                                    Organization
+                                </label>
+                                <div className="relative">
+                                    <Building size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                    <input
+                                        type="text"
+                                        value={profile.organization}
+                                        onChange={(e) => setProfile({ ...profile, organization: e.target.value })}
+                                        className="w-full pl-11 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
+                                        placeholder="Enter organization name"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Save Button */}
+                        <div className="flex justify-end pt-2 border-t border-zinc-100">
+                            <button
+                                onClick={handleUpdate}
+                                disabled={isSaving}
+                                className="bg-yellow-400 hover:bg-yellow-500 disabled:bg-zinc-200 text-black px-6 py-3 rounded-xl font-bold transition-all shadow-sm hover:shadow hover:shadow-yellow-400/25 flex items-center justify-center gap-2"
+                            >
+                                {isSaving ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                                        Saving...
+                                    </>
+                                ) : (
+                                    "Save Profile Changes"
+                                )}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* PERFORMANCE STATS */}
+            <div className="space-y-4">
+                <h3 className="text-lg font-bold text-zinc-900 flex items-center gap-2">
+                    <Activity size={18} className="text-amber-500" />
+                    Tournament & Management Statistics
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Stat 1 */}
+                    <div className="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm hover:scale-[1.01] transition-transform duration-200 flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Total Races</p>
+                            <h4 className="text-3xl font-black text-zinc-800 mt-1.5">128</h4>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600">
+                            <Trophy size={18} />
+                        </div>
+                    </div>
+
+                    {/* Stat 2 */}
+                    <div className="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm hover:scale-[1.01] transition-transform duration-200 flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Horses Managed</p>
+                            <h4 className="text-3xl font-black text-zinc-800 mt-1.5">56</h4>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600">
+                            <Zap size={18} />
+                        </div>
+                    </div>
+
+                    {/* Stat 3 */}
+                    <div className="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm hover:scale-[1.01] transition-transform duration-200 flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Jockeys</p>
+                            <h4 className="text-3xl font-black text-zinc-800 mt-1.5">24</h4>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+                            <Users size={18} />
+                        </div>
+                    </div>
+
+                    {/* Stat 4 */}
+                    <div className="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm hover:scale-[1.01] transition-transform duration-200 flex items-center justify-between">
+                        <div>
+                            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Win Rate</p>
+                            <h4 className="text-3xl font-black text-zinc-800 mt-1.5">86%</h4>
+                        </div>
+                        <div className="w-10 h-10 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center text-violet-600">
+                            <TrendingUp size={18} />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* RECENT ACTIVITIES TIMELINE */}
+            <div className="bg-white border border-zinc-200/80 rounded-3xl p-8 shadow-sm">
+                <h3 className="text-lg font-bold text-zinc-900 border-b border-zinc-100 pb-3.5 mb-6 flex items-center gap-2">
+                    <Clock size={18} className="text-amber-500" />
+                    Recent Activity Timeline
+                </h3>
+
+                <div className="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-zinc-100">
+                    {/* Activity 1 */}
+                    <div className="relative flex items-start gap-4">
+                        <div className="absolute left-[-21px] w-3 h-3 rounded-full bg-emerald-500 border-4 border-white shadow-[0_0_0_2px_#10b981]" />
+                        <div className="flex-1">
+                            <p className="text-sm font-semibold text-zinc-800">
+                                Updated horse profile of Thunder Bolt
+                            </p>
+                            <p className="text-xs text-zinc-400 mt-1">5 minutes ago</p>
+                        </div>
+                    </div>
+
+                    {/* Activity 2 */}
+                    <div className="relative flex items-start gap-4">
+                        <div className="absolute left-[-21px] w-3 h-3 rounded-full bg-amber-500 border-4 border-white shadow-[0_0_0_2px_#f59e0b]" />
+                        <div className="flex-1">
+                            <p className="text-sm font-semibold text-zinc-800">
+                                Created new tournament: Summer Cup 2026
+                            </p>
+                            <p className="text-xs text-zinc-400 mt-1">20 minutes ago</p>
+                        </div>
+                    </div>
+
+                    {/* Activity 3 */}
+                    <div className="relative flex items-start gap-4">
+                        <div className="absolute left-[-21px] w-3 h-3 rounded-full bg-indigo-500 border-4 border-white shadow-[0_0_0_2px_#6366f1]" />
+                        <div className="flex-1">
+                            <p className="text-sm font-semibold text-zinc-800">
+                                Added new jockey: David Miller to roster
+                            </p>
+                            <p className="text-xs text-zinc-400 mt-1">1 hour ago</p>
+                        </div>
+                    </div>
+
+                    {/* Activity 4 */}
+                    <div className="relative flex items-start gap-4">
+                        <div className="absolute left-[-21px] w-3 h-3 rounded-full bg-zinc-400 border-4 border-white shadow-[0_0_0_2px_#a1a1aa]" />
+                        <div className="flex-1">
+                            <p className="text-sm font-semibold text-zinc-800">
+                                Updated race results for Race #04
+                            </p>
+                            <p className="text-xs text-zinc-400 mt-1">Yesterday</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }
 
