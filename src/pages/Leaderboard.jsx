@@ -1,612 +1,614 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import {
+    Trophy,
+    Crown,
+    Medal,
+    Search,
+    TrendingUp,
+    Zap,
+    Star,
+    Award,
+    Eye,
+    ChevronLeft,
+    ChevronRight,
+    ArrowUpRight,
+    Sparkles,
+    Flame,
+    TrendingDown,
+} from "lucide-react";
 import RankingDetailsModal from "../components/leaderboard/RankingDetailsModal";
 
+const initialRankings = [
+    {
+        horse: "Thunder Bolt",
+        jockey: "Akira Sato",
+        wins: 48,
+        points: 1240,
+        winRate: 78,
+        breed: "Arabian",
+        form: ["W", "W", "L", "W", "W"],
+        avatarBg: "from-amber-400 to-amber-600",
+        textCol: "text-amber-500",
+    },
+    {
+        horse: "Golden Sprint",
+        jockey: "James Carter",
+        wins: 41,
+        points: 1130,
+        winRate: 72,
+        breed: "Thoroughbred",
+        form: ["W", "L", "W", "W", "L"],
+        avatarBg: "from-slate-300 to-slate-500",
+        textCol: "text-slate-400",
+    },
+    {
+        horse: "Night Fury",
+        jockey: "Ryan Cooper",
+        wins: 36,
+        points: 980,
+        winRate: 65,
+        breed: "Mustang",
+        form: ["L", "W", "W", "L", "W"],
+        avatarBg: "from-orange-400 to-orange-600",
+        textCol: "text-orange-600",
+    },
+    {
+        horse: "Silver Storm",
+        jockey: "Lucas Fernandez",
+        wins: 24,
+        points: 760,
+        winRate: 58,
+        breed: "Appaloosa",
+        form: ["W", "L", "L", "W", "L"],
+        avatarBg: "from-teal-400 to-emerald-600",
+        textCol: "text-emerald-500",
+    },
+    {
+        horse: "Crimson Star",
+        jockey: "Maria Santos",
+        wins: 29,
+        points: 710,
+        winRate: 62,
+        breed: "Quarter Horse",
+        form: ["L", "W", "L", "W", "W"],
+        avatarBg: "from-red-400 to-rose-600",
+        textCol: "text-red-500",
+    },
+    {
+        horse: "Blizzard King",
+        jockey: "Hans Mueller",
+        wins: 22,
+        points: 680,
+        winRate: 50,
+        breed: "Arabian",
+        form: ["W", "W", "L", "L", "L"],
+        avatarBg: "from-sky-400 to-blue-600",
+        textCol: "text-blue-500",
+    },
+    {
+        horse: "Shadow Dancer",
+        jockey: "Yuki Tanaka",
+        wins: 19,
+        points: 620,
+        winRate: 45,
+        breed: "Mustang",
+        form: ["L", "L", "W", "W", "L"],
+        avatarBg: "from-slate-600 to-zinc-800",
+        textCol: "text-zinc-600",
+    },
+    {
+        horse: "Desert Wind",
+        jockey: "Ahmed Ali",
+        wins: 15,
+        points: 580,
+        winRate: 40,
+        breed: "Thoroughbred",
+        form: ["W", "L", "L", "L", "W"],
+        avatarBg: "from-yellow-400 to-amber-600",
+        textCol: "text-amber-600",
+    },
+    {
+        horse: "Mystic Ocean",
+        jockey: "Emma Watson",
+        wins: 18,
+        points: 530,
+        winRate: 42,
+        breed: "Appaloosa",
+        form: ["L", "W", "L", "L", "W"],
+        avatarBg: "from-cyan-400 to-blue-500",
+        textCol: "text-cyan-500",
+    },
+    {
+        horse: "Eclipse",
+        jockey: "Oliver Green",
+        wins: 12,
+        points: 490,
+        winRate: 35,
+        breed: "Quarter Horse",
+        form: ["L", "L", "L", "W", "L"],
+        avatarBg: "from-violet-400 to-purple-600",
+        textCol: "text-purple-500",
+    },
+];
+
 function Leaderboard() {
-
-  const [search, setSearch] =
-    useState("");
-
-  const [openDetails, setOpenDetails] =
-    useState(false);
-
-  const [selectedRanking, setSelectedRanking] =
-    useState(null);
-
-  const [currentPage, setCurrentPage] =
-    useState(1);
-
-  const itemsPerPage = 3;
-
-  const rankings = [
-
-    {
-      rank: 1,
-      horse: "Thunder Bolt",
-      jockey: "Akira Sato",
-      wins: 48,
-      points: 1240,
-    },
-
-    {
-      rank: 2,
-      horse: "Golden Sprint",
-      jockey: "James Carter",
-      wins: 41,
-      points: 1130,
-    },
-
-    {
-      rank: 3,
-      horse: "Night Fury",
-      jockey: "Ryan Cooper",
-      wins: 36,
-      points: 980,
-    },
-
-    {
-      rank: 4,
-      horse: "Silver Storm",
-      jockey: "Lucas Fernandez",
-      wins: 24,
-      points: 760,
-    },
-
-  ];
-
-  const filteredRankings =
-    rankings.filter(
-      (item) =>
-        item.horse
-          .toLowerCase()
-          .includes(
-            search.toLowerCase()
-          ) ||
-        item.jockey
-          .toLowerCase()
-          .includes(
-            search.toLowerCase()
-          )
-    );
-
-  const totalPages =
-    Math.ceil(
-      filteredRankings.length /
-      itemsPerPage
-    );
-
-  const paginatedRankings =
-    filteredRankings.slice(
-      (currentPage - 1) *
-      itemsPerPage,
-      currentPage *
-      itemsPerPage
-    );
-
-  const totalPoints =
-    rankings.reduce(
-      (sum, item) =>
-        sum + item.points,
-      0
-    );
-
-  const totalWins =
-    rankings.reduce(
-      (sum, item) =>
-        sum + item.wins,
-      0
-    );
-
-  const topHorse =
-    rankings[0]?.horse;
-
-  const topJockey =
-    rankings[0]?.jockey;
-
-  return (
-
-    <div>
-
-      {/* HEADER */}
-      <div
-        className="
-    flex
-    items-center
-    justify-between
-    mb-10
-  "
-      >
-
-        <div>
-
-          <h1 className="page-title">
-            Leaderboard
-          </h1>
-
-          <p className="page-subtitle">
-            Global horse racing rankings
-            and championship standings.
-          </p>
-
-        </div>
-
-        <input
-          type="text"
-          placeholder="Search horse or jockey..."
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-          className="
-      px-4
-      py-3
-
-      border
-      border-zinc-200
-
-      rounded-2xl
-
-      outline-none
-    "
-        />
-
-      </div>
-
-      {/* STATS */}
-      <div
-        className="
-    grid
-    grid-cols-1
-    md:grid-cols-2
-    xl:grid-cols-4
-    gap-6
-    mb-10
-  "
-      >
-
-        <div className="card p-6">
-
-          <p className="text-zinc-500 mb-2">
-            Total Points
-          </p>
-
-          <h2
-            className="
-        text-4xl
-        font-black
-      "
-          >
-            {totalPoints}
-          </h2>
-
-        </div>
-
-        <div className="card p-6">
-
-          <p className="text-zinc-500 mb-2">
-            Total Wins
-          </p>
-
-          <h2
-            className="
-        text-4xl
-        font-black
-      "
-          >
-            {totalWins}
-          </h2>
-
-        </div>
-
-        <div className="card p-6">
-
-          <p className="text-zinc-500 mb-2">
-            Top Horse
-          </p>
-
-          <h2
-            className="
-        text-2xl
-        font-black
-      "
-          >
-            {topHorse}
-          </h2>
-
-        </div>
-
-        <div className="card p-6">
-
-          <p className="text-zinc-500 mb-2">
-            Top Jockey
-          </p>
-
-          <h2
-            className="
-        text-2xl
-        font-black
-      "
-          >
-            {topJockey}
-          </h2>
-
-        </div>
-
-      </div>
-
-      {/* TOP 3 */}
-      <div
-        className="
-          grid
-          grid-cols-1
-          md:grid-cols-3
-
-          gap-6
-
-          mb-10
-        "
-      >
-
-        {/* SECOND */}
-        <div
-          className="
-            card
-            p-8
-
-            flex
-            flex-col
-            items-center
-            justify-center
-
-            mt-10
-          "
-        >
-
-          <div
-            className="
-              w-24
-              h-24
-
-              rounded-full
-
-              bg-zinc-200
-
-              flex
-              items-center
-              justify-center
-
-              text-4xl
-              font-black
-
-              mb-6
-            "
-          >
-            2
-          </div>
-
-          <h2 className="text-3xl font-bold mb-2">
-            Golden Sprint
-          </h2>
-
-          <p className="text-zinc-500 mb-6">
-            James Carter
-          </p>
-
-          <h3 className="text-5xl font-black">
-            1130
-          </h3>
-
-          <p className="text-zinc-500 mt-2">
-            Points
-          </p>
-
-        </div>
-
-        {/* FIRST */}
-        <div
-          className="
-            card
-            p-8
-
-            flex
-            flex-col
-            items-center
-            justify-center
-
-            border-4
-            border-yellow-400
-          "
-        >
-
-          <div
-            className="
-              w-28
-              h-28
-
-              rounded-full
-
-              bg-yellow-400
-
-              flex
-              items-center
-              justify-center
-
-              text-5xl
-              font-black
-
-              mb-6
-            "
-          >
-            1
-          </div>
-
-          <h2 className="text-4xl font-black mb-2">
-            Thunder Bolt
-          </h2>
-
-          <p className="text-zinc-500 mb-6">
-            Akira Sato
-          </p>
-
-          <h3 className="text-6xl font-black">
-            1240
-          </h3>
-
-          <p className="text-zinc-500 mt-2">
-            Points
-          </p>
-
-        </div>
-
-        {/* THIRD */}
-        <div
-          className="
-            card
-            p-8
-
-            flex
-            flex-col
-            items-center
-            justify-center
-
-            mt-16
-          "
-        >
-
-          <div
-            className="
-              w-24
-              h-24
-
-              rounded-full
-
-              bg-orange-200
-
-              flex
-              items-center
-              justify-center
-
-              text-4xl
-              font-black
-
-              mb-6
-            "
-          >
-            3
-          </div>
-
-          <h2 className="text-3xl font-bold mb-2">
-            Night Fury
-          </h2>
-
-          <p className="text-zinc-500 mb-6">
-            Ryan Cooper
-          </p>
-
-          <h3 className="text-5xl font-black">
-            980
-          </h3>
-
-          <p className="text-zinc-500 mt-2">
-            Points
-          </p>
-
-        </div>
-
-      </div>
-
-      {/* TABLE */}
-      <div className="card overflow-hidden">
-
-        {/* HEADER */}
-        <div
-          className="
-            grid
-            grid-cols-5
-
-            px-8
-            py-6
-
-            border-b
-            border-zinc-200
-
-            text-sm
-            uppercase
-            tracking-wider
-
-            text-zinc-500
-            font-semibold
-          "
-        >
-
-          <p>Rank</p>
-
-          <p>Horse</p>
-
-          <p>Jockey</p>
-
-          <p>Wins</p>
-
-          <p>Points</p>
-
-        </div>
-
-        <div
-          className="
-    flex
-    justify-center
-    gap-3
-    mt-8
-  "
-        >
-
-          <button
-            disabled={
-              currentPage === 1
-            }
-            onClick={() =>
-              setCurrentPage(
-                currentPage - 1
-              )
-            }
-            className="
-      px-4
-      py-2
-      rounded-xl
-      border
-      disabled:opacity-50
-    "
-          >
-            Previous
-          </button>
-
-          <span
-            className="
-      flex
-      items-center
-      font-semibold
-    "
-          >
-            {currentPage} / {totalPages}
-          </span>
-
-          <button
-            disabled={
-              currentPage ===
-              totalPages
-            }
-            onClick={() =>
-              setCurrentPage(
-                currentPage + 1
-              )
-            }
-            className="
-      px-4
-      py-2
-      rounded-xl
-      border
-      disabled:opacity-50
-    "
-          >
-            Next
-          </button>
-
-        </div>
-
-        {/* ROWS */}
-        <div>
-
-          {paginatedRankings.map((item, index) => (
-
-            <div
-              key={index}
-              className="
-                grid
-                grid-cols-5
-
-                px-8
-                py-6
-
-                border-b
-                border-zinc-100
-
-                hover:bg-zinc-50
-
-                transition-all
-              "
-            >
-
-              <p className="font-black text-xl">
-                #{item.rank}
-              </p>
-
-              <p className="font-bold">
-                {item.horse}
-              </p>
-
-              <p className="text-zinc-600">
-                {item.jockey}
-              </p>
-
-              <p>{item.wins}</p>
-
-              <div
-                className="
-    flex
-    items-center
-    justify-between
-  "
-              >
-
-                <p className="font-black">
-                  {item.points}
-                </p>
-
-                <button
-                  onClick={() => {
-
-                    setSelectedRanking(
-                      item
-                    );
-
-                    setOpenDetails(true);
-
-                  }}
-                  className="
-      px-3
-      py-1
-
-      bg-yellow-400
-      hover:bg-yellow-500
-
-      rounded-xl
-
-      text-sm
-      font-semibold
-    "
-                >
-                  View
-                </button>
-
-              </div>
-
+    const [search, setSearch] = useState("");
+    const [sortBy, setSortBy] = useState("points"); // "points" | "wins"
+    const [openDetails, setOpenDetails] = useState(false);
+    const [selectedRanking, setSelectedRanking] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+
+    // Dynamically sort items and attach ranks
+    const sortedRankings = useMemo(() => {
+        const sorted = [...initialRankings].sort((a, b) => b[sortBy] - a[sortBy]);
+        return sorted.map((item, index) => ({
+            ...item,
+            rank: index + 1,
+        }));
+    }, [sortBy]);
+
+    // Filter by search query
+    const filteredRankings = useMemo(() => {
+        return sortedRankings.filter(
+            (item) =>
+                item.horse.toLowerCase().includes(search.toLowerCase()) ||
+                item.jockey.toLowerCase().includes(search.toLowerCase()) ||
+                item.breed.toLowerCase().includes(search.toLowerCase())
+        );
+    }, [sortedRankings, search]);
+
+    const totalPages = Math.ceil(filteredRankings.length / itemsPerPage);
+
+    const paginatedRankings = useMemo(() => {
+        return filteredRankings.slice(
+            (currentPage - 1) * itemsPerPage,
+            currentPage * itemsPerPage
+        );
+    }, [filteredRankings, currentPage]);
+
+    // Stats calculations
+    const totalPointsSum = useMemo(() => {
+        return initialRankings.reduce((sum, item) => sum + item.points, 0);
+    }, []);
+
+    const totalWinsSum = useMemo(() => {
+        return initialRankings.reduce((sum, item) => sum + item.wins, 0);
+    }, []);
+
+    const topLeader = sortedRankings[0];
+
+    const podiumData = useMemo(() => {
+        if (sortedRankings.length < 3) return [];
+        // Layout order: 2nd place, 1st place, 3rd place
+        return [sortedRankings[1], sortedRankings[0], sortedRankings[2]];
+    }, [sortedRankings]);
+
+    const handleSortToggle = (criteria) => {
+        setSortBy(criteria);
+        setCurrentPage(1);
+    };
+
+    return (
+        <div className="pb-12">
+            {/* HEADER HERO */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-3xl p-8 md:p-12 mb-10 shadow-xl border border-zinc-700/50">
+                <div className="absolute top-0 right-0 -mt-10 -mr-10 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 left-1/3 -mb-10 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
+
+                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-full text-xs font-bold uppercase tracking-wider mb-4 animate-pulse">
+                            <Sparkles className="w-3.5 h-3.5" />
+                            Live Championship Standings
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-none mb-3">
+                            Leaderboard
+                        </h1>
+                        <p className="text-zinc-400 text-base max-w-xl">
+                            Real-time standings of global horse racing legends. Filter by points or total wins to see who leads the league.
+                        </p>
+                    </div>
+
+                    <div className="relative min-w-[280px]">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
+                        <input
+                            type="text"
+                            placeholder="Search horse, jockey, breed..."
+                            value={search}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                                setCurrentPage(1);
+                            }}
+                            className="w-full pl-12 pr-4 py-3.5 bg-zinc-800/80 border border-zinc-700 hover:border-zinc-600 focus:border-amber-500 rounded-2xl text-white placeholder-zinc-500 outline-none transition-all shadow-inner focus:ring-2 focus:ring-amber-500/20"
+                        />
+                    </div>
+                </div>
             </div>
 
-          ))}
+            {/* QUICK STATS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                {/* Stat 1 */}
+                <div className="bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+                    <div>
+                        <p className="text-zinc-500 text-sm font-semibold mb-1">Total Points Accum.</p>
+                        <h3 className="text-3xl font-black text-zinc-900">{totalPointsSum.toLocaleString()}</h3>
+                        <p className="text-emerald-600 text-xs font-bold mt-1 flex items-center gap-1">
+                            <TrendingUp className="w-3 h-3" />
+                            +12.4% vs last week
+                        </p>
+                    </div>
+                    <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-500">
+                        <Zap className="w-6 h-6" />
+                    </div>
+                </div>
 
+                {/* Stat 2 */}
+                <div className="bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+                    <div>
+                        <p className="text-zinc-500 text-sm font-semibold mb-1">Total Races Won</p>
+                        <h3 className="text-3xl font-black text-zinc-900">{totalWinsSum}</h3>
+                        <p className="text-zinc-500 text-xs mt-1">Average Win Rate: 55.2%</p>
+                    </div>
+                    <div className="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-500">
+                        <Trophy className="w-6 h-6" />
+                    </div>
+                </div>
+
+                {/* Stat 3 */}
+                <div className="bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+                    <div>
+                        <p className="text-zinc-500 text-sm font-semibold mb-1">Current Leader</p>
+                        <h3 className="text-xl font-bold text-zinc-950 truncate max-w-[150px]">{topLeader.horse}</h3>
+                        <p className="text-amber-600 text-xs font-semibold mt-1">
+                            {topLeader.points} Pts ({topLeader.wins} wins)
+                        </p>
+                    </div>
+                    <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600">
+                        <Crown className="w-6 h-6" />
+                    </div>
+                </div>
+
+                {/* Stat 4 */}
+                <div className="bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
+                    <div>
+                        <p className="text-zinc-500 text-sm font-semibold mb-1">MVP Jockey</p>
+                        <h3 className="text-xl font-bold text-zinc-950 truncate max-w-[150px]">{topLeader.jockey}</h3>
+                        <p className="text-zinc-500 text-xs mt-1">Win Rate: {topLeader.winRate}%</p>
+                    </div>
+                    <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-600">
+                        <Star className="w-6 h-6" />
+                    </div>
+                </div>
+            </div>
+
+            {/* TAB FILTER & CONTROLS */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8">
+                <div className="flex bg-zinc-200/60 p-1.5 rounded-2xl border border-zinc-300/40 self-start">
+                    <button
+                        onClick={() => handleSortToggle("points")}
+                        className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                            sortBy === "points"
+                                ? "bg-white text-zinc-900 shadow-sm"
+                                : "text-zinc-500 hover:text-zinc-800"
+                        }`}
+                    >
+                        Championship Points
+                    </button>
+                    <button
+                        onClick={() => handleSortToggle("wins")}
+                        className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                            sortBy === "wins"
+                                ? "bg-white text-zinc-900 shadow-sm"
+                                : "text-zinc-500 hover:text-zinc-800"
+                        }`}
+                    >
+                        Total Wins Standings
+                    </button>
+                </div>
+
+                {search && (
+                    <span className="text-zinc-500 text-sm font-medium">
+                        Found <strong className="text-zinc-800">{filteredRankings.length}</strong> matching entries
+                    </span>
+                )}
+            </div>
+
+            {/* DYNAMIC TOP 3 PODIUM - Show only when not searching */}
+            {!search && podiumData.length >= 3 && (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end mb-12">
+                    {/* 2nd Place: Silver */}
+                    <div className="group relative bg-white border border-zinc-200 rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 order-2 md:order-1 flex flex-col items-center pt-12 text-center md:h-[310px] justify-between">
+                        <div className="absolute top-0 -translate-y-1/2 w-16 h-16 rounded-full bg-zinc-200 border-4 border-white flex items-center justify-center shadow-md text-zinc-500 font-extrabold text-2xl group-hover:scale-110 transition-transform">
+                            2
+                        </div>
+                        <div className="w-14 h-14 bg-gradient-to-br from-slate-300 to-slate-500 text-white rounded-2xl flex items-center justify-center font-black text-xl mb-4 shadow-inner">
+                            {podiumData[0].horse.split(" ").map(w => w[0]).join("")}
+                        </div>
+                        <div>
+                            <h3 className="font-extrabold text-zinc-900 text-lg group-hover:text-amber-500 transition-colors">
+                                {podiumData[0].horse}
+                            </h3>
+                            <p className="text-zinc-500 text-xs font-semibold mb-2">Jockey: {podiumData[0].jockey}</p>
+                            <span className="inline-block px-2.5 py-1 bg-zinc-100 rounded-lg text-zinc-600 text-xs font-bold border border-zinc-200">
+                                {podiumData[0].breed}
+                            </span>
+                        </div>
+                        <div className="mt-4 w-full">
+                            <div className="flex items-baseline justify-center gap-1">
+                                <span className="text-3xl font-black text-zinc-800">
+                                    {sortBy === "points" ? podiumData[0].points : podiumData[0].wins}
+                                </span>
+                                <span className="text-xs text-zinc-500 font-semibold">{sortBy === "points" ? "Pts" : "Wins"}</span>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setSelectedRanking(podiumData[0]);
+                                    setOpenDetails(true);
+                                }}
+                                className="w-full mt-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5"
+                            >
+                                <Eye className="w-3.5 h-3.5" /> Details
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* 1st Place: Gold Crown */}
+                    <div className="group relative bg-zinc-950 border border-zinc-900 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 order-1 md:order-2 flex flex-col items-center pt-16 text-center md:h-[350px] justify-between overflow-hidden">
+                        {/* Glow and decoration background */}
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
+                        <div className="absolute top-0 -translate-y-1/2 w-20 h-20 rounded-full bg-amber-400 border-4 border-zinc-950 flex items-center justify-center shadow-lg text-zinc-950 font-black text-3xl group-hover:scale-110 transition-transform">
+                            <Crown className="w-8 h-8 text-zinc-950 animate-bounce mt-[-3px]" />
+                        </div>
+                        
+                        <div className="relative">
+                            <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 text-zinc-950 rounded-2xl flex items-center justify-center font-black text-2xl mx-auto mb-4 shadow-lg border border-amber-300/30">
+                                {podiumData[1].horse.split(" ").map(w => w[0]).join("")}
+                            </div>
+                            <h3 className="font-black text-white text-xl tracking-tight group-hover:text-amber-400 transition-colors">
+                                {podiumData[1].horse}
+                            </h3>
+                            <p className="text-zinc-400 text-xs font-semibold mb-2">Jockey: {podiumData[1].jockey}</p>
+                            <span className="inline-block px-2.5 py-1 bg-amber-500/10 rounded-lg text-amber-400 text-xs font-bold border border-amber-500/35">
+                                {podiumData[1].breed}
+                            </span>
+                        </div>
+
+                        <div className="mt-4 w-full relative z-10">
+                            <div className="flex items-baseline justify-center gap-1 text-amber-400">
+                                <span className="text-4xl font-black">
+                                    {sortBy === "points" ? podiumData[1].points : podiumData[1].wins}
+                                </span>
+                                <span className="text-xs text-amber-500 font-bold uppercase tracking-wider">{sortBy === "points" ? "Pts" : "Wins"}</span>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setSelectedRanking(podiumData[1]);
+                                    setOpenDetails(true);
+                                }}
+                                className="w-full mt-3 py-2.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-zinc-950 text-xs font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5"
+                            >
+                                <Eye className="w-3.5 h-3.5" /> Details card
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* 3rd Place: Bronze */}
+                    <div className="group relative bg-white border border-zinc-200 rounded-3xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 order-3 md:order-3 flex flex-col items-center pt-12 text-center md:h-[290px] justify-between">
+                        <div className="absolute top-0 -translate-y-1/2 w-16 h-16 rounded-full bg-orange-100 border-4 border-white flex items-center justify-center shadow-md text-orange-600 font-extrabold text-2xl group-hover:scale-110 transition-transform">
+                            3
+                        </div>
+                        <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 text-white rounded-2xl flex items-center justify-center font-black text-xl mb-4 shadow-inner">
+                            {podiumData[2].horse.split(" ").map(w => w[0]).join("")}
+                        </div>
+                        <div>
+                            <h3 className="font-extrabold text-zinc-900 text-lg group-hover:text-amber-500 transition-colors">
+                                {podiumData[2].horse}
+                            </h3>
+                            <p className="text-zinc-500 text-xs font-semibold mb-2">Jockey: {podiumData[2].jockey}</p>
+                            <span className="inline-block px-2.5 py-1 bg-zinc-100 rounded-lg text-zinc-600 text-xs font-bold border border-zinc-200">
+                                {podiumData[2].breed}
+                            </span>
+                        </div>
+                        <div className="mt-4 w-full">
+                            <div className="flex items-baseline justify-center gap-1">
+                                <span className="text-3xl font-black text-zinc-800">
+                                    {sortBy === "points" ? podiumData[2].points : podiumData[2].wins}
+                                </span>
+                                <span className="text-xs text-zinc-500 font-semibold">{sortBy === "points" ? "Pts" : "Wins"}</span>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    setSelectedRanking(podiumData[2]);
+                                    setOpenDetails(true);
+                                }}
+                                className="w-full mt-3 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-bold rounded-xl transition-colors flex items-center justify-center gap-1.5"
+                            >
+                                <Eye className="w-3.5 h-3.5" /> Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* LEADERBOARD STANDINGS LIST */}
+            <div className="bg-white rounded-3xl border border-zinc-200 shadow-md overflow-hidden">
+                <div className="px-8 py-6 border-b border-zinc-100 flex items-center justify-between">
+                    <h2 className="text-lg font-black text-zinc-900">
+                        {search ? "Championship Search Results" : "Rankings Standings"}
+                    </h2>
+                    <span className="text-xs font-bold text-zinc-500 bg-zinc-100 px-3 py-1.5 rounded-lg border border-zinc-200">
+                        Sorted by: {sortBy === "points" ? "Championship Points" : "Total Wins"}
+                    </span>
+                </div>
+
+                {/* TABLE HEAD */}
+                <div className="grid grid-cols-12 px-8 py-4 bg-zinc-50/50 text-xs uppercase tracking-wider text-zinc-500 font-bold border-b border-zinc-100">
+                    <div className="col-span-2 md:col-span-1">Rank</div>
+                    <div className="col-span-5 md:col-span-4">Horse Details</div>
+                    <div className="col-span-3">Jockey</div>
+                    <div className="hidden md:block col-span-2">Form</div>
+                    <div className="col-span-2 md:col-span-2 text-right">Points / Wins</div>
+                </div>
+
+                {/* TABLE ROWS */}
+                <div className="divide-y divide-zinc-100">
+                    {paginatedRankings.length === 0 ? (
+                        <div className="p-12 text-center text-zinc-500 font-medium">
+                            No rankings match your search criteria. Try a different keyword!
+                        </div>
+                    ) : (
+                        paginatedRankings.map((item) => {
+                            const isFirst = item.rank === 1;
+                            const isSecond = item.rank === 2;
+                            const isThird = item.rank === 3;
+
+                            return (
+                                <div
+                                    key={item.horse}
+                                    onClick={() => {
+                                        setSelectedRanking(item);
+                                        setOpenDetails(true);
+                                    }}
+                                    className="grid grid-cols-12 px-8 py-5 items-center hover:bg-zinc-50/80 transition-all cursor-pointer group"
+                                >
+                                    {/* Rank column */}
+                                    <div className="col-span-2 md:col-span-1 flex items-center">
+                                        {isFirst ? (
+                                            <div className="w-8 h-8 rounded-full bg-amber-400 text-zinc-950 flex items-center justify-center shadow-sm font-extrabold text-sm border border-amber-300">
+                                                <Crown className="w-4.5 h-4.5" />
+                                            </div>
+                                        ) : isSecond ? (
+                                            <div className="w-8 h-8 rounded-full bg-slate-200 text-zinc-700 flex items-center justify-center shadow-sm font-extrabold text-sm border border-slate-300">
+                                                2
+                                            </div>
+                                        ) : isThird ? (
+                                            <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center shadow-sm font-extrabold text-sm border border-orange-200">
+                                                3
+                                            </div>
+                                        ) : (
+                                            <span className="font-extrabold text-zinc-400 text-sm pl-2">
+                                                #{item.rank}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    {/* Horse details column */}
+                                    <div className="col-span-5 md:col-span-4 flex items-center gap-3">
+                                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${item.avatarBg} text-white flex items-center justify-center font-black text-sm shadow-inner`}>
+                                            {item.horse.split(" ").map(w => w[0]).join("")}
+                                        </div>
+                                        <div className="truncate pr-2">
+                                            <h4 className="font-bold text-zinc-900 group-hover:text-amber-500 transition-colors truncate">
+                                                {item.horse}
+                                            </h4>
+                                            <p className="text-xs text-zinc-400 font-semibold truncate">
+                                                {item.breed}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Jockey column */}
+                                    <div className="col-span-3">
+                                        <p className="font-bold text-zinc-700 truncate text-sm">
+                                            {item.jockey}
+                                        </p>
+                                    </div>
+
+                                    {/* Form history column */}
+                                    <div className="hidden md:flex col-span-2 items-center gap-1">
+                                        {item.form.map((f, i) => (
+                                            <span
+                                                key={i}
+                                                className={`w-5 h-5 rounded-md flex items-center justify-center text-[10px] font-black border ${
+                                                    f === "W"
+                                                        ? "bg-emerald-500/10 border-emerald-500/25 text-emerald-600"
+                                                        : "bg-red-500/10 border-red-500/25 text-red-500"
+                                                }`}
+                                            >
+                                                {f}
+                                            </span>
+                                        ))}
+                                    </div>
+
+                                    {/* Points/Wins column */}
+                                    <div className="col-span-2 md:col-span-2 flex items-center justify-end gap-3 text-right">
+                                        <div>
+                                            <p className="font-black text-zinc-900 text-sm">
+                                                {sortBy === "points" ? `${item.points.toLocaleString()} pts` : `${item.wins} wins`}
+                                            </p>
+                                            <p className="text-xs text-zinc-400 font-semibold">
+                                                {sortBy === "points" ? `${item.wins} wins` : `${item.points.toLocaleString()} pts`}
+                                            </p>
+                                        </div>
+                                        <button className="p-1.5 bg-zinc-100 hover:bg-amber-500 hover:text-zinc-950 text-zinc-500 rounded-lg transition-colors group-hover:bg-zinc-200">
+                                            <ArrowUpRight className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })
+                    )}
+                </div>
+
+                {/* PAGINATION CONTROLS */}
+                {totalPages > 1 && (
+                    <div className="px-8 py-5 border-t border-zinc-100 bg-zinc-50/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <span className="text-xs font-semibold text-zinc-500">
+                            Showing page <strong className="text-zinc-800">{currentPage}</strong> of <strong className="text-zinc-800">{totalPages}</strong>
+                        </span>
+
+                        <div className="flex items-center gap-2">
+                            <button
+                                disabled={currentPage === 1}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCurrentPage(currentPage - 1);
+                                }}
+                                className="p-2 border border-zinc-200 rounded-xl bg-white hover:bg-zinc-50 disabled:opacity-40 disabled:hover:bg-white text-zinc-700 transition-colors"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
+
+                            {[...Array(totalPages)].map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setCurrentPage(i + 1);
+                                    }}
+                                    className={`w-9 h-9 rounded-xl text-xs font-bold transition-all ${
+                                        currentPage === i + 1
+                                            ? "bg-zinc-950 text-white shadow-md shadow-zinc-950/10"
+                                            : "border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-600"
+                                    }`}
+                                >
+                                    {i + 1}
+                                </button>
+                            ))}
+
+                            <button
+                                disabled={currentPage === totalPages}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setCurrentPage(currentPage + 1);
+                                }}
+                                className="p-2 border border-zinc-200 rounded-xl bg-white hover:bg-zinc-50 disabled:opacity-40 disabled:hover:bg-white text-zinc-700 transition-colors"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            <RankingDetailsModal
+                open={openDetails}
+                onClose={() => setOpenDetails(false)}
+                ranking={selectedRanking}
+            />
         </div>
-
-      </div>
-
-      <RankingDetailsModal
-        open={openDetails}
-        onClose={() =>
-          setOpenDetails(false)
-        }
-        ranking={selectedRanking}
-      />
-    </div>
-
-  );
+    );
 }
 
 export default Leaderboard;
