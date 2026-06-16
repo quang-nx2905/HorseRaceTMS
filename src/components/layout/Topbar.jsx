@@ -84,11 +84,6 @@ function Topbar() {
             {/* RIGHT */}
             <div className="flex items-center gap-5">
 
-                {/* NEW RACE */}
-                <button className="bg-yellow-400 hover:bg-yellow-500 transition-all px-6 py-3 rounded-2xl font-semibold">
-                    + New Race
-                </button>
-
                 {/* NOTIFICATION */}
                 <div
                     ref={notificationRef}

@@ -8,8 +8,6 @@ import {
   BarChart3,
   Shield,
   Eye,
-  Settings,
-  LogOut,
   GanttChartSquare,
 } from "lucide-react";
 
@@ -115,20 +113,6 @@ function Sidebar() {
             </NavLink>
           ))}
         </div>
-      </div>
-
-      <div className="space-y-3">
-        <button className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl hover:bg-zinc-100 transition-all">
-          <Settings size={20} />
-
-          {sidebarOpen && <span>Settings</span>}
-        </button>
-
-        <button className="w-full flex items-center gap-3 px-4 py-4 rounded-2xl text-red-500 hover:bg-red-50 transition-all">
-          <LogOut size={20} />
-
-          {sidebarOpen && <span>Logout</span>}
-        </button>
       </div>
     </div>
   );

@@ -1,150 +1,242 @@
-import { Link } from "react-router-dom"; // Bỏ dùng useNavigate vì thay bằng window.location
+import { Link } from "react-router-dom";
 import { useState } from "react";
-import axios from "axios"; // 1. THÊM DÒNG NÀY ĐỂ DÙNG AXIOS
+import axios from "axios";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Trophy, Zap, BarChart3 } from "lucide-react";
+
+const features = [
+    { icon: Trophy, label: "Elite Tournaments", desc: "Manage world-class racing events" },
+    { icon: Zap,    label: "AI Predictions",   desc: "86% win accuracy engine"         },
+    { icon: BarChart3, label: "Live Analytics", desc: "Real-time race performance data" },
+];
 
 function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // Thêm trạng thái loading khi đợi API
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-  // 2. SỬA HÀM HANDLELOGIN THÀNH HÀM BẤT ĐỒNG BỘ (ASYNC/AWAIT)
-  const handleLogin = async () => {
-    if (!email || !password) {
-      alert("Please enter email and password.");
-      return;
-    }
+    const handleLogin = async () => {
+        if (!email || !password) {
+            alert("Please enter email and password.");
+            return;
+        }
+        setLoading(true);
+        try {
+            const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://localhost:7179";
+            const response = await axios.post(
+                `${apiBaseUrl}/api/auth/login`,
+                { email, password },
+                { withCredentials: true }
+            );
+            if (response.data && response.data.accessToken) {
+                localStorage.setItem("token", response.data.accessToken);
+                window.location.href = "/";
+            } else {
+                alert("Login failed: Invalid response from server.");
+            }
+        } catch (error) {
+            const errorMessage =
+                error.response?.data?.message ||
+                "Cannot connect to server. Please check Backend!";
+            alert(`Login Failed: ${errorMessage}`);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    setLoading(true);
+    const handleKeyDown = (e) => {
+        if (e.key === "Enter") handleLogin();
+    };
 
-    try {
-      // Lấy URL Backend từ file .env (https://localhost:7179)
-      const apiBaseUrl =
-        import.meta.env.VITE_API_BASE_URL || "https://localhost:7179";
+    return (
+        <div className="min-h-screen flex">
 
-      // Gọi API Đăng nhập sang ASP.NET Core
-      // CHANGED: thêm withCredentials
-      const response = await axios.post(
-        `${apiBaseUrl}/api/auth/login`,
-        {
-          email: email,
-          password: password,
-        },
-        {
-          withCredentials: true,
-        },
-      );
+            {/* ── LEFT PANEL – Dark Brand ── */}
+            <div className="hidden lg:flex lg:w-[52%] bg-zinc-950 flex-col justify-between p-14 relative overflow-hidden">
 
-      // Nếu Backend trả về dữ liệu thành công kèm Token
-      if (response.data && response.data.accessToken) {
-        // Lưu accessToken vào trình duyệt để chứng thực cho các request sau
-        localStorage.setItem("token", response.data.accessToken);
+                {/* Decorative blobs */}
+                <div className="absolute top-[-80px] right-[-80px] w-[420px] h-[420px] rounded-full bg-yellow-400/10 blur-3xl pointer-events-none" />
+                <div className="absolute bottom-[-60px] left-[-60px] w-[320px] h-[320px] rounded-full bg-yellow-400/5 blur-3xl pointer-events-none" />
 
-        alert("Login successful!");
+                {/* Logo */}
+                <div className="flex items-center gap-3 relative z-10">
+                    <div className="w-11 h-11 rounded-2xl bg-yellow-400 flex items-center justify-center text-xl font-black text-black">
+                        H
+                    </div>
+                    <span className="text-white font-bold text-lg tracking-tight">HorseRace TMS</span>
+                </div>
 
-        // Ép trình duyệt tải lại trang để ProtectedRoute quét lại token mới
-        window.location.href = "/";
-      } else {
-        alert("Login failed: Invalid response from server.");
-      }
-    } catch (error) {
-      console.error("Login API Error:", error);
-      // Hiển thị lỗi từ Backend trả về nếu có, hoặc lỗi mất kết nối mạng
-      const errorMessage =
-        error.response?.data?.message ||
-        "Cannot connect to server. Please check Backend!";
-      alert(`Login Failed: ${errorMessage}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+                {/* Hero text */}
+                <div className="relative z-10">
+                    <div className="inline-flex items-center gap-2 bg-yellow-400/15 border border-yellow-400/30 rounded-full px-4 py-1.5 mb-8">
+                        <span className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+                        <span className="text-yellow-400 text-xs font-semibold tracking-wider uppercase">
+                            Elite Racing Platform
+                        </span>
+                    </div>
 
-  return (
-    <div className="min-h-screen bg-[#f5f5f4] flex items-center justify-center p-8">
-      <div className="grid grid-cols-1 xl:grid-cols-2 w-full max-w-7xl overflow-hidden rounded-[40px] shadow-2xl bg-white">
-        {/* LEFT */}
-        <div className="p-14 flex flex-col justify-center">
-          {/* LOGO */}
-          <div className="mb-12">
-            <div className="w-20 h-20 rounded-3xl bg-yellow-400 flex items-center justify-center text-4xl font-black mb-6">
-              🏇
+                    <h2 className="text-5xl font-black text-white leading-[1.1] mb-6">
+                        Horse Race<br />
+                        <span className="text-yellow-400">Tournament</span><br />
+                        Management
+                    </h2>
+
+                    <p className="text-zinc-400 text-base leading-7 max-w-sm mb-12">
+                        Professional management, AI-powered predictions and real-time
+                        tournament operations — all in one platform.
+                    </p>
+
+                    {/* Feature list */}
+                    <div className="space-y-4">
+                        {features.map(({ icon: Icon, label, desc }) => (
+                            <div key={label} className="flex items-center gap-4">
+                                <div className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center flex-shrink-0">
+                                    <Icon size={18} className="text-yellow-400" />
+                                </div>
+                                <div>
+                                    <p className="text-white font-semibold text-sm">{label}</p>
+                                    <p className="text-zinc-500 text-xs">{desc}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Bottom badge */}
+                <div className="relative z-10 flex items-center gap-3">
+                    <div className="flex -space-x-2">
+                        {["#f59e0b", "#10b981", "#3b82f6"].map((c, i) => (
+                            <div key={i} className="w-8 h-8 rounded-full border-2 border-zinc-950" style={{ background: c }} />
+                        ))}
+                    </div>
+                    <p className="text-zinc-500 text-sm">
+                        Trusted by <span className="text-white font-semibold">2,400+</span> racing professionals
+                    </p>
+                </div>
             </div>
-            <h1 className="text-6xl font-black tracking-tight mb-4">
-              Welcome Back
-            </h1>
-            <p className="text-zinc-500 text-xl leading-8">
-              Access the Horse Race Tournament Management System dashboard.
-            </p>
-          </div>
 
-          {/* FORM */}
-          <div className="space-y-6">
-            {/* EMAIL */}
-            <div>
-              <label className="block text-sm font-semibold mb-3">
-                Email Address
-              </label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-                className="w-full bg-zinc-100 rounded-2xl px-6 py-5 outline-none focus:ring-2 focus:ring-yellow-400 transition-all disabled:opacity-50"
-              />
+            {/* ── RIGHT PANEL – Form ── */}
+            <div className="flex-1 bg-white flex items-center justify-center p-8 lg:p-16">
+                <div className="w-full max-w-[420px]">
+
+                    {/* Mobile logo */}
+                    <div className="flex items-center gap-3 mb-10 lg:hidden">
+                        <div className="w-10 h-10 rounded-xl bg-yellow-400 flex items-center justify-center text-lg font-black text-black">
+                            H
+                        </div>
+                        <span className="font-bold text-base">HorseRace TMS</span>
+                    </div>
+
+                    {/* Heading */}
+                    <div className="mb-8">
+                        <h1 className="text-4xl font-black text-zinc-900 mb-2">
+                            Welcome back
+                        </h1>
+                        <p className="text-zinc-500 text-sm">
+                            Sign in to your account to continue
+                        </p>
+                    </div>
+
+                    {/* Form */}
+                    <div className="space-y-5">
+
+                        {/* Email */}
+                        <div className="space-y-1.5">
+                            <label className="text-sm font-semibold text-zinc-700">
+                                Email address
+                            </label>
+                            <div className="relative">
+                                <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+                                <input
+                                    id="login-email"
+                                    type="email"
+                                    placeholder="you@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    disabled={loading}
+                                    className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 outline-none text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all disabled:opacity-50"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Password */}
+                        <div className="space-y-1.5">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-semibold text-zinc-700">
+                                    Password
+                                </label>
+                                <button className="text-xs text-yellow-600 hover:text-yellow-700 font-semibold transition-colors">
+                                    Forgot password?
+                                </button>
+                            </div>
+                            <div className="relative">
+                                <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+                                <input
+                                    id="login-password"
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="Enter your password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    disabled={loading}
+                                    className="w-full pl-11 pr-12 py-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 outline-none text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all disabled:opacity-50"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
+                                >
+                                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Submit */}
+                        <button
+                            id="login-submit"
+                            onClick={handleLogin}
+                            disabled={loading}
+                            className="group w-full flex items-center justify-center gap-2 bg-yellow-400 hover:bg-yellow-500 disabled:bg-zinc-200 disabled:text-zinc-400 text-black font-bold py-3.5 rounded-2xl transition-all duration-200 hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5 text-sm"
+                        >
+                            {loading ? (
+                                <>
+                                    <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                                    Signing in...
+                                </>
+                            ) : (
+                                <>
+                                    Sign in
+                                    <ArrowRight size={16} className="group-hover:translate-x-0.5 transition-transform" />
+                                </>
+                            )}
+                        </button>
+
+                    </div>
+
+                    {/* Divider */}
+                    <div className="flex items-center gap-4 my-7">
+                        <div className="flex-1 h-px bg-zinc-100" />
+                        <span className="text-xs text-zinc-400 font-medium">OR</span>
+                        <div className="flex-1 h-px bg-zinc-100" />
+                    </div>
+
+                    {/* Register link */}
+                    <p className="text-center text-sm text-zinc-500">
+                        Don't have an account?{" "}
+                        <Link
+                            to="/register"
+                            className="text-zinc-900 font-bold hover:text-yellow-600 transition-colors"
+                        >
+                            Create account →
+                        </Link>
+                    </p>
+
+                </div>
             </div>
 
-            {/* PASSWORD */}
-            <div>
-              <label className="block text-sm font-semibold mb-3">
-                Password
-              </label>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-                className="w-full bg-zinc-100 rounded-2xl px-6 py-5 outline-none focus:ring-2 focus:ring-yellow-400 transition-all disabled:opacity-50"
-              />
-            </div>
-
-            {/* BUTTON */}
-            <button
-              onClick={handleLogin}
-              disabled={loading}
-              className="w-full bg-yellow-400 hover:bg-yellow-500 transition-all py-5 rounded-2xl font-bold text-lg disabled:bg-zinc-300"
-            >
-              {loading ? "Signing In..." : "Sign In"}
-            </button>
-          </div>
-
-          {/* REGISTER */}
-          <p className="mt-8 text-zinc-500">
-            Don’t have an account?
-            <Link to="/register" className="ml-2 text-black font-bold">
-              Create Account
-            </Link>
-          </p>
         </div>
-
-        {/* RIGHT */}
-        <div className="hidden xl:flex bg-gradient-to-br from-yellow-400 to-yellow-500 items-center justify-center p-16">
-          <div className="text-black">
-            <p className="uppercase tracking-[6px] font-semibold mb-6">
-              Elite Racing Platform
-            </p>
-            <h2 className="text-7xl font-black leading-tight mb-8">
-              Horse Race <br /> Tournament <br /> System
-            </h2>
-            <p className="text-2xl leading-10 max-w-xl">
-              Professional management, AI predictions and real-time tournament
-              operations platform.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 export default Login;

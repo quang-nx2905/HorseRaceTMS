@@ -4,7 +4,7 @@ import { API_BASE_URL }
     from "../config/api";
 
 const API_URL =
-    "http://localhost:8080/api/horses";
+    `${API_BASE_URL}/horses`;
 
 export const getAllHorses =
     () => axios.get(API_URL);
