@@ -2,7 +2,7 @@ import StatCard from "../components/ui/StatCard";
 import AnalyticsChart from "../components/charts/AnalyticsChart";
 import RecentRaces from "../components/dashboard/RecentRaces";
 import {
-    Horse,
+    GanttChartSquare,
     Zap,
     TrendingUp,
     Target,
@@ -15,7 +15,7 @@ const stats = [
         title: "Total Horses",
         value: "2,450",
         subtitle: "+12% this month",
-        icon: Horse,
+        icon: GanttChartSquare,
         accent: "bg-yellow-400",
         iconColor: "text-yellow-900",
         trend: "+12%",

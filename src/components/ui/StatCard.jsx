@@ -1,6 +1,6 @@
 import {
     TrendingUp,
-    Horse,
+    GanttChartSquare,
     Zap,
     Target,
     ArrowUpRight,
@@ -11,7 +11,7 @@ const stats = [
         title: "Total Horses",
         value: "2,450",
         subtitle: "+12% this month",
-        icon: Horse,
+        icon: GanttChartSquare,
         accent: "bg-yellow-400",
         iconColor: "text-yellow-900",
         trend: "+12%",
