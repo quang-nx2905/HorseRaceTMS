@@ -1,432 +1,321 @@
-import { useState } from "react";
-import PredictionDetailsModal
-    from "../components/predictions/PredictionDetailsModal";
+import { useState, useMemo } from "react";
+import {
+    BrainCircuit,
+    Sparkles,
+    Search,
+    Zap,
+    TrendingUp,
+    Target,
+    FlaskConical,
+    Eye,
+    ChevronRight,
+    ArrowUpRight,
+    BarChart3,
+    Cpu,
+    AlertCircle,
+    CheckCircle2,
+    Clock,
+} from "lucide-react";
+import PredictionDetailsModal from "../components/predictions/PredictionDetailsModal";
+
+const PREDICTIONS_DATA = [
+    {
+        horse: "Thunder Bolt",
+        race: "Golden Cup Final",
+        confidence: 92,
+        odds: "1.8x",
+        status: "High Chance",
+        breed: "Arabian",
+        jockey: "Akira Sato",
+        track: "Tokyo Arena",
+        form: ["W", "W", "W", "L", "W"],
+        raceDate: "12 Jun 2026",
+        gradient: "from-emerald-500 to-teal-600",
+        avatarGrad: "from-emerald-400 to-teal-600",
+    },
+    {
+        horse: "Night Fury",
+        race: "Royal Derby",
+        confidence: 76,
+        odds: "2.4x",
+        status: "Moderate",
+        breed: "Mustang",
+        jockey: "Ryan Cooper",
+        track: "London Track",
+        form: ["W", "L", "W", "W", "L"],
+        raceDate: "20 Jun 2026",
+        gradient: "from-amber-500 to-orange-600",
+        avatarGrad: "from-amber-400 to-orange-600",
+    },
+    {
+        horse: "Silver Storm",
+        race: "Tokyo Sprint",
+        confidence: 61,
+        odds: "3.1x",
+        status: "Risky",
+        breed: "Appaloosa",
+        jockey: "Lucas Fernandez",
+        track: "New York Track",
+        form: ["L", "W", "L", "W", "L"],
+        raceDate: "02 Jul 2026",
+        gradient: "from-red-500 to-rose-600",
+        avatarGrad: "from-red-400 to-rose-600",
+    },
+    {
+        horse: "Golden Sprint",
+        race: "Dubai Masters",
+        confidence: 85,
+        odds: "2.0x",
+        status: "High Chance",
+        breed: "Thoroughbred",
+        jockey: "James Carter",
+        track: "Dubai Racing Club",
+        form: ["W", "W", "L", "W", "W"],
+        raceDate: "18 Jul 2026",
+        gradient: "from-emerald-500 to-green-600",
+        avatarGrad: "from-sky-400 to-blue-600",
+    },
+    {
+        horse: "Crimson Star",
+        race: "Singapore Open",
+        confidence: 70,
+        odds: "2.7x",
+        status: "Moderate",
+        breed: "Quarter Horse",
+        jockey: "Maria Santos",
+        track: "Singapore Racecourse",
+        form: ["L", "W", "W", "L", "W"],
+        raceDate: "28 Jul 2026",
+        gradient: "from-amber-500 to-yellow-600",
+        avatarGrad: "from-rose-400 to-red-600",
+    },
+];
+
+const STATUS_CONFIG = {
+    "High Chance": {
+        badge: "bg-emerald-500/10 text-emerald-600 border border-emerald-500/25",
+        icon: CheckCircle2,
+        bar: "from-emerald-400 to-teal-500",
+    },
+    "Moderate": {
+        badge: "bg-amber-500/10 text-amber-700 border border-amber-500/25",
+        icon: Clock,
+        bar: "from-amber-400 to-orange-500",
+    },
+    "Risky": {
+        badge: "bg-red-500/10 text-red-500 border border-red-500/25",
+        icon: AlertCircle,
+        bar: "from-red-400 to-rose-500",
+    },
+};
 
 function Predictions() {
+    const [search, setSearch] = useState("");
+    const [filterStatus, setFilterStatus] = useState("All");
+    const [openDetails, setOpenDetails] = useState(false);
+    const [selectedPrediction, setSelectedPrediction] = useState(null);
 
-    const [search, setSearch] =
-        useState("");
+    const filtered = useMemo(() => {
+        return PREDICTIONS_DATA.filter((item) => {
+            const matchSearch =
+                item.horse.toLowerCase().includes(search.toLowerCase()) ||
+                item.race.toLowerCase().includes(search.toLowerCase());
+            const matchStatus = filterStatus === "All" || item.status === filterStatus;
+            return matchSearch && matchStatus;
+        });
+    }, [search, filterStatus]);
 
-    const [openDetails, setOpenDetails] =
-        useState(false);
-
-    const [selectedPrediction,
-        setSelectedPrediction] =
-        useState(null);
-
-    const [predictions] = useState([
-
-        {
-            horse: "Thunder Bolt",
-            race: "Golden Cup Final",
-            confidence: "92%",
-            odds: "1.8x",
-            status: "High Chance",
-        },
-
-        {
-            horse: "Night Fury",
-            race: "Royal Derby",
-            confidence: "76%",
-            odds: "2.4x",
-            status: "Moderate",
-        },
-
-        {
-            horse: "Silver Storm",
-            race: "Tokyo Sprint",
-            confidence: "61%",
-            odds: "3.1x",
-            status: "Risky",
-        },
-
-    ]);
-
-    const filteredPredictions =
-        predictions.filter((item) =>
-            item.horse
-                .toLowerCase()
-                .includes(
-                    search.toLowerCase()
-                )
-        );
+    const avgConfidence = Math.round(
+        PREDICTIONS_DATA.reduce((sum, p) => sum + p.confidence, 0) / PREDICTIONS_DATA.length
+    );
 
     return (
-
-        <div>
-
-            {/* HEADER */}
-            <div
-                className="
-          flex
-          items-center
-          justify-between
-          mb-10
-        "
-            >
-
-                <div>
-
-                    <h1 className="page-title">
-                        Predictions
-                    </h1>
-
-                    <p className="page-subtitle">
-                        AI-powered race prediction
-                        and analytics engine.
-                    </p>
-
+        <div className="pb-12">
+            {/* ═══════ HERO HEADER ═══════ */}
+            <div className="relative overflow-hidden bg-gradient-to-br from-violet-950 via-violet-900 to-indigo-900 rounded-3xl p-8 md:p-12 mb-10 border border-violet-800/40 shadow-xl">
+                <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                    <div className="absolute -top-16 right-0 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl" />
+                    <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-indigo-400/8 rounded-full blur-3xl" />
+                    <div className="absolute top-1/2 left-0 w-40 h-40 bg-pink-500/6 rounded-full blur-2xl" />
                 </div>
-
-                <div className="flex gap-4">
-
-                    <input
-                        type="text"
-                        placeholder="Search horse..."
-                        value={search}
-                        onChange={(e) =>
-                            setSearch(
-                                e.target.value
-                            )
-                        }
-                        className="
-            px-4
-            py-3
-
-            border
-            border-zinc-200
-
-            rounded-2xl
-        "
-                    />
-
-                    <button
-                        className="
-            bg-yellow-400
-            hover:bg-yellow-500
-
-            transition-all
-
-            px-6
-            py-4
-
-            rounded-2xl
-            font-semibold
-        "
-                    >
-                        Generate Prediction
-                    </button>
-
-                </div>
-
-            </div>
-
-            {/* TOP CARDS */}
-            <div
-                className="
-          grid
-          grid-cols-1
-          md:grid-cols-3
-
-          gap-6
-
-          mb-8
-        "
-            >
-
-                {/* CARD */}
-                <div className="card p-8">
-
-                    <p className="text-zinc-500 mb-4">
-                        Prediction Accuracy
-                    </p>
-
-                    <h2
-                        className="
-              text-5xl
-              font-black
-              mb-4
-            "
-                    >
-                        86%
-                    </h2>
-
-                    <div
-                        className="
-              h-3
-              bg-zinc-100
-              rounded-full
-              overflow-hidden
-            "
-                    >
-
-                        <div
-                            className="
-                h-full
-                w-[86%]
-                bg-yellow-400
-              "
-                        ></div>
-
+                <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                    <div>
+                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-violet-500/20 border border-violet-400/30 text-violet-300 rounded-full text-xs font-bold uppercase tracking-widest mb-5">
+                            <BrainCircuit className="w-3.5 h-3.5" />
+                            AI-Powered Engine · Model v3.2
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight mb-3">
+                            Race <span className="bg-gradient-to-r from-violet-300 to-pink-300 bg-clip-text text-transparent">Predictions</span>
+                        </h1>
+                        <p className="text-violet-300/70 text-base max-w-md">
+                            Machine-learning predictions powered by historical data, real-time telemetry, and jockey performance analytics.
+                        </p>
                     </div>
-
+                    <div className="grid grid-cols-3 gap-3 min-w-[280px]">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
+                            <p className="text-xs text-violet-300/60 font-bold uppercase tracking-wider mb-1">Accuracy</p>
+                            <p className="text-2xl font-black text-white">86%</p>
+                        </div>
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
+                            <p className="text-xs text-violet-300/60 font-bold uppercase tracking-wider mb-1">AI Models</p>
+                            <p className="text-2xl font-black text-white">12</p>
+                        </div>
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
+                            <p className="text-xs text-violet-300/60 font-bold uppercase tracking-wider mb-1">Generated</p>
+                            <p className="text-2xl font-black text-white">14.2K</p>
+                        </div>
+                    </div>
                 </div>
-
-                {/* CARD */}
-                <div className="card p-8">
-
-                    <p className="text-zinc-500 mb-4">
-                        Total AI Models
-                    </p>
-
-                    <h2
-                        className="
-              text-5xl
-              font-black
-            "
-                    >
-                        12
-                    </h2>
-
-                </div>
-
-                {/* CARD */}
-                <div className="card p-8">
-
-                    <p className="text-zinc-500 mb-4">
-                        Predictions Generated
-                    </p>
-
-                    <h2
-                        className="
-              text-5xl
-              font-black
-            "
-                    >
-                        14.2k
-                    </h2>
-
-                </div>
-
             </div>
 
-            {/* PREDICTION LIST */}
-            <div className="space-y-6">
-
-                {filteredPredictions.map((item, index) => (
-
-                    <div
-                        key={index}
-                        className="
-              card
-              p-8
-
-              hover:shadow-xl
-
-              transition-all
-            "
-                    >
-
+            {/* ═══════ ACCURACY STAT + SEARCH/FILTER ═══════ */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+                {/* Accuracy card */}
+                <div className="lg:col-span-1 bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm">
+                    <p className="text-xs text-zinc-400 font-bold uppercase tracking-wider mb-2">Avg. Confidence</p>
+                    <p className="text-4xl font-black text-zinc-900 mb-3">{avgConfidence}%</p>
+                    <div className="w-full bg-zinc-100 h-2 rounded-full overflow-hidden">
                         <div
-                            className="
-                flex
-                items-center
-                justify-between
-                mb-6
-              "
-                        >
+                            className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full transition-all duration-700"
+                            style={{ width: `${avgConfidence}%` }}
+                        />
+                    </div>
+                    <p className="text-xs text-zinc-400 mt-2 font-medium">{PREDICTIONS_DATA.length} active predictions</p>
+                </div>
 
-                            <div>
-
-                                <h2
-                                    className="
-                    text-3xl
-                    font-bold
-                    mb-2
-                  "
-                                >
-                                    {item.horse}
-                                </h2>
-
-                                <p className="text-zinc-500">
-                                    {item.race}
-                                </p>
-
-                            </div>
-
-                            <span
-                                className={`
-                  px-4
-                  py-2
-
-                  rounded-full
-
-                  text-sm
-                  font-semibold
-
-                  ${item.status === "High Chance"
-                                        ? "bg-green-100 text-green-600"
-                                        : item.status === "Moderate"
-                                            ? "bg-yellow-100 text-yellow-700"
-                                            : "bg-red-100 text-red-500"
-                                    }
-                `}
-                            >
-                                {item.status}
-                            </span>
-
-                        </div>
-
-                        <div className="mb-6">
-
-                            <div
-                                className="
-            flex
-            justify-between
-            mb-2
-        "
-                            >
-
-                                <span>
-                                    Win Probability
-                                </span>
-
-                                <span>
-                                    {item.confidence}
-                                </span>
-
-                            </div>
-
-                            <div
-                                className="
-            h-3
-            bg-zinc-100
-            rounded-full
-            overflow-hidden
-        "
-                            >
-
-                                <div
-                                    className="
-                h-full
-                bg-yellow-400
-            "
-                                    style={{
-                                        width:
-                                            item.confidence,
-                                    }}
-                                />
-
-                            </div>
-
-                        </div>
-
-                        <div className="mb-6">
-
+                {/* Search + filters */}
+                <div className="lg:col-span-3 bg-white rounded-3xl p-5 border border-zinc-200 shadow-sm flex flex-col sm:flex-row gap-4">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                        <input
+                            type="text"
+                            placeholder="Search horse or race name..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/15 rounded-2xl outline-none text-sm transition-all"
+                        />
+                    </div>
+                    <div className="flex gap-2">
+                        {["All", "High Chance", "Moderate", "Risky"].map((f) => (
                             <button
-                                onClick={() => {
-
-                                    setSelectedPrediction(
-                                        item
-                                    );
-
-                                    setOpenDetails(true);
-
-                                }}
-                                className="
-            px-5
-            py-3
-
-            bg-yellow-400
-            hover:bg-yellow-500
-
-            rounded-2xl
-
-            font-semibold
-        "
+                                key={f}
+                                onClick={() => setFilterStatus(f)}
+                                className={`px-3 py-3 rounded-2xl text-xs font-bold whitespace-nowrap transition-all border ${
+                                    filterStatus === f
+                                        ? f === "High Chance"
+                                            ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
+                                            : f === "Moderate"
+                                            ? "bg-amber-500 text-white border-amber-500 shadow-sm"
+                                            : f === "Risky"
+                                            ? "bg-red-500 text-white border-red-500 shadow-sm"
+                                            : "bg-violet-600 text-white border-violet-600 shadow-sm"
+                                        : "bg-zinc-50 text-zinc-600 border-zinc-200 hover:bg-zinc-100"
+                                }`}
                             >
-                                View Details
+                                {f}
                             </button>
-
-                        </div>
-
-                        {/* STATS */}
-                        <div
-                            className="
-                grid
-                grid-cols-2
-                gap-6
-              "
-                        >
-
-                            {/* CONFIDENCE */}
-                            <div
-                                className="
-                  bg-zinc-50
-                  rounded-2xl
-                  p-6
-                "
-                            >
-
-                                <p className="text-zinc-500 mb-3">
-                                    Confidence
-                                </p>
-
-                                <h3
-                                    className="
-                    text-4xl
-                    font-black
-                  "
-                                >
-                                    {item.confidence}
-                                </h3>
-
-                            </div>
-
-                            {/* ODDS */}
-                            <div
-                                className="
-                  bg-zinc-50
-                  rounded-2xl
-                  p-6
-                "
-                            >
-
-                                <p className="text-zinc-500 mb-3">
-                                    Betting Odds
-                                </p>
-
-                                <h3
-                                    className="
-                    text-4xl
-                    font-black
-                  "
-                                >
-                                    {item.odds}
-                                </h3>
-
-                            </div>
-
-                        </div>
-
+                        ))}
                     </div>
+                </div>
+            </div>
 
-                ))}
+            {/* ═══════ PREDICTION CARDS ═══════ */}
+            <div className="space-y-5">
+                {filtered.length === 0 && (
+                    <div className="text-center py-20 text-zinc-400 font-medium bg-white rounded-3xl border border-zinc-200">
+                        No predictions match your search.
+                    </div>
+                )}
+                {filtered.map((item) => {
+                    const cfg = STATUS_CONFIG[item.status] || STATUS_CONFIG["Moderate"];
+                    const StatusIcon = cfg.icon;
+                    return (
+                        <div
+                            key={item.horse}
+                            className="group bg-white border border-zinc-200 rounded-3xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
+                        >
+                            {/* Top gradient stripe */}
+                            <div className={`h-1 w-full bg-gradient-to-r ${item.gradient}`} />
 
+                            <div className="p-7">
+                                <div className="flex flex-col md:flex-row md:items-center gap-6">
+                                    {/* Horse avatar + info */}
+                                    <div className="flex items-center gap-4 flex-1">
+                                        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.avatarGrad} text-white flex items-center justify-center font-black text-lg shadow-sm flex-shrink-0`}>
+                                            {item.horse.split(" ").map(w => w[0]).join("")}
+                                        </div>
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <h2 className="text-lg font-black text-zinc-900 group-hover:text-violet-700 transition-colors">
+                                                    {item.horse}
+                                                </h2>
+                                                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${cfg.badge}`}>
+                                                    <StatusIcon className="w-3 h-3" />
+                                                    {item.status}
+                                                </span>
+                                            </div>
+                                            <p className="text-zinc-500 text-sm font-medium">
+                                                {item.race} · <span className="text-zinc-400">{item.track}</span>
+                                            </p>
+                                            <p className="text-zinc-400 text-xs mt-0.5">{item.jockey} · {item.breed} · {item.raceDate}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Recent Form */}
+                                    <div className="hidden lg:flex flex-col items-center gap-2">
+                                        <p className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Recent Form</p>
+                                        <div className="flex gap-1">
+                                            {item.form.map((f, i) => (
+                                                <span key={i} className={`w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-black border ${
+                                                    f === "W"
+                                                        ? "bg-emerald-50 border-emerald-200 text-emerald-600"
+                                                        : "bg-red-50 border-red-200 text-red-500"
+                                                }`}>{f}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    {/* Confidence bar */}
+                                    <div className="flex-1 max-w-[180px]">
+                                        <div className="flex justify-between text-xs font-bold text-zinc-500 mb-2">
+                                            <span>Win Probability</span>
+                                            <span className="text-zinc-800">{item.confidence}%</span>
+                                        </div>
+                                        <div className="w-full bg-zinc-100 h-2.5 rounded-full overflow-hidden">
+                                            <div
+                                                className={`h-full bg-gradient-to-r ${cfg.bar} rounded-full transition-all duration-700`}
+                                                style={{ width: `${item.confidence}%` }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Odds + CTA */}
+                                    <div className="flex items-center gap-4">
+                                        <div className="text-center">
+                                            <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Betting Odds</p>
+                                            <p className="text-2xl font-black text-zinc-900">{item.odds}</p>
+                                        </div>
+                                        <button
+                                            onClick={() => { setSelectedPrediction(item); setOpenDetails(true); }}
+                                            className="flex items-center gap-2 px-4 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl text-xs font-bold transition-all shadow-md shadow-violet-600/20 hover:shadow-violet-500/30 group-hover:scale-105"
+                                        >
+                                            <Eye className="w-3.5 h-3.5" />
+                                            Details
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
 
             <PredictionDetailsModal
                 open={openDetails}
-                onClose={() =>
-                    setOpenDetails(false)
-                }
-                prediction={
-                    selectedPrediction
-                }
+                onClose={() => setOpenDetails(false)}
+                prediction={selectedPrediction}
             />
-
         </div>
-
     );
 }
 
