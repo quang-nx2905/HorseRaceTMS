@@ -11,6 +11,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import GoogleCallback from "./pages/GoogleCallback";
 import Dashboard from "./pages/Dashboard";
 import Horses from "./pages/Horses";
 import Tournaments from "./pages/Tournaments";
@@ -29,6 +30,7 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/auth/callback" element={<GoogleCallback />} />
 
           <Route
             path="/"
