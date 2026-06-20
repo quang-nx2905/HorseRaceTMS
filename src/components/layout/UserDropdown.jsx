@@ -61,7 +61,7 @@ function UserDropdown() {
                     <p className="text-xs font-bold text-zinc-800 leading-tight">
                         {user?.name || "User"}
                     </p>
-                    <p className="text-[10px] text-zinc-400 leading-none font-medium">{user?.role === "Admin" ? "Admin" : "Member"}</p>
+                    <p className="text-[10px] text-zinc-400 leading-none font-medium">{user?.role || "Member"}</p>
                 </div>
 
                 <ChevronDown
@@ -103,7 +103,7 @@ function UserDropdown() {
                         </div>
                         <div className="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-lg">
                             <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">Admin Access</span>
+                            <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">{user?.role || "User"}</span>
                         </div>
                     </div>
 
