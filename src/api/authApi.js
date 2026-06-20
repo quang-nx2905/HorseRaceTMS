@@ -7,7 +7,7 @@ import api from "./axios";
  */
 export const loginWithGoogle = () => {
   const apiBaseUrl =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:5173";
   window.location.href = `${apiBaseUrl}/api/auth/google-login`;
 };
 
