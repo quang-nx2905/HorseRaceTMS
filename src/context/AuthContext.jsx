@@ -4,24 +4,56 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
+const parseJwt = (token) => {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    return null;
+  }
+};
+
+const extractUserFromToken = (token) => {
+  const decoded = parseJwt(token);
+  if (!decoded) return null;
+
+  // JWT Claims can use full schema URIs
+  const claimEmail = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"] || decoded.email;
+  const claimRole = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || decoded.role;
+  const claimName = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] || decoded.name || decoded.FullName || decoded.fullname;
+
+  return {
+    id: decoded.sub,
+    email: claimEmail,
+    role: claimRole || "User",
+    name: claimName || "User",
+  };
+};
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const decodedUser = extractUserFromToken(token);
+      if (decodedUser) return decodedUser;
+    }
+    // Backward compatibility for old fake user data
     const savedUser = localStorage.getItem("user");
-
     return savedUser ? JSON.parse(savedUser) : null;
   });
 
-  // LOGIN
-  const login = (email, password) => {
-    // DEMO LOGIN
-    const fakeUser = {
-      email,
-      role: "admin",
-    };
-
-    setUser(fakeUser);
-
-    localStorage.setItem("user", JSON.stringify(fakeUser));
+  // LOGIN (Takes token from API response)
+  const login = (token) => {
+    localStorage.setItem("token", token);
+    const decodedUser = extractUserFromToken(token);
+    if (decodedUser) {
+      setUser(decodedUser);
+      localStorage.setItem("user", JSON.stringify(decodedUser)); // Optional backup
+    }
   };
 
   // LOGOUT
@@ -41,10 +73,7 @@ export function AuthProvider({ children }) {
       console.error("Logout API Error:", error);
     } finally {
       setUser(null);
-
       localStorage.removeItem("user");
-
-      // Xóa access token nếu đang lưu
       localStorage.removeItem("token");
     }
   };

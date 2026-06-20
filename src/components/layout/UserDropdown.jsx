@@ -59,9 +59,9 @@ function UserDropdown() {
                 {/* Name — hidden on small screens */}
                 <div className="hidden sm:block text-left">
                     <p className="text-xs font-bold text-zinc-800 leading-tight">
-                        {user?.name?.split(" ")[0] || "User"}
+                        {user?.name || "User"}
                     </p>
-                    <p className="text-[10px] text-zinc-400 leading-none font-medium">Admin</p>
+                    <p className="text-[10px] text-zinc-400 leading-none font-medium">{user?.role === "Admin" ? "Admin" : "Member"}</p>
                 </div>
 
                 <ChevronDown

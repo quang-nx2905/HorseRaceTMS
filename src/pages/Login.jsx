@@ -1,8 +1,9 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Trophy, Zap, BarChart3 } from "lucide-react";
 import { loginWithGoogle } from "../api/authApi";
+import { useAuth } from "../context/AuthContext";
 
 const features = [
     { icon: Trophy, label: "Elite Tournaments", desc: "Manage world-class racing events" },
@@ -15,6 +16,8 @@ function Login() {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+    const { login } = useAuth();
 
     const handleLogin = async () => {
         if (!email || !password) {
@@ -30,8 +33,8 @@ function Login() {
                 { withCredentials: true }
             );
             if (response.data && response.data.accessToken) {
-                localStorage.setItem("token", response.data.accessToken);
-                window.location.href = "/";
+                login(response.data.accessToken);
+                navigate("/", { replace: true });
             } else {
                 alert("Login failed: Invalid response from server.");
             }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getGoogleCallbackToken } from "../api/authApi";
+import { useAuth } from "../context/AuthContext";
 
 /**
  * Trang này được load sau khi backend hoàn tất Google OAuth
@@ -12,13 +13,14 @@ import { getGoogleCallbackToken } from "../api/authApi";
 function GoogleCallback() {
     const navigate = useNavigate();
     const [error, setError] = useState(null);
+    const { login } = useAuth();
 
     useEffect(() => {
         const token = getGoogleCallbackToken();
 
         if (token) {
-            // Lưu token như khi login bình thường
-            localStorage.setItem("token", token);
+            // Lưu token và parse user qua context
+            login(token);
             // Chuyển về trang chủ
             navigate("/", { replace: true });
         } else {
