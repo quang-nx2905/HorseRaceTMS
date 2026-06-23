@@ -11,6 +11,8 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import GoogleCallback from "./pages/GoogleCallback";
 import Dashboard from "./pages/Dashboard";
 import Horses from "./pages/Horses";
@@ -30,6 +32,8 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/auth/callback" element={<GoogleCallback />} />
 
           <Route
