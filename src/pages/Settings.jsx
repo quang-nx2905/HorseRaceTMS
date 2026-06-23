@@ -1,5 +1,6 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { changePasswordApi } from "../api/authApi";
 import {
     Mail,
     Lock,
@@ -65,7 +66,7 @@ function Settings() {
         }, 800);
     };
 
-    const handleChangePassword = () => {
+    const handleChangePassword = async () => {
         if (!currentPassword || !newPassword || !confirmPassword) {
             toast.error("Please fill in all password fields.");
             return;
@@ -75,13 +76,34 @@ function Settings() {
             return;
         }
         setIsChangingPass(true);
-        setTimeout(() => {
-            setIsChangingPass(false);
+        try {
+            const res = await changePasswordApi({
+                oldPassword: currentPassword,
+                newPassword: newPassword,
+                confirmNewPassword: confirmPassword
+            });
+            toast.success(res.message || "Password changed successfully!");
             setCurrentPassword("");
             setNewPassword("");
             setConfirmPassword("");
-            toast.success("Password changed successfully!");
-        }, 1000);
+        } catch (error) {
+            let errorMsg = "Failed to change password.";
+            if (error.response?.data) {
+                const data = error.response.data;
+                if (data.message) {
+                    errorMsg = data.message;
+                } else if (data.errors) {
+                    // Trích xuất lỗi đầu tiên từ object errors của DataAnnotations
+                    const firstErrorKey = Object.keys(data.errors)[0];
+                    errorMsg = data.errors[firstErrorKey][0];
+                } else if (data.title) {
+                    errorMsg = data.title;
+                }
+            }
+            toast.error(errorMsg);
+        } finally {
+            setIsChangingPass(false);
+        }
     };
 
     return (
