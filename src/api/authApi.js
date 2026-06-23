@@ -7,7 +7,7 @@ import api from "./axios";
  */
 export const loginWithGoogle = () => {
   const apiBaseUrl =
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:5173";
+    import.meta.env.VITE_API_BASE_URL || "https://localhost:7179";
   window.location.href = `${apiBaseUrl}/api/auth/google-login`;
 };
 
@@ -22,12 +22,15 @@ export const getGoogleCallbackToken = () => {
 
 export const loginApi = async (data) => {
   const response = await api.post("/auth/login", data);
-
   return response.data;
 };
 
 export const registerApi = async (data) => {
   const response = await api.post("/auth/register", data);
+  return response.data;
+};
 
+export const changePasswordApi = async (data) => {
+  const response = await api.post("/auth/change-password", data);
   return response.data;
 };
