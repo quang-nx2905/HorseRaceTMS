@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { changePasswordApi } from "../api/authApi";
+import { useAuth } from "../context/AuthContext";
 import {
     Mail,
     Lock,
@@ -39,15 +40,24 @@ function ToggleSwitch({ checked, onChange, id }) {
 }
 
 function Settings() {
+    const { user } = useAuth();
+
     // Notification states
     const [emailNotification, setEmailNotification] = useState(true);
     const [smsNotification, setSmsNotification] = useState(false);
     const [pushNotification, setPushNotification] = useState(true);
 
     // Profile states
-    const [fullName, setFullName] = useState("Admin User");
-    const [email, setEmail] = useState("admin@equinerace.com");
+    const [fullName, setFullName] = useState(user?.name || "");
+    const [email, setEmail] = useState(user?.email || "");
     const [isSavingProfile, setIsSavingProfile] = useState(false);
+
+    useEffect(() => {
+        if (user) {
+            setFullName(user.name || "");
+            setEmail(user.email || "");
+        }
+    }, [user]);
 
     // Security states
     const [currentPassword, setCurrentPassword] = useState("");
@@ -132,16 +142,18 @@ function Settings() {
                                 Control notification delivery methods, general metadata settings, and manage account security protocols.
                             </p>
                         </div>
-                        <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100 space-y-3.5">
-                            <div className="flex items-center gap-2.5 text-xs font-semibold text-zinc-500">
-                                <UserCheck size={14} className="text-zinc-400" />
-                                <span>Role: System Admin</span>
+                        {user?.role === "Admin" && (
+                            <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100 space-y-3.5">
+                                <div className="flex items-center gap-2.5 text-xs font-semibold text-zinc-500">
+                                    <UserCheck size={14} className="text-zinc-400" />
+                                    <span>Role: System Admin</span>
+                                </div>
+                                <div className="flex items-center gap-2.5 text-xs font-semibold text-zinc-500">
+                                    <Key size={14} className="text-zinc-400" />
+                                    <span>Encryption: AES-256</span>
+                                </div>
                             </div>
-                            <div className="flex items-center gap-2.5 text-xs font-semibold text-zinc-500">
-                                <Key size={14} className="text-zinc-400" />
-                                <span>Encryption: AES-256</span>
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
 
