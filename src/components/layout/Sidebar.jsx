@@ -10,38 +10,56 @@ import {
   GanttChartSquare,
   Zap,
   ChevronRight,
+  UserCog,
 } from "lucide-react";
 import { useLayout } from "../../context/LayoutContext";
+import { useAuth } from "../../context/AuthContext";
 
-const NAV_GROUPS = [
-  {
-    label: "Main",
-    items: [
-      { name: "Dashboard", path: "/", icon: LayoutDashboard },
-      { name: "Tournaments", path: "/tournaments", icon: Trophy },
-      { name: "Horses", path: "/horses", icon: GanttChartSquare },
-      { name: "Jockeys", path: "/jockeys", icon: Users },
-    ],
-  },
-  {
-    label: "Analytics",
-    items: [
-      { name: "Predictions", path: "/predictions", icon: BrainCircuit },
-      { name: "Leaderboard", path: "/leaderboard", icon: BarChart3 },
-    ],
-  },
-  {
-    label: "Management",
-    items: [
-      { name: "Referee", path: "/referee", icon: Shield },
-      { name: "Spectator", path: "/spectator", icon: Eye },
-    ],
-  },
-];
+const getNavGroups = (userRole) => {
+  const groups = [
+    {
+      label: "Main",
+      items: [
+        { name: "Dashboard", path: "/", icon: LayoutDashboard },
+        { name: "Tournaments", path: "/tournaments", icon: Trophy },
+        { name: "Horses", path: "/horses", icon: GanttChartSquare },
+        { name: "Jockeys", path: "/jockeys", icon: Users },
+      ],
+    },
+    {
+      label: "Analytics",
+      items: [
+        { name: "Predictions", path: "/predictions", icon: BrainCircuit },
+        { name: "Leaderboard", path: "/leaderboard", icon: BarChart3 },
+      ],
+    },
+    {
+      label: "Management",
+      items: [
+        { name: "Referee", path: "/referee", icon: Shield },
+        { name: "Spectator", path: "/spectator", icon: Eye },
+      ],
+    },
+  ];
+
+  if (userRole === "Admin") {
+    groups.push({
+      label: "Admin Panel",
+      items: [
+        { name: "User Management", path: "/admin/users", icon: UserCog },
+      ]
+    });
+  }
+
+  return groups;
+};
 
 function Sidebar() {
   const { sidebarOpen } = useLayout();
   const location = useLocation();
+  const { user } = useAuth();
+
+  const navGroups = getNavGroups(user?.role);
 
   return (
     <div
@@ -84,7 +102,7 @@ function Sidebar() {
 
       {/* ── NAVIGATION GROUPS ── */}
       <nav className="relative z-10 flex-1 overflow-y-auto py-4 px-3 space-y-1">
-        {NAV_GROUPS.map((group) => (
+        {navGroups.map((group) => (
           <div key={group.label} className="mb-2">
             {sidebarOpen && (
               <p className="px-2 py-2 text-[9px] font-black uppercase tracking-[0.15em] text-zinc-600">

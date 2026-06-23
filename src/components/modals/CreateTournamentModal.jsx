@@ -1,137 +1,94 @@
-import { X } from "lucide-react";
+import { Trophy, MapPin, Calendar, DollarSign } from "lucide-react";
+import Modal from "../common/Modal";
 
 function CreateTournamentModal({
     open,
     onClose,
 }) {
-
-    if (!open) return null;
-
     return (
-
-        <div
-            className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+        <Modal
+            open={open}
+            onClose={onClose}
+            title="Create Tournament"
+            width="w-[700px]"
         >
+            <p className="text-zinc-500 mb-8 -mt-6">
+                Add a new horse racing tournament.
+            </p>
 
-            {/* MODAL */}
-            <div
-                className="w-[700px] bg-white rounded-3xl border border-zinc-200 p-8 animate-in fade-in zoom-in-95 duration-200"
-            >
-
-                {/* HEADER */}
-                <div className="flex items-center justify-between mb-8">
-
-                    <div>
-
-                        <h2 className="text-3xl font-black">
-                            Create Tournament
-                        </h2>
-
-                        <p className="text-zinc-500 mt-2">
-                            Add a new horse racing tournament.
-                        </p>
-
-                    </div>
-
-                    <button
-                        onClick={onClose}
-
-                        className="w-12 h-12 rounded-2xl bg-zinc-100 flex items-center justify-center"
-                    >
-
-                        <X size={20} />
-
-                    </button>
-
-                </div>
-
-                {/* FORM */}
-                <div className="grid grid-cols-2 gap-5">
-
-                    <div>
-
-                        <label className="block mb-2 font-semibold">
-                            Tournament Name
-                        </label>
-
+            {/* FORM */}
+            <div className="grid grid-cols-2 gap-5">
+                <div>
+                    <label className="block mb-2 font-semibold text-zinc-700">
+                        Tournament Name
+                    </label>
+                    <div className="relative">
+                        <Trophy size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
                         <input
                             type="text"
                             placeholder="Enter tournament name"
-
-                            className="w-full bg-zinc-100 rounded-2xl px-5 py-4 outline-none"
+                            className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium"
                         />
-
                     </div>
+                </div>
 
-                    <div>
-
-                        <label className="block mb-2 font-semibold">
-                            Location
-                        </label>
-
+                <div>
+                    <label className="block mb-2 font-semibold text-zinc-700">
+                        Location
+                    </label>
+                    <div className="relative">
+                        <MapPin size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
                         <input
                             type="text"
                             placeholder="Enter location"
-
-                            className="w-full bg-zinc-100 rounded-2xl px-5 py-4 outline-none"
+                            className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium"
                         />
-
                     </div>
+                </div>
 
-                    <div>
-
-                        <label className="block mb-2 font-semibold">
-                            Date
-                        </label>
-
+                <div>
+                    <label className="block mb-2 font-semibold text-zinc-700">
+                        Date
+                    </label>
+                    <div className="relative">
+                        <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
                         <input
                             type="date"
-
-                            className="w-full bg-zinc-100 rounded-2xl px-5 py-4 outline-none"
+                            className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium text-zinc-700"
                         />
-
                     </div>
+                </div>
 
-                    <div>
-
-                        <label className="block mb-2 font-semibold">
-                            Prize Pool
-                        </label>
-
+                <div>
+                    <label className="block mb-2 font-semibold text-zinc-700">
+                        Prize Pool
+                    </label>
+                    <div className="relative">
+                        <DollarSign size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
                         <input
                             type="text"
-                            placeholder="$100,000"
-
-                            className="w-full bg-zinc-100 rounded-2xl px-5 py-4 outline-none"
+                            placeholder="100,000"
+                            className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium"
                         />
-
                     </div>
-
                 </div>
-
-                {/* ACTIONS */}
-                <div className="flex justify-end gap-4 mt-10">
-
-                    <button
-                        onClick={onClose}
-
-                        className="px-6 py-3 rounded-2xl bg-zinc-100 font-semibold"
-                    >
-                        Cancel
-                    </button>
-
-                    <button
-                        className="px-6 py-3 rounded-2xl bg-yellow-400 hover:bg-yellow-500 transition-all font-semibold"
-                    >
-                        Create Tournament
-                    </button>
-
-                </div>
-
             </div>
 
-        </div>
-
+            {/* ACTIONS */}
+            <div className="flex justify-end gap-4 mt-10">
+                <button
+                    onClick={onClose}
+                    className="px-6 py-3.5 rounded-xl bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 transition-all font-bold"
+                >
+                    Cancel
+                </button>
+                <button
+                    className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-amber-950 transition-all font-bold shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/40 hover:-translate-y-0.5"
+                >
+                    Create Tournament
+                </button>
+            </div>
+        </Modal>
     );
 }
 

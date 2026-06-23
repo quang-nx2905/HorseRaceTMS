@@ -22,6 +22,7 @@ import Referee from "./pages/Referee";
 import Spectator from "./pages/Spectator";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
+import UsersManagement from "./pages/UsersManagement";
 
 function App() {
   return (
@@ -137,6 +138,17 @@ function App() {
               <ProtectedRoute>
                 <DashboardLayout>
                   <Profile />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin/users"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout>
+                  <UsersManagement />
                 </DashboardLayout>
               </ProtectedRoute>
             }
