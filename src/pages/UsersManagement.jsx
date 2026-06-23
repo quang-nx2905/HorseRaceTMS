@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, Filter, Shield, User, Pencil, Trash2, Mail, ShieldAlert } from "lucide-react";
+import { Plus, Search, Filter, Shield, User, Pencil, Trash2, Mail, ShieldAlert, BadgeCheck } from "lucide-react";
 import toast from "react-hot-toast";
 
 import CreateUserModal from "../components/users/CreateUserModal";
@@ -7,70 +7,87 @@ import EditUserModal from "../components/users/EditUserModal";
 import ConfirmModal from "../components/common/ConfirmModal";
 import { useAuth } from "../context/AuthContext";
 
-const roleColors = {
-    Admin: "bg-purple-100 text-purple-700 ring-purple-200",
-    Referee: "bg-blue-100 text-blue-700 ring-blue-200",
-    User: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+const roleConfig = {
+    Admin: { 
+        gradient: "from-purple-500 to-indigo-600", 
+        badge: "bg-purple-100 text-purple-700 ring-purple-200",
+        icon: ShieldAlert
+    },
+    Referee: { 
+        gradient: "from-blue-400 to-cyan-500", 
+        badge: "bg-blue-100 text-blue-700 ring-blue-200",
+        icon: Shield
+    },
+    User: { 
+        gradient: "from-zinc-400 to-zinc-600", 
+        badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+        icon: User
+    },
 };
 
-const statusColors = {
-    Active: "bg-emerald-100 text-emerald-700 ring-emerald-200 dot-emerald-500",
-    Inactive: "bg-red-100 text-red-700 ring-red-200 dot-red-500",
-};
-
-function UserCard({ user, onEdit, onDelete, currentUser }) {
-    const roleStyle = roleColors[user.role] || roleColors.User;
-    const statusStyle = statusColors[user.status] || statusColors.Active;
+function UserCard({ user, onEdit, onDelete }) {
+    const config = roleConfig[user.role] || roleConfig.User;
+    const Icon = config.icon;
+    const isActive = user.status === "Active";
     
     // Disable actions if the target user is an Admin
     const isTargetAdmin = user.role === "Admin";
     const canEditDelete = !isTargetAdmin;
 
     return (
-        <div className={`bg-white border rounded-3xl overflow-hidden transition-all duration-300 group ${user.status === 'Inactive' ? 'border-red-200 bg-red-50/30' : 'border-zinc-200 hover:shadow-xl hover:-translate-y-1'}`}>
-            <div className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${isTargetAdmin ? 'bg-purple-100 text-purple-600' : 'bg-zinc-100 text-zinc-500'}`}>
-                            {isTargetAdmin ? <ShieldAlert size={24} /> : <User size={24} />}
-                        </div>
-                        <div>
-                            <h3 className={`font-black text-lg leading-tight ${user.status === 'Inactive' ? 'text-zinc-500 line-through' : 'text-zinc-900'}`}>
-                                {user.name}
-                            </h3>
-                            <div className="flex items-center gap-2 text-sm text-zinc-500 mt-1">
-                                <Mail size={14} />
-                                {user.email}
-                            </div>
-                        </div>
-                    </div>
-                    <span className={`flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ring-1 ${statusStyle.split(' ')[0]} ${statusStyle.split(' ')[1]} ${statusStyle.split(' ')[2]}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${statusStyle.split(' ')[3]?.replace('dot-', 'bg-') || 'bg-emerald-500'}`} />
-                        {user.status}
-                    </span>
-                </div>
+        <div className={`relative bg-white border rounded-[2rem] p-6 transition-all duration-300 group ${isActive ? 'border-zinc-200 hover:shadow-2xl hover:shadow-zinc-200/50 hover:-translate-y-1' : 'border-red-100 bg-red-50/30 opacity-90'}`}>
+            
+            {/* Background Pattern for Admin */}
+            {isTargetAdmin && (
+                <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-bl-full pointer-events-none" />
+            )}
 
-                <div className="flex items-center justify-between mt-6 pt-6 border-t border-zinc-100">
-                    <span className={`text-xs font-bold px-3 py-1.5 rounded-xl ring-1 ${roleStyle}`}>
-                        {user.role}
-                    </span>
-                    
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => canEditDelete && onEdit(user)}
-                            disabled={!canEditDelete}
-                            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${canEditDelete ? 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200' : 'bg-zinc-50 text-zinc-300 cursor-not-allowed'}`}
-                        >
-                            <Pencil size={14} /> Edit
-                        </button>
-                        <button
-                            onClick={() => canEditDelete && onDelete(user)}
-                            disabled={!canEditDelete}
-                            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all ${canEditDelete ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-red-50/50 text-red-300 cursor-not-allowed'}`}
-                        >
-                            <Trash2 size={14} /> Disable
-                        </button>
+            <div className="relative flex items-start justify-between mb-5">
+                <div className="flex items-center gap-4">
+                    <div className={`relative w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${config.gradient} text-white shadow-lg ${isTargetAdmin ? 'shadow-purple-500/30' : 'shadow-zinc-400/20'}`}>
+                        <Icon size={24} strokeWidth={2} />
+                        {isActive && (
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white" />
+                        )}
+                        {!isActive && (
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-red-500 border-2 border-white" />
+                        )}
                     </div>
+                    <div>
+                        <h3 className={`font-black text-xl leading-tight flex items-center gap-2 ${isActive ? 'text-zinc-900' : 'text-zinc-500 line-through decoration-zinc-300'}`}>
+                            {user.name}
+                            {isTargetAdmin && <BadgeCheck size={18} className="text-purple-500" />}
+                        </h3>
+                        <div className="flex items-center gap-1.5 text-sm text-zinc-500 mt-1 font-medium">
+                            <Mail size={14} className="text-zinc-400" />
+                            {user.email}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex items-center justify-between mt-8 pt-5 border-t border-zinc-100/80">
+                <span className={`text-xs font-bold px-3 py-1.5 rounded-xl ring-1 ${config.badge}`}>
+                    {user.role}
+                </span>
+                
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => canEditDelete && onEdit(user)}
+                        disabled={!canEditDelete}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${canEditDelete ? 'bg-zinc-50 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900' : 'bg-zinc-50/50 text-zinc-300 cursor-not-allowed'}`}
+                        title="Edit User"
+                    >
+                        <Pencil size={16} />
+                    </button>
+                    <button
+                        onClick={() => canEditDelete && onDelete(user)}
+                        disabled={!canEditDelete}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${canEditDelete ? 'bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600' : 'bg-red-50/30 text-red-300 cursor-not-allowed'}`}
+                        title={isActive ? "Disable User" : "User Disabled"}
+                    >
+                        <Trash2 size={16} />
+                    </button>
                 </div>
             </div>
         </div>
@@ -132,72 +149,77 @@ function UsersManagement() {
     };
 
     return (
-        <div className="space-y-7 animate-in fade-in duration-500">
+        <div className="space-y-8 animate-in fade-in duration-500 pb-10">
             {/* ── HEADER ── */}
             <div className="flex items-end justify-between">
                 <div>
-                    <p className="text-sm font-semibold text-purple-600 uppercase tracking-widest mb-2 flex items-center gap-2">
-                        <ShieldAlert size={16} /> Admin Panel
+                    <p className="text-sm font-bold text-indigo-600 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                        <ShieldAlert size={16} strokeWidth={2.5} /> Administration
                     </p>
-                    <h1 className="text-5xl font-black text-zinc-900 tracking-tight">Users</h1>
-                    <p className="text-zinc-500 mt-2 text-base">
-                        Manage all platform users, roles, and access.
+                    <h1 className="text-5xl font-black text-zinc-900 tracking-tight">Access Control</h1>
+                    <p className="text-zinc-500 mt-3 text-lg font-medium">
+                        Manage platform users, roles, and system access.
                     </p>
                 </div>
 
                 <button
                     onClick={() => setOpenCreate(true)}
-                    className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-zinc-900/20 hover:-translate-y-0.5"
+                    className="group flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-7 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-zinc-900/20 hover:shadow-zinc-900/30 hover:-translate-y-0.5"
                 >
-                    <Plus size={18} />
-                    Add User
+                    <Plus size={20} className="transition-transform group-hover:rotate-90" />
+                    Invite User
                 </button>
             </div>
 
             {/* ── SUMMARY STATS ── */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {[
-                    { label: "Total Users", value: usersList.length, icon: User, color: "bg-zinc-100", iconColor: "text-zinc-600" },
-                    { label: "Active Users", value: activeUsersCount, icon: Shield, color: "bg-emerald-100", iconColor: "text-emerald-600" },
-                    { label: "Administrators", value: adminCount, icon: ShieldAlert, color: "bg-purple-100", iconColor: "text-purple-600" },
-                ].map(({ label, value, icon: Icon, color, iconColor }) => (
-                    <div key={label} className="bg-white border border-zinc-200 rounded-2xl p-5 flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
-                            <Icon size={20} className={iconColor} />
-                        </div>
-                        <div>
-                            <p className="text-2xl font-black text-zinc-900">{value}</p>
-                            <p className="text-xs text-zinc-500 font-bold uppercase tracking-wider mt-0.5">{label}</p>
+                    { label: "Total Users", value: usersList.length, icon: User, bg: "bg-white", border: "border-zinc-200", iconColor: "text-zinc-600", iconBg: "bg-zinc-100" },
+                    { label: "Active Users", value: activeUsersCount, icon: Shield, bg: "bg-gradient-to-br from-emerald-400 to-teal-500", border: "border-emerald-400", textColor: "text-white", iconColor: "text-emerald-500", iconBg: "bg-white", isDark: true },
+                    { label: "Administrators", value: adminCount, icon: ShieldAlert, bg: "bg-gradient-to-br from-purple-500 to-indigo-600", border: "border-purple-500", textColor: "text-white", iconColor: "text-purple-600", iconBg: "bg-white", isDark: true },
+                ].map((stat) => (
+                    <div key={stat.label} className={`relative overflow-hidden rounded-[2rem] p-6 border shadow-lg ${stat.bg} ${stat.border} ${stat.isDark ? 'shadow-current/20' : 'shadow-zinc-200/50'}`}>
+                        {stat.isDark && (
+                            <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-bl-full pointer-events-none" />
+                        )}
+                        <div className="flex items-center gap-5 relative z-10">
+                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm ${stat.iconBg}`}>
+                                <stat.icon size={24} className={stat.iconColor} strokeWidth={2.5} />
+                            </div>
+                            <div>
+                                <p className={`text-4xl font-black ${stat.textColor || 'text-zinc-900'}`}>{stat.value}</p>
+                                <p className={`text-sm font-bold uppercase tracking-wider mt-1 ${stat.textColor ? 'text-white/80' : 'text-zinc-500'}`}>{stat.label}</p>
+                            </div>
                         </div>
                     </div>
                 ))}
             </div>
 
             {/* ── FILTERS ── */}
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-4 flex-wrap bg-white p-3 rounded-[2rem] shadow-sm border border-zinc-200">
                 {/* Search */}
-                <div className="relative flex-1 min-w-[240px]">
-                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+                <div className="relative flex-1 min-w-[280px]">
+                    <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
                     <input
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search by name or email..."
-                        className="w-full pl-11 pr-4 py-3 bg-white border border-zinc-200 rounded-2xl outline-none text-sm focus:border-zinc-900 focus:ring-4 focus:ring-zinc-900/10 transition-all font-medium"
+                        className="w-full pl-12 pr-5 py-4 bg-zinc-50 border border-transparent rounded-2xl outline-none font-medium focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-400/10 transition-all text-zinc-900 placeholder:text-zinc-400"
                     />
                 </div>
 
                 {/* Role filter chips */}
-                <div className="flex items-center gap-2 bg-white border border-zinc-200 p-1.5 rounded-2xl">
-                    <Filter size={14} className="text-zinc-400 ml-2 mr-1" />
+                <div className="flex items-center gap-2 px-2">
+                    <Filter size={16} className="text-zinc-400 ml-2 mr-2" />
                     {roleFilters.map((f) => (
                         <button
                             key={f}
                             onClick={() => setFilterRole(f)}
-                            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                            className={`px-5 py-3 rounded-2xl text-sm font-bold transition-all ${
                                 filterRole === f
-                                    ? "bg-zinc-100 text-zinc-900 shadow-sm"
-                                    : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-50"
+                                    ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/20"
+                                    : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100"
                             }`}
                         >
                             {f}
@@ -208,20 +230,19 @@ function UsersManagement() {
 
             {/* ── CARD GRID ── */}
             {filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 text-center bg-white border border-zinc-200 rounded-3xl border-dashed">
-                    <div className="w-16 h-16 rounded-2xl bg-zinc-50 flex items-center justify-center mb-4 border border-zinc-100">
-                        <User size={28} className="text-zinc-300" />
+                <div className="flex flex-col items-center justify-center py-32 text-center bg-white border border-zinc-200 rounded-[3rem] border-dashed">
+                    <div className="w-20 h-20 rounded-[2rem] bg-zinc-50 flex items-center justify-center mb-6 border border-zinc-100 shadow-sm">
+                        <User size={32} className="text-zinc-300" strokeWidth={1.5} />
                     </div>
-                    <p className="font-bold text-zinc-700">No users found</p>
-                    <p className="text-zinc-400 text-sm mt-1">Try adjusting your search or filter</p>
+                    <p className="text-2xl font-black text-zinc-800">No users found</p>
+                    <p className="text-zinc-500 text-lg mt-2 font-medium">Try adjusting your search or filter</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filtered.map((user) => (
                         <UserCard
                             key={user.id}
                             user={user}
-                            currentUser={currentUser}
                             onEdit={(u) => { setSelectedUser(u); setOpenEdit(true); }}
                             onDelete={(u) => { setSelectedUser(u); setOpenDelete(true); }}
                         />
