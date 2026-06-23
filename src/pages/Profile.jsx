@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
 import {
     User,
     Mail,
@@ -17,12 +18,24 @@ import {
 } from "lucide-react";
 
 function Profile() {
+    const { user } = useAuth();
+
     const [profile, setProfile] = useState({
-        name: "Admin User",
-        email: "admin@equinerace.com",
+        name: user?.name || "",
+        email: user?.email || "",
         phone: "0123456789",
         organization: "Horse Race Tournament",
     });
+
+    useEffect(() => {
+        if (user) {
+            setProfile(prev => ({
+                ...prev,
+                name: user.name || "",
+                email: user.email || ""
+            }));
+        }
+    }, [user]);
 
     const [isSaving, setIsSaving] = useState(false);
 

@@ -170,7 +170,11 @@ function Login() {
                                 <label className="text-sm font-semibold text-zinc-700">
                                     Password
                                 </label>
-                                <button className="text-xs text-yellow-600 hover:text-yellow-700 font-semibold transition-colors">
+                                <button 
+                                    type="button"
+                                    onClick={() => navigate("/forgot-password")}
+                                    className="text-xs text-yellow-600 hover:text-yellow-700 font-semibold transition-colors"
+                                >
                                     Forgot password?
                                 </button>
                             </div>
