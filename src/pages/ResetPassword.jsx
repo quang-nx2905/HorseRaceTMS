@@ -1,6 +1,6 @@
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
-import { Lock, ArrowRight, Trophy, Zap, BarChart3, CheckCircle } from "lucide-react";
+import { Lock, ArrowRight, Trophy, Zap, BarChart3, CheckCircle, Eye, EyeOff, AlertCircle } from "lucide-react";
 import { resetPasswordApi } from "../api/authApi";
 
 const features = [
@@ -16,35 +16,42 @@ function ResetPassword() {
 
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [error, setError] = useState("");
 
     const handleReset = async () => {
+        setError("");
         if (!token) {
-            alert("Invalid or missing reset token.");
+            setError("Invalid or missing reset token.");
             return;
         }
         if (newPassword.length < 6) {
-            alert("Password must be at least 6 characters.");
+            setError("Password must be at least 6 characters.");
             return;
         }
         if (newPassword !== confirmPassword) {
-            alert("Passwords do not match.");
+            setError("Passwords do not match.");
             return;
         }
 
         setLoading(true);
         try {
-            await resetPasswordApi({ token, newPassword });
+            await resetPasswordApi({ 
+                token, 
+                newPassword, 
+                confirmNewPassword: confirmPassword 
+            });
             setSuccess(true);
             setTimeout(() => {
                 navigate("/login");
             }, 3000);
-        } catch (error) {
+        } catch (err) {
             const errorMessage =
-                error.response?.data?.message ||
+                err.response?.data?.message ||
                 "Cannot connect to server. Please check Backend!";
-            alert(`Error: ${errorMessage}`);
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -174,6 +181,13 @@ function ResetPassword() {
                                 </p>
                             </div>
 
+                            {error && (
+                                <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-100 flex items-start gap-3 animate-in fade-in duration-300">
+                                    <AlertCircle size={20} className="text-red-500 shrink-0 mt-0.5" />
+                                    <p className="text-sm text-red-600 font-medium">{error}</p>
+                                </div>
+                            )}
+
                             {/* Form */}
                             <div className="space-y-5">
                                 {/* New Password */}
@@ -184,14 +198,21 @@ function ResetPassword() {
                                     <div className="relative">
                                         <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
                                         <input
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             placeholder="Enter new password"
                                             value={newPassword}
                                             onChange={(e) => setNewPassword(e.target.value)}
                                             onKeyDown={handleKeyDown}
                                             disabled={loading}
-                                            className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 outline-none text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all disabled:opacity-50"
+                                            className="w-full pl-11 pr-12 py-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 outline-none text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all disabled:opacity-50"
                                         />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
+                                        >
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
                                     </div>
                                 </div>
 
@@ -203,14 +224,21 @@ function ResetPassword() {
                                     <div className="relative">
                                         <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
                                         <input
-                                            type="password"
+                                            type={showPassword ? "text" : "password"}
                                             placeholder="Confirm new password"
                                             value={confirmPassword}
                                             onChange={(e) => setConfirmPassword(e.target.value)}
                                             onKeyDown={handleKeyDown}
                                             disabled={loading}
-                                            className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 outline-none text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all disabled:opacity-50"
+                                            className="w-full pl-11 pr-12 py-3.5 rounded-2xl bg-zinc-50 border border-zinc-200 outline-none text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all disabled:opacity-50"
                                         />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
+                                        >
+                                            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                                        </button>
                                     </div>
                                 </div>
 
