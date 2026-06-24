@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Search, Filter, Shield, User, Pencil, Trash2, Mail, ShieldAlert, BadgeCheck } from "lucide-react";
+import { Plus, Search, Filter, Shield, User, Pencil, Trash2, Mail, ShieldAlert, BadgeCheck, Unlock } from "lucide-react";
 import toast from "react-hot-toast";
 
 import CreateUserModal from "../components/users/CreateUserModal";
@@ -10,18 +10,18 @@ import { useAuth } from "../context/AuthContext";
 import { userApi } from "../api/userApi";
 
 const roleConfig = {
-    Admin: { 
-        gradient: "from-purple-500 to-indigo-600", 
+    Admin: {
+        gradient: "from-purple-500 to-indigo-600",
         badge: "bg-purple-100 text-purple-700 ring-purple-200",
         icon: ShieldAlert
     },
-    Referee: { 
-        gradient: "from-blue-400 to-cyan-500", 
+    Referee: {
+        gradient: "from-blue-400 to-cyan-500",
         badge: "bg-blue-100 text-blue-700 ring-blue-200",
         icon: Shield
     },
-    User: { 
-        gradient: "from-zinc-400 to-zinc-600", 
+    User: {
+        gradient: "from-zinc-400 to-zinc-600",
         badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
         icon: User
     },
@@ -31,14 +31,14 @@ function UserCard({ user, onEdit, onDelete }) {
     const config = roleConfig[user.role] || roleConfig.User;
     const Icon = config.icon;
     const isActive = user.status === "Active";
-    
+
     // Disable actions if the target user is an Admin
     const isTargetAdmin = user.role === "Admin";
     const canEditDelete = !isTargetAdmin;
 
     return (
         <div className={`relative bg-white border rounded-[2rem] p-6 transition-all duration-300 group ${isActive ? 'border-zinc-200 hover:shadow-2xl hover:shadow-zinc-200/50 hover:-translate-y-1' : 'border-red-100 bg-red-50/30 opacity-90'}`}>
-            
+
             {/* Background Pattern for Admin */}
             {isTargetAdmin && (
                 <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-bl-full pointer-events-none" />
@@ -72,7 +72,7 @@ function UserCard({ user, onEdit, onDelete }) {
                 <span className={`text-xs font-bold px-3 py-1.5 rounded-xl ring-1 ${config.badge}`}>
                     {user.role}
                 </span>
-                
+
                 <div className="flex gap-2">
                     <button
                         onClick={() => canEditDelete && onEdit(user)}
@@ -85,10 +85,12 @@ function UserCard({ user, onEdit, onDelete }) {
                     <button
                         onClick={() => canEditDelete && onDelete(user)}
                         disabled={!canEditDelete}
-                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${canEditDelete ? 'bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600' : 'bg-red-50/30 text-red-300 cursor-not-allowed'}`}
-                        title={isActive ? "Disable User" : "User Disabled"}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${!canEditDelete ? 'bg-zinc-50/50 text-zinc-300 cursor-not-allowed' :
+                                isActive ? 'bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600' : 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100 hover:text-emerald-600'
+                            }`}
+                        title={isActive ? "Deactivate User" : "Reactivate User"}
                     >
-                        <Trash2 size={16} />
+                        {isActive ? <Trash2 size={16} /> : <Unlock size={16} />}
                     </button>
                 </div>
             </div>
@@ -100,14 +102,14 @@ function UsersManagement() {
     const { user: currentUser } = useAuth();
     const [search, setSearch] = useState("");
     const [filterRole, setFilterRole] = useState("All");
-    
+
     const [openCreate, setOpenCreate] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
 
     const [usersList, setUsersList] = useState([]);
-    
+
     // Pagination and API state
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize] = useState(10);
@@ -161,18 +163,23 @@ function UsersManagement() {
         toast.success("User updated successfully!");
     };
 
-    const handleConfirmDelete = () => {
+    const handleConfirmDelete = async () => {
         if (!selectedUser) return;
-        
-        // Soft delete: change status to Inactive instead of filtering out
-        const updatedUsers = usersList.map(u => 
-            u.id === selectedUser.id ? { ...u, status: "Inactive", isDeleted: true } : u
-        );
-        
-        setUsersList(updatedUsers);
-        toast.success("User has been disabled (soft deleted)!");
-        setOpenDelete(false);
-        setSelectedUser(null);
+
+        try {
+            await userApi.toggleUserStatus(selectedUser.id);
+            const updatedUsers = usersList.map(u =>
+                u.id === selectedUser.id ? { ...u, status: u.status === "Active" ? "Inactive" : "Active" } : u
+            );
+
+            setUsersList(updatedUsers);
+            toast.success(`User has been ${selectedUser.status === "Active" ? "deactivated" : "reactivated"} successfully!`);
+        } catch (error) {
+            toast.error("Failed to update user status");
+        } finally {
+            setOpenDelete(false);
+            setSelectedUser(null);
+        }
     };
 
     return (
@@ -243,11 +250,10 @@ function UsersManagement() {
                         <button
                             key={f}
                             onClick={() => { setFilterRole(f); setCurrentPage(1); }}
-                            className={`px-5 py-3 rounded-2xl text-sm font-bold transition-all ${
-                                filterRole === f
-                                    ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/20"
-                                    : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100"
-                            }`}
+                            className={`px-5 py-3 rounded-2xl text-sm font-bold transition-all ${filterRole === f
+                                ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/20"
+                                : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100"
+                                }`}
                         >
                             {f}
                         </button>
@@ -281,7 +287,7 @@ function UsersManagement() {
                         ))}
                     </div>
                     {totalPages > 1 && (
-                        <Pagination 
+                        <Pagination
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={(page) => setCurrentPage(page)}
@@ -296,7 +302,7 @@ function UsersManagement() {
                 onClose={() => setOpenCreate(false)}
                 onCreate={handleCreateUser}
             />
-            
+
             <EditUserModal
                 open={openEdit}
                 onClose={() => setOpenEdit(false)}
@@ -308,8 +314,14 @@ function UsersManagement() {
                 open={openDelete}
                 onClose={() => setOpenDelete(false)}
                 onConfirm={handleConfirmDelete}
-                title="Disable User Account"
-                message={`Are you sure you want to disable ${selectedUser?.name}? They will no longer be able to log in.`}
+                title={selectedUser?.status === "Active" ? "Deactivate User Account" : "Reactivate User Account"}
+                message={
+                    selectedUser?.status === "Active"
+                        ? `Are you sure you want to deactivate ${selectedUser?.name}? They will no longer be able to log in.`
+                        : `Are you sure you want to reactivate ${selectedUser?.name}? They will be able to log in again.`
+                }
+                confirmLabel={selectedUser?.status === "Active" ? "Deactivate" : "Restore Account"}
+                confirmVariant={selectedUser?.status === "Active" ? "danger" : "success"}
             />
         </div>
     );
