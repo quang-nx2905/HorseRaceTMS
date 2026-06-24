@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Trophy, Zap, BarChart3 } from "lucide-react";
 import { loginWithGoogle } from "../api/authApi";
@@ -16,15 +16,26 @@ function Login() {
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
     const navigate = useNavigate();
+    const location = useLocation();
     const { login } = useAuth();
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const errorParam = searchParams.get("error");
+        if (errorParam) {
+            setError(errorParam);
+        }
+    }, [location]);
 
     const handleLogin = async () => {
         if (!email || !password) {
-            alert("Please enter email and password.");
+            setError("Please enter email and password.");
             return;
         }
         setLoading(true);
+        setError("");
         try {
             const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "https://localhost:7179";
             const response = await axios.post(
@@ -36,13 +47,13 @@ function Login() {
                 login(response.data.accessToken);
                 navigate("/", { replace: true });
             } else {
-                alert("Login failed: Invalid response from server.");
+                setError("Login failed: Invalid response from server.");
             }
         } catch (error) {
             const errorMessage =
                 error.response?.data?.message ||
                 "Cannot connect to server. Please check Backend!";
-            alert(`Login Failed: ${errorMessage}`);
+            setError(`Login Failed: ${errorMessage}`);
         } finally {
             setLoading(false);
         }
@@ -199,6 +210,16 @@ function Login() {
                                 </button>
                             </div>
                         </div>
+
+                        {/* Error Message */}
+                        {error && (
+                            <div className="p-3 bg-red-50 text-red-600 rounded-xl text-sm font-medium border border-red-100 flex items-start gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 flex-shrink-0 mt-0.5">
+                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                                </svg>
+                                <span>{error}</span>
+                            </div>
+                        )}
 
                         {/* Submit */}
                         <button
