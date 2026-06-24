@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
+import axiosClient from "../api/axiosClient";
 import {
     User,
     Mail,
@@ -15,37 +16,115 @@ import {
     Activity,
     ShieldCheck,
     CalendarDays,
+    Loader2
 } from "lucide-react";
 
 function Profile() {
-    const { user } = useAuth();
+    const { user, setUser } = useAuth();
 
     const [profile, setProfile] = useState({
-        name: user?.name || "",
-        email: user?.email || "",
-        phone: "0123456789",
-        organization: "Horse Race Tournament",
+        name: "",
+        email: "",
+        phone: "",
+        organization: "Horse Race Tournament", // Still static as not in DB
+        avatarUrl: null,
+        role: "User",
+        joinedDate: null,
+        isActive: true
     });
 
-    useEffect(() => {
-        if (user) {
-            setProfile(prev => ({
-                ...prev,
-                name: user.name || "",
-                email: user.email || ""
-            }));
-        }
-    }, [user]);
-
+    const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
+    const fileInputRef = useRef(null);
 
-    const handleUpdate = () => {
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await axiosClient.get("/Profile/Me");
+                const data = response.data;
+                setProfile(prev => ({
+                    ...prev,
+                    name: data.fullName || "",
+                    email: data.email || "",
+                    phone: data.phone || "",
+                    avatarUrl: data.avatarUrl || null,
+                    role: data.role || prev.role,
+                    joinedDate: data.joinedDate,
+                    isActive: data.isActive
+                }));
+                setUser(prev => ({ ...prev, avatarUrl: data.avatarUrl, name: data.fullName || prev?.name }));
+            } catch (error) {
+                console.error("Failed to fetch profile:", error);
+                toast.error("Failed to load profile details.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchProfile();
+    }, []);
+
+    const handleUpdate = async () => {
         setIsSaving(true);
-        setTimeout(() => {
-            setIsSaving(false);
+        try {
+            await axiosClient.put("/Profile/Me", {
+                fullName: profile.name,
+                email: profile.email,
+                phone: profile.phone,
+                avatarUrl: profile.avatarUrl
+            });
             toast.success("Profile updated successfully!");
-        }, 800);
+        } catch (error) {
+            console.error("Failed to update profile:", error);
+            toast.error("Failed to update profile.");
+        } finally {
+            setIsSaving(false);
+        }
     };
+
+    const handleAvatarUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith("image/")) {
+            toast.error("Please select an image file");
+            return;
+        }
+
+        setIsUploading(true);
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await axiosClient.post("/Upload/Image", formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+            const uploadedUrl = response.data.url;
+            setProfile(prev => ({ ...prev, avatarUrl: uploadedUrl }));
+            setUser(prev => ({ ...prev, avatarUrl: uploadedUrl }));
+            toast.success("Avatar uploaded! Remember to save changes.");
+        } catch (error) {
+            console.error("Upload failed", error);
+            toast.error("Failed to upload avatar.");
+        } finally {
+            setIsUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex h-[60vh] items-center justify-center">
+                <Loader2 size={32} className="animate-spin text-amber-500" />
+            </div>
+        );
+    }
+
+    // Format joined date
+    const formattedDate = profile.joinedDate 
+        ? new Date(profile.joinedDate).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+        : "N/A";
 
     return (
         <div className="space-y-8 max-w-[1200px] mx-auto pb-12 animate-in fade-in duration-300">
@@ -68,11 +147,31 @@ function Profile() {
                         <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-amber-400/20 to-orange-500/20" />
 
                         {/* Avatar */}
-                        <div className="relative mt-8 mb-4">
-                            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-black text-zinc-950 text-3xl shadow-lg border-4 border-white relative z-10">
-                                {profile.name.charAt(0)}
+                        <div className="relative mt-8 mb-4 group">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                ref={fileInputRef}
+                                onChange={handleAvatarUpload}
+                                className="hidden"
+                            />
+                            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-black text-zinc-950 text-3xl shadow-lg border-4 border-white relative z-10 overflow-hidden">
+                                {isUploading ? (
+                                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center backdrop-blur-sm">
+                                        <Loader2 size={24} className="animate-spin text-white" />
+                                    </div>
+                                ) : profile.avatarUrl ? (
+                                    <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    profile.name.charAt(0) || <User />
+                                )}
                             </div>
-                            <button className="absolute bottom-[-6px] right-[-6px] w-8 h-8 rounded-xl bg-zinc-900 border-2 border-white flex items-center justify-center text-white hover:scale-105 active:scale-95 transition-all shadow-md z-20">
+                            <button 
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={isUploading}
+                                className="absolute bottom-[-6px] right-[-6px] w-8 h-8 rounded-xl bg-zinc-900 border-2 border-white flex items-center justify-center text-white hover:scale-105 active:scale-95 transition-all shadow-md z-20 disabled:opacity-50 disabled:hover:scale-100"
+                                title="Change Avatar"
+                            >
                                 <Camera size={14} />
                             </button>
                         </div>
@@ -83,7 +182,7 @@ function Profile() {
                         
                         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold mt-4">
                             <ShieldCheck size={12} className="text-amber-500" />
-                            Tournament Director
+                            {profile.role}
                         </div>
 
                         {/* Divider */}
@@ -93,20 +192,26 @@ function Profile() {
                         <div className="w-full space-y-3.5 text-left text-sm">
                             <div className="flex justify-between items-center">
                                 <span className="text-zinc-400 font-medium">Status</span>
-                                <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">
-                                    Active Account
-                                </span>
+                                {profile.isActive ? (
+                                    <span className="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">
+                                        Active Account
+                                    </span>
+                                ) : (
+                                    <span className="px-2.5 py-0.5 rounded-md bg-red-50 text-red-700 text-xs font-bold border border-red-100">
+                                        Locked
+                                    </span>
+                                )}
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-zinc-400 font-medium">Joined Date</span>
                                 <span className="text-zinc-700 font-semibold flex items-center gap-1">
                                     <CalendarDays size={13} className="text-zinc-400" />
-                                    June 2026
+                                    {formattedDate}
                                 </span>
                             </div>
                             <div className="flex justify-between items-center">
                                 <span className="text-zinc-400 font-medium">Security Clearance</span>
-                                <span className="text-zinc-700 font-semibold">Admin (Lvl 3)</span>
+                                <span className="text-zinc-700 font-semibold">{profile.role}</span>
                             </div>
                         </div>
                     </div>
@@ -194,12 +299,12 @@ function Profile() {
                         <div className="flex justify-end pt-2 border-t border-zinc-100">
                             <button
                                 onClick={handleUpdate}
-                                disabled={isSaving}
+                                disabled={isSaving || isUploading}
                                 className="bg-yellow-400 hover:bg-yellow-500 disabled:bg-zinc-200 text-black px-6 py-3 rounded-xl font-bold transition-all shadow-sm hover:shadow hover:shadow-yellow-400/25 flex items-center justify-center gap-2"
                             >
                                 {isSaving ? (
                                     <>
-                                        <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                                        <Loader2 size={18} className="animate-spin" />
                                         Saving...
                                     </>
                                 ) : (

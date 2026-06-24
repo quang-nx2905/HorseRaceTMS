@@ -8,7 +8,19 @@ function UserDropdown() {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, setUser, logout } = useAuth();
+  
+  useEffect(() => {
+    if (user && user.avatarUrl === undefined) {
+      import("../../api/axiosClient").then(({ default: axiosClient }) => {
+        axiosClient.get("/Profile/Me")
+          .then(res => {
+            setUser(prev => ({ ...prev, avatarUrl: res.data.avatarUrl || null, name: res.data.fullName || prev?.name }));
+          })
+          .catch(err => console.error("Failed to fetch user profile in dropdown:", err));
+      });
+    }
+  }, [user?.id, user?.avatarUrl, setUser]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -47,8 +59,12 @@ function UserDropdown() {
                 `}
       >
         {/* Avatar */}
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-black text-zinc-950 text-sm shadow-inner">
-          {initial}
+        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-black text-zinc-950 text-sm shadow-inner overflow-hidden border border-amber-200">
+          {user?.avatarUrl ? (
+            <img src={user.avatarUrl} alt="Avatar" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+          ) : (
+            initial
+          )}
         </div>
 
         {/* Name — hidden on small screens */}
@@ -83,8 +99,12 @@ function UserDropdown() {
           {/* User info header */}
           <div className="px-4 py-4 bg-gradient-to-br from-zinc-50 to-white border-b border-zinc-100">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-black text-zinc-950 text-base shadow-sm">
-                {initial}
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-black text-zinc-950 text-base shadow-sm overflow-hidden border border-amber-200">
+                {user?.avatarUrl ? (
+                  <img src={user.avatarUrl} alt="Avatar" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                ) : (
+                  initial
+                )}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
