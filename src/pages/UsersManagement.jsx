@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Search, Filter, Shield, User, Pencil, Trash2, Mail, ShieldAlert, BadgeCheck } from "lucide-react";
 import toast from "react-hot-toast";
 
 import CreateUserModal from "../components/users/CreateUserModal";
 import EditUserModal from "../components/users/EditUserModal";
 import ConfirmModal from "../components/common/ConfirmModal";
+import Pagination from "../components/common/Pagination";
 import { useAuth } from "../context/AuthContext";
+import { userApi } from "../api/userApi";
 
 const roleConfig = {
     Admin: { 
@@ -43,7 +45,7 @@ function UserCard({ user, onEdit, onDelete }) {
             )}
 
             <div className="relative flex items-start justify-between mb-5">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 w-full min-w-0">
                     <div className={`relative w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${config.gradient} text-white shadow-lg ${isTargetAdmin ? 'shadow-purple-500/30' : 'shadow-zinc-400/20'}`}>
                         <Icon size={24} strokeWidth={2} />
                         {isActive && (
@@ -53,14 +55,14 @@ function UserCard({ user, onEdit, onDelete }) {
                             <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-red-500 border-2 border-white" />
                         )}
                     </div>
-                    <div>
+                    <div className="flex-1 min-w-0">
                         <h3 className={`font-black text-xl leading-tight flex items-center gap-2 ${isActive ? 'text-zinc-900' : 'text-zinc-500 line-through decoration-zinc-300'}`}>
-                            {user.name}
-                            {isTargetAdmin && <BadgeCheck size={18} className="text-purple-500" />}
+                            <span className="truncate">{user.name}</span>
+                            {isTargetAdmin && <BadgeCheck size={18} className="text-purple-500 flex-shrink-0" />}
                         </h3>
                         <div className="flex items-center gap-1.5 text-sm text-zinc-500 mt-1 font-medium">
-                            <Mail size={14} className="text-zinc-400" />
-                            {user.email}
+                            <Mail size={14} className="text-zinc-400 flex-shrink-0" />
+                            <span className="truncate block" title={user.email}>{user.email}</span>
                         </div>
                     </div>
                 </div>
@@ -104,22 +106,47 @@ function UsersManagement() {
     const [openDelete, setOpenDelete] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
 
-    const [usersList, setUsersList] = useState([
-        { id: 1, name: "System Admin", email: "admin@horseracetms.com", role: "Admin", status: "Active" },
-        { id: 2, name: "John Doe", email: "john.doe@example.com", role: "User", status: "Active" },
-        { id: 3, name: "Jane Smith", email: "jane.referee@example.com", role: "Referee", status: "Active" },
-        { id: 4, name: "Mike Johnson", email: "mike.j@example.com", role: "User", status: "Inactive" },
-        { id: 5, name: "Sarah Connor", email: "sarah.c@example.com", role: "User", status: "Active" },
-    ]);
+    const [usersList, setUsersList] = useState([]);
+    
+    // Pagination and API state
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const [isLoading, setIsLoading] = useState(false);
 
-    const roleFilters = ["All", "Admin", "Referee", "User"];
+    useEffect(() => {
+        const fetchUsers = async () => {
+            setIsLoading(true);
+            try {
+                const data = await userApi.getUsers({
+                    search: search,
+                    role: filterRole,
+                    page: currentPage,
+                    pageSize: pageSize
+                });
+                setUsersList(data.items);
+                setTotalCount(data.totalCount);
+                setTotalPages(data.totalPages);
+            } catch (error) {
+                toast.error("Failed to load users");
+                console.error(error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-    const filtered = usersList.filter((u) => {
-        const matchSearch = u.name.toLowerCase().includes(search.toLowerCase()) || 
-                            u.email.toLowerCase().includes(search.toLowerCase());
-        const matchRole = filterRole === "All" || u.role === filterRole;
-        return matchSearch && matchRole;
-    });
+        const timeoutId = setTimeout(() => {
+            fetchUsers();
+        }, 300);
+
+        return () => clearTimeout(timeoutId);
+    }, [search, filterRole, currentPage, pageSize]);
+
+    const roleFilters = ["All", "Admin", "Referee", "User", "Spectator", "Jockey", "Owner"];
+
+    // Since filtering is done in backend, we don't need local filter logic
+    const filtered = usersList;
 
     const activeUsersCount = usersList.filter(u => u.status === "Active").length;
     const adminCount = usersList.filter(u => u.role === "Admin").length;
@@ -174,7 +201,7 @@ function UsersManagement() {
             {/* ── SUMMARY STATS ── */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {[
-                    { label: "Total Users", value: usersList.length, icon: User, bg: "bg-white", border: "border-zinc-200", iconColor: "text-zinc-600", iconBg: "bg-zinc-100" },
+                    { label: "Total Users", value: totalCount, icon: User, bg: "bg-white", border: "border-zinc-200", iconColor: "text-zinc-600", iconBg: "bg-zinc-100" },
                     { label: "Active Users", value: activeUsersCount, icon: Shield, bg: "bg-gradient-to-br from-emerald-400 to-teal-500", border: "border-emerald-400", textColor: "text-white", iconColor: "text-emerald-500", iconBg: "bg-white", isDark: true },
                     { label: "Administrators", value: adminCount, icon: ShieldAlert, bg: "bg-gradient-to-br from-purple-500 to-indigo-600", border: "border-purple-500", textColor: "text-white", iconColor: "text-purple-600", iconBg: "bg-white", isDark: true },
                 ].map((stat) => (
@@ -215,7 +242,7 @@ function UsersManagement() {
                     {roleFilters.map((f) => (
                         <button
                             key={f}
-                            onClick={() => setFilterRole(f)}
+                            onClick={() => { setFilterRole(f); setCurrentPage(1); }}
                             className={`px-5 py-3 rounded-2xl text-sm font-bold transition-all ${
                                 filterRole === f
                                     ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/20"
@@ -229,7 +256,11 @@ function UsersManagement() {
             </div>
 
             {/* ── CARD GRID ── */}
-            {filtered.length === 0 ? (
+            {isLoading ? (
+                <div className="flex justify-center items-center py-32">
+                    <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            ) : filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-32 text-center bg-white border border-zinc-200 rounded-[3rem] border-dashed">
                     <div className="w-20 h-20 rounded-[2rem] bg-zinc-50 flex items-center justify-center mb-6 border border-zinc-100 shadow-sm">
                         <User size={32} className="text-zinc-300" strokeWidth={1.5} />
@@ -238,16 +269,25 @@ function UsersManagement() {
                     <p className="text-zinc-500 text-lg mt-2 font-medium">Try adjusting your search or filter</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filtered.map((user) => (
-                        <UserCard
-                            key={user.id}
-                            user={user}
-                            onEdit={(u) => { setSelectedUser(u); setOpenEdit(true); }}
-                            onDelete={(u) => { setSelectedUser(u); setOpenDelete(true); }}
+                <>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {filtered.map((user) => (
+                            <UserCard
+                                key={user.id}
+                                user={user}
+                                onEdit={(u) => { setSelectedUser(u); setOpenEdit(true); }}
+                                onDelete={(u) => { setSelectedUser(u); setOpenDelete(true); }}
+                            />
+                        ))}
+                    </div>
+                    {totalPages > 1 && (
+                        <Pagination 
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={(page) => setCurrentPage(page)}
                         />
-                    ))}
-                </div>
+                    )}
+                </>
             )}
 
             {/* ── MODALS ── */}
