@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Search, Filter, Shield, User, Pencil, Trash2, Mail, ShieldAlert, BadgeCheck, Unlock } from "lucide-react";
+import { Plus, Search, Filter, Shield, User, Pencil, Trash2, Mail, ShieldAlert, BadgeCheck, Unlock, Crown, Flag, Eye } from "lucide-react";
 import toast from "react-hot-toast";
 
 import CreateUserModal from "../components/users/CreateUserModal";
@@ -20,15 +20,25 @@ const roleConfig = {
         badge: "bg-blue-100 text-blue-700 ring-blue-200",
         icon: Shield
     },
-    User: {
+    HorseOwner: {
+        gradient: "from-amber-400 to-orange-500",
+        badge: "bg-amber-100 text-amber-700 ring-amber-200",
+        icon: Crown
+    },
+    Jockey: {
+        gradient: "from-rose-400 to-red-500",
+        badge: "bg-rose-100 text-rose-700 ring-rose-200",
+        icon: Flag
+    },
+    Spectator: {
         gradient: "from-zinc-400 to-zinc-600",
         badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
-        icon: User
+        icon: Eye
     },
 };
 
 function UserCard({ user, onEdit, onDelete }) {
-    const config = roleConfig[user.role] || roleConfig.User;
+    const config = roleConfig[user.role] || roleConfig.Spectator;
     const Icon = config.icon;
     const isActive = user.status === "Active";
 
@@ -145,7 +155,7 @@ function UsersManagement() {
         return () => clearTimeout(timeoutId);
     }, [search, filterRole, currentPage, pageSize]);
 
-    const roleFilters = ["All", "Admin", "Referee", "User", "Spectator", "Jockey", "HorseOwner"];
+    const roleFilters = ["All", "Admin", "Referee", "Spectator", "Jockey", "HorseOwner"];
 
     // Since filtering is done in backend, we don't need local filter logic
     const filtered = usersList;
@@ -163,7 +173,13 @@ function UsersManagement() {
             await userApi.updateUser(updatedUser.id, {
                 fullName: updatedUser.name,
                 email: updatedUser.email,
-                role: updatedUser.role
+                role: updatedUser.role,
+                phone: updatedUser.phone,
+                weight: updatedUser.weight ? parseFloat(updatedUser.weight) : null,
+                experienceYear: updatedUser.experienceYear ? parseInt(updatedUser.experienceYear) : null,
+                expYears: updatedUser.expYears ? parseInt(updatedUser.expYears) : null,
+                totalPoints: updatedUser.totalPoints ? parseInt(updatedUser.totalPoints) : null,
+                removeAvatar: updatedUser.removeAvatar || false
             });
             setUsersList(usersList.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
             toast.success("User updated successfully!");
@@ -211,7 +227,7 @@ function UsersManagement() {
                     className="group flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-7 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-zinc-900/20 hover:shadow-zinc-900/30 hover:-translate-y-0.5"
                 >
                     <Plus size={20} className="transition-transform group-hover:rotate-90" />
-                    Invite User
+                    Create New User
                 </button>
             </div>
 

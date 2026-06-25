@@ -14,6 +14,7 @@ import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import GoogleCallback from "./pages/GoogleCallback";
+import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Horses from "./pages/Horses";
 import Tournaments from "./pages/Tournaments";
@@ -37,10 +38,12 @@ function App() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/auth/callback" element={<GoogleCallback />} />
 
+          <Route path="/" element={<Home />} />
+
           <Route
-            path="/"
+            path="/dashboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["Admin", "Referee", "HorseOwner", "Jockey", "Spectator"]}>
                 <DashboardLayout>
                   <Dashboard />
                 </DashboardLayout>
@@ -51,7 +54,7 @@ function App() {
           <Route
             path="/horses"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["Admin", "Referee", "HorseOwner"]}>
                 <DashboardLayout>
                   <Horses />
                 </DashboardLayout>
@@ -62,7 +65,7 @@ function App() {
           <Route
             path="/tournaments"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["Admin", "Referee", "HorseOwner", "Jockey", "Spectator"]}>
                 <DashboardLayout>
                   <Tournaments />
                 </DashboardLayout>
@@ -73,7 +76,7 @@ function App() {
           <Route
             path="/jockeys"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["Admin", "Referee", "HorseOwner", "Jockey"]}>
                 <DashboardLayout>
                   <Jockeys />
                 </DashboardLayout>
@@ -84,7 +87,7 @@ function App() {
           <Route
             path="/predictions"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["Admin", "Spectator"]}>
                 <DashboardLayout>
                   <Predictions />
                 </DashboardLayout>
@@ -95,7 +98,7 @@ function App() {
           <Route
             path="/leaderboard"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["Admin", "Referee", "HorseOwner", "Jockey", "Spectator"]}>
                 <DashboardLayout>
                   <Leaderboard />
                 </DashboardLayout>
@@ -106,7 +109,7 @@ function App() {
           <Route
             path="/referee"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["Admin", "Referee"]}>
                 <DashboardLayout>
                   <Referee />
                 </DashboardLayout>
@@ -117,7 +120,7 @@ function App() {
           <Route
             path="/spectator"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["Admin", "Spectator"]}>
                 <DashboardLayout>
                   <Spectator />
                 </DashboardLayout>
@@ -150,7 +153,7 @@ function App() {
           <Route
             path="/admin/users"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute allowedRoles={["Admin"]}>
                 <DashboardLayout>
                   <UsersManagement />
                 </DashboardLayout>

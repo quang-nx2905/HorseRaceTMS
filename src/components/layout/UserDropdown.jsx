@@ -41,6 +41,19 @@ function UserDropdown() {
 
   const initial = user?.name?.[0]?.toUpperCase() || "U";
 
+  if (!user) {
+    return (
+      <div className="flex items-center gap-2.5 pl-1 pr-3 py-1 rounded-2xl border bg-white border-zinc-200 shadow-sm opacity-50 cursor-not-allowed">
+        <div className="w-8 h-8 rounded-xl bg-zinc-200 animate-pulse" />
+        <div className="hidden sm:block text-left space-y-1">
+          <div className="w-20 h-3 bg-zinc-200 animate-pulse rounded" />
+          <div className="w-12 h-2 bg-zinc-200 animate-pulse rounded" />
+        </div>
+        <ChevronDown size={13} className="text-zinc-300" />
+      </div>
+    );
+  }
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Trigger button */}
@@ -70,10 +83,10 @@ function UserDropdown() {
         {/* Name — hidden on small screens */}
         <div className="hidden sm:block text-left">
           <p className="text-xs font-bold text-zinc-800 leading-tight">
-            {user?.name || "User"}
+            {user.name || "Unknown"}
           </p>
           <p className="text-[10px] text-zinc-400 leading-none font-medium">
-            {user?.role || "Member"}
+            {user.role || "Member"}
           </p>
         </div>
 
@@ -109,19 +122,19 @@ function UserDropdown() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <p className="font-bold text-sm text-zinc-900 truncate">
-                    {user?.name || "User"}
+                    {user.name || "Unknown"}
                   </p>
                   <BadgeCheck className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
                 </div>
                 <p className="text-xs text-zinc-400 font-medium truncate">
-                  {user?.email || "email@example.com"}
+                  {user.email || ""}
                 </p>
               </div>
             </div>
             <div className="mt-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-amber-50 border border-amber-200 rounded-lg">
               <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
               <span className="text-[10px] font-bold text-amber-700 uppercase tracking-wider">
-                {user?.role || "User"}
+                {user.role || "Member"}
               </span>
             </div>
           </div>
