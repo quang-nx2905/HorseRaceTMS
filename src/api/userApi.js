@@ -8,5 +8,9 @@ export const userApi = {
     toggleUserStatus: async (id) => {
         const response = await api.put(`/users/${id}/status`);
         return response.data;
+    },
+    updateUser: async (id, data) => {
+        const response = await api.put(`/users/${id}/update`, data);
+        return response.data;
     }
 };

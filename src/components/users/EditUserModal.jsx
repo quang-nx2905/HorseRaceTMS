@@ -15,7 +15,7 @@ function EditUserModal({ open, onClose, onSave, user }) {
             setFormData({
                 name: user.name,
                 email: user.email,
-                role: user.role,
+                role: user.role === "User" ? "Spectator" : user.role,
                 status: user.status || "Active",
             });
         }
@@ -52,9 +52,11 @@ function EditUserModal({ open, onClose, onSave, user }) {
                     <div className="relative">
                         <ShieldAlert size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
                         <select value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium appearance-none">
-                            <option value="User">User</option>
+                            <option value="Spectator">Spectator</option>
                             <option value="Admin">Admin</option>
                             <option value="Referee">Referee</option>
+                            <option value="HorseOwner">HorseOwner</option>
+                            <option value="Jockey">Jockey</option>
                         </select>
                     </div>
                 </div>

@@ -86,7 +86,7 @@ function UserCard({ user, onEdit, onDelete }) {
                         onClick={() => canEditDelete && onDelete(user)}
                         disabled={!canEditDelete}
                         className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${!canEditDelete ? 'bg-zinc-50/50 text-zinc-300 cursor-not-allowed' :
-                                isActive ? 'bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600' : 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100 hover:text-emerald-600'
+                            isActive ? 'bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600' : 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100 hover:text-emerald-600'
                             }`}
                         title={isActive ? "Deactivate User" : "Reactivate User"}
                     >
@@ -145,7 +145,7 @@ function UsersManagement() {
         return () => clearTimeout(timeoutId);
     }, [search, filterRole, currentPage, pageSize]);
 
-    const roleFilters = ["All", "Admin", "Referee", "User", "Spectator", "Jockey", "Owner"];
+    const roleFilters = ["All", "Admin", "Referee", "User", "Spectator", "Jockey", "HorseOwner"];
 
     // Since filtering is done in backend, we don't need local filter logic
     const filtered = usersList;
@@ -158,9 +158,19 @@ function UsersManagement() {
         toast.success("User created successfully!");
     };
 
-    const handleUpdateUser = (updatedUser) => {
-        setUsersList(usersList.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
-        toast.success("User updated successfully!");
+    const handleUpdateUser = async (updatedUser) => {
+        try {
+            await userApi.updateUser(updatedUser.id, {
+                fullName: updatedUser.name,
+                email: updatedUser.email,
+                role: updatedUser.role
+            });
+            setUsersList(usersList.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
+            toast.success("User updated successfully!");
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to update user");
+            console.error(error);
+        }
     };
 
     const handleConfirmDelete = async () => {
