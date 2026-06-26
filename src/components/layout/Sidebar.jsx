@@ -16,42 +16,46 @@ import { useLayout } from "../../context/LayoutContext";
 import { useAuth } from "../../context/AuthContext";
 
 const getNavGroups = (userRole) => {
-  const groups = [
+  const role = userRole || "Spectator";
+
+  const allGroups = [
     {
       label: "Main",
       items: [
-        { name: "Dashboard", path: "/", icon: LayoutDashboard },
-        { name: "Tournaments", path: "/tournaments", icon: Trophy },
-        { name: "Horses", path: "/horses", icon: GanttChartSquare },
-        { name: "Jockeys", path: "/jockeys", icon: Users },
+        { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard, roles: ["Admin", "Referee", "HorseOwner", "Jockey", "Spectator"] },
+        { name: "Tournaments", path: "/tournaments", icon: Trophy, roles: ["Admin", "Referee", "HorseOwner", "Jockey", "Spectator"] },
+        { name: "Horses", path: "/horses", icon: GanttChartSquare, roles: ["Admin", "Referee", "HorseOwner"] },
+        { name: "Jockeys", path: "/jockeys", icon: Users, roles: ["Admin", "Referee", "HorseOwner", "Jockey"] },
       ],
     },
     {
       label: "Analytics",
       items: [
-        { name: "Predictions", path: "/predictions", icon: BrainCircuit },
-        { name: "Leaderboard", path: "/leaderboard", icon: BarChart3 },
+        { name: "Predictions", path: "/predictions", icon: BrainCircuit, roles: ["Admin", "Spectator"] },
+        { name: "Leaderboard", path: "/leaderboard", icon: BarChart3, roles: ["Admin", "Referee", "HorseOwner", "Jockey", "Spectator"] },
       ],
     },
     {
       label: "Management",
       items: [
-        { name: "Referee", path: "/referee", icon: Shield },
-        { name: "Spectator", path: "/spectator", icon: Eye },
+        { name: "Referee", path: "/referee", icon: Shield, roles: ["Admin", "Referee"] },
+        { name: "Spectator", path: "/spectator", icon: Eye, roles: ["Admin", "Spectator"] },
       ],
     },
-  ];
-
-  if (userRole === "Admin") {
-    groups.push({
+    {
       label: "Admin Panel",
       items: [
-        { name: "User Management", path: "/admin/users", icon: UserCog },
+        { name: "User Management", path: "/admin/users", icon: UserCog, roles: ["Admin"] },
       ]
-    });
-  }
+    }
+  ];
 
-  return groups;
+  return allGroups
+    .map(group => ({
+      ...group,
+      items: group.items.filter(item => item.roles.includes(role))
+    }))
+    .filter(group => group.items.length > 0);
 };
 
 function Sidebar() {
@@ -79,9 +83,11 @@ function Sidebar() {
       </div>
 
       {/* ── LOGO / BRAND ── */}
-      <div className={`
+      <div 
+        onClick={() => window.location.reload()}
+        className={`
         relative z-10 flex items-center gap-3
-        px-4 py-5
+        px-4 py-5 cursor-pointer hover:bg-zinc-900/50 transition-colors
         border-b border-zinc-800/60
         ${sidebarOpen ? "px-5" : "justify-center px-4"}
       `}>

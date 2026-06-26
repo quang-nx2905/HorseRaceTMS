@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { GanttChartSquare, Tag, Hash, Activity, Trophy } from "lucide-react";
 import Modal from "../common/Modal";
+import ImageUpload from "../common/ImageUpload";
 
 function CreateHorseModal({
     open,
@@ -13,6 +14,7 @@ function CreateHorseModal({
         age: "",
         health: "Excellent",
         wins: 0,
+        imageUrl: "",
     });
 
     const handleSubmit = (e) => {
@@ -30,6 +32,7 @@ function CreateHorseModal({
             age: "",
             health: "Excellent",
             wins: 0,
+            imageUrl: "",
         });
         onClose();
     };
@@ -48,6 +51,15 @@ function CreateHorseModal({
             <form onSubmit={handleSubmit} className="space-y-6">
                 
                 <div className="grid grid-cols-2 gap-5">
+                    {/* Image Upload */}
+                    <div className="col-span-2">
+                        <label className="block mb-2 font-semibold text-zinc-700">Horse Photo</label>
+                        <ImageUpload 
+                            value={form.imageUrl} 
+                            onChange={(url) => setForm({ ...form, imageUrl: url })} 
+                        />
+                    </div>
+
                     {/* Name */}
                     <div className="col-span-2">
                         <label className="block mb-2 font-semibold text-zinc-700">Horse Name</label>
