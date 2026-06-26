@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight, Trophy, Zap, Shield, TrendingUp,
-  Clock, Users, Star, ChevronRight, Play, Activity,
+  Clock, Users, Star, ChevronRight, Activity,
   BarChart2, CheckCircle
 } from "lucide-react";
 
@@ -45,66 +45,66 @@ function StatCard({ value, suffix = "", label, icon: Icon, color, started }) {
 const FUN_FACTS = [
   {
     emoji: "🐎",
-    title: "Ngựa nhìn gần như 360°",
-    desc: "Mắt ngựa đặt ở hai bên đầu cho phép chúng quan sát gần như toàn bộ xung quanh — chỉ trừ một điểm mù nhỏ phía sau đuôi.",
+    title: "Nearly 360° Vision",
+    desc: "A horse's eyes are positioned on the sides of its head, giving it an almost full-circle field of view — with only a tiny blind spot directly behind its tail.",
   },
   {
     emoji: "⚡",
-    title: "Vận tốc lên tới 88 km/h",
-    desc: "Ngựa đua thuần chủng có thể đạt tốc độ tối đa 88 km/h — nhanh hơn nhiều xe máy đô thị!",
+    title: "Top Speed: 88 km/h",
+    desc: "Thoroughbred racehorses can reach a top speed of 88 km/h — faster than most motorcycles on city roads!",
   },
   {
     emoji: "🏆",
-    title: "Kỷ lục 400 năm tuổi",
-    desc: "Giải đua ngựa Epsom Derby (Anh) được tổ chức từ năm 1780 — lâu đời hơn cả nước Mỹ!",
+    title: "A 400-Year-Old Record",
+    desc: "The Epsom Derby in England has been held since 1780 — making it older than the United States itself!",
   },
   {
     emoji: "❤️",
-    title: "Tim ngựa nặng tới 5kg",
-    desc: "Trái tim của một con ngựa đua đỉnh cao có thể nặng hơn 5kg và đập tới 240 lần/phút khi chạy nước rút.",
+    title: "Heart Weighing Up to 5 kg",
+    desc: "An elite racehorse's heart can weigh over 5 kg and beat up to 240 times per minute during a full sprint.",
   },
   {
     emoji: "🔢",
-    title: "Mỗi ngựa có... 1 sinh nhật",
-    desc: "Tất cả ngựa thuần chủng trên toàn thế giới đều tính sinh nhật chính thức vào ngày 1 tháng 1 mỗi năm!",
+    title: "Every Horse Shares One Birthday",
+    desc: "All thoroughbreds worldwide share an official birthday of January 1st each year — no matter when they were actually born!",
   },
   {
     emoji: "🌙",
-    title: "Ngủ đứng như bình thường",
-    desc: "Ngựa có thể ngủ đứng nhờ cơ chế khóa khớp chân đặc biệt. Chúng chỉ nằm xuống khi cần ngủ sâu.",
+    title: "They Sleep Standing Up",
+    desc: "Horses can sleep while standing thanks to a special locking mechanism in their legs. They only lie down when they need deep REM sleep.",
   },
 ];
 
 // --- Activity Feed Data ---
 const ACTIVITIES = [
-  { icon: "🏁", text: "Race #42 tại Hà Nội vừa kết thúc", time: "2 phút trước" },
-  { icon: "🐎", text: "Ngựa Thunder Storm đăng ký giải Mùa Hè 2026", time: "5 phút trước" },
-  { icon: "🏆", text: "Giải Vietnam Grand Prix đã có kết quả chính thức", time: "12 phút trước" },
-  { icon: "👤", text: "Jockey Nguyễn Văn A vừa cập nhật hồ sơ", time: "18 phút trước" },
-  { icon: "⚡", text: "Dự đoán AI cho Race #43 vừa được cập nhật", time: "25 phút trước" },
-  { icon: "🎯", text: "Tournament Spring Cup 2026 đang tuyển thêm đội", time: "30 phút trước" },
+  { icon: "🏁", text: "Race #42 at Hanoi Track has just finished", time: "2 min ago" },
+  { icon: "🐎", text: "Thunder Storm registered for the Summer 2026 Championship", time: "5 min ago" },
+  { icon: "🏆", text: "Vietnam Grand Prix official results are now live", time: "12 min ago" },
+  { icon: "👤", text: "Jockey Alex Nguyen just updated their profile", time: "18 min ago" },
+  { icon: "⚡", text: "AI prediction for Race #43 has been refreshed", time: "25 min ago" },
+  { icon: "🎯", text: "Spring Cup 2026 is now open for team registration", time: "30 min ago" },
 ];
 
 // --- Steps Data ---
 const STEPS = [
   {
     step: "01",
-    title: "Tạo tài khoản miễn phí",
-    desc: "Đăng ký trong vòng 60 giây. Không cần thẻ tín dụng, không phí ẩn.",
+    title: "Create a Free Account",
+    desc: "Sign up in under 60 seconds. No credit card required, no hidden fees.",
     icon: Users,
     color: "from-amber-400 to-orange-500",
   },
   {
     step: "02",
-    title: "Thiết lập giải đấu",
-    desc: "Tạo giải đấu, thêm ngựa, jockey và lên lịch các cuộc đua chỉ trong vài click.",
+    title: "Set Up Your Tournament",
+    desc: "Create events, add horses and jockeys, and schedule races in just a few clicks.",
     icon: BarChart2,
     color: "from-orange-400 to-rose-500",
   },
   {
     step: "03",
-    title: "Theo dõi trực tiếp",
-    desc: "Xem kết quả trực tiếp, bảng xếp hạng và dự đoán AI cập nhật liên tục.",
+    title: "Track Everything Live",
+    desc: "Watch live results, live leaderboards, and continuously updated AI predictions.",
     icon: Activity,
     color: "from-rose-400 to-pink-500",
   },
@@ -201,19 +201,17 @@ function Home() {
           </h1>
 
           <p className="text-xl sm:text-2xl text-zinc-600 font-medium max-w-3xl mx-auto leading-relaxed">
-            Nền tảng quản lý đua ngựa toàn diện — lên lịch, theo dõi, phân tích và dự đoán tất cả trong một chỗ.
+            The all-in-one horse racing management platform — schedule, track, analyze, and predict, all in one place.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-4">
-            <Link to="/register" className="group relative flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-full font-bold text-lg transition-all shadow-[0_0_40px_-10px_rgba(245,158,11,0.5)] hover:shadow-[0_0_60px_-15px_rgba(245,158,11,0.8)] hover:-translate-y-1 overflow-hidden">
+            <Link to="/dashboard" className="group relative flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-full font-bold text-lg transition-all shadow-[0_0_40px_-10px_rgba(245,158,11,0.5)] hover:shadow-[0_0_60px_-15px_rgba(245,158,11,0.8)] hover:-translate-y-1 overflow-hidden">
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
               <span className="relative z-10 flex items-center gap-2">
-                Bắt đầu miễn phí <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                Go to Dashboard <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </span>
             </Link>
-            <Link to="/dashboard" className="flex items-center gap-2 px-8 py-4 bg-white/80 backdrop-blur-md hover:bg-white border border-zinc-200/80 text-zinc-900 rounded-full font-bold text-lg transition-all shadow-sm hover:shadow-xl hover:-translate-y-1">
-              <Play className="w-5 h-5 fill-zinc-900" /> Xem demo
-            </Link>
+
           </div>
         </div>
       </section>
@@ -221,12 +219,12 @@ function Home() {
       {/* ───────────── Animated Stats ───────────── */}
       <section ref={statsRef} className="py-16 px-6 bg-white border-y border-zinc-100">
         <div className="max-w-6xl mx-auto">
-          <p className="text-center text-sm font-bold text-zinc-400 uppercase tracking-widest mb-10">Những con số nói lên tất cả</p>
+          <p className="text-center text-sm font-bold text-zinc-400 uppercase tracking-widest mb-10">The numbers speak for themselves</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <StatCard value={1240} suffix="+" label="Giải đấu đã tổ chức" icon={Trophy} color="bg-amber-400/20 text-amber-600" started={statsStarted} />
-            <StatCard value={8500} suffix="+" label="Lượt đua được ghi nhận" icon={Activity} color="bg-orange-400/20 text-orange-600" started={statsStarted} />
-            <StatCard value={340} suffix="+" label="Jockey đăng ký" icon={Users} color="bg-rose-400/20 text-rose-600" started={statsStarted} />
-            <StatCard value={97} suffix="%" label="Độ chính xác dự đoán AI" icon={TrendingUp} color="bg-emerald-400/20 text-emerald-600" started={statsStarted} />
+            <StatCard value={1240} suffix="+" label="Tournaments Organized" icon={Trophy} color="bg-amber-400/20 text-amber-600" started={statsStarted} />
+            <StatCard value={8500} suffix="+" label="Races Recorded" icon={Activity} color="bg-orange-400/20 text-orange-600" started={statsStarted} />
+            <StatCard value={340} suffix="+" label="Registered Jockeys" icon={Users} color="bg-rose-400/20 text-rose-600" started={statsStarted} />
+            <StatCard value={97} suffix="%" label="AI Prediction Accuracy" icon={TrendingUp} color="bg-emerald-400/20 text-emerald-600" started={statsStarted} />
           </div>
         </div>
       </section>
@@ -236,9 +234,9 @@ function Home() {
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]" />
         <div className="max-w-5xl mx-auto relative z-10">
           <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1.5 bg-amber-400/20 text-amber-400 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Khám phá</span>
-            <h2 className="text-4xl font-black text-white">Bạn có biết không? 🤔</h2>
-            <p className="text-zinc-400 mt-3 font-medium">Những sự thật thú vị về thế giới đua ngựa</p>
+            <span className="inline-block px-4 py-1.5 bg-amber-400/20 text-amber-400 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Explore</span>
+            <h2 className="text-4xl font-black text-white">Did You Know? 🤔</h2>
+            <p className="text-zinc-400 mt-3 font-medium">Fascinating facts from the world of horse racing</p>
           </div>
 
           {/* Main Fact Display */}
@@ -272,9 +270,9 @@ function Home() {
       <section className="py-24 px-6 bg-zinc-50">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 bg-orange-100 text-orange-600 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Đơn giản — Nhanh chóng — Hiệu quả</span>
-            <h2 className="text-4xl font-black text-zinc-900">Bắt đầu chỉ trong 3 bước</h2>
-            <p className="text-zinc-500 mt-3 font-medium max-w-xl mx-auto">Không cần cài đặt phức tạp. Sẵn sàng hoạt động trong vòng chưa đầy 5 phút.</p>
+            <span className="inline-block px-4 py-1.5 bg-orange-100 text-orange-600 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Simple — Fast — Effective</span>
+            <h2 className="text-4xl font-black text-zinc-900">Get Started in 3 Steps</h2>
+            <p className="text-zinc-500 mt-3 font-medium max-w-xl mx-auto">No complex setup needed. Up and running in under 5 minutes.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
@@ -291,7 +289,7 @@ function Home() {
                 <h3 className="text-xl font-black text-zinc-900 mb-3 relative z-10">{step.title}</h3>
                 <p className="text-zinc-500 font-medium leading-relaxed relative z-10">{step.desc}</p>
                 <div className="mt-6 flex items-center gap-1 text-sm font-bold text-amber-600 group-hover:gap-2 transition-all">
-                  <span>Tìm hiểu thêm</span>
+                  <span>Learn more</span>
                   <ChevronRight className="w-4 h-4" />
                 </div>
               </div>
@@ -304,32 +302,32 @@ function Home() {
       <section className="py-24 px-6 bg-white border-t border-zinc-100">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 bg-zinc-100 text-zinc-600 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Tính năng nổi bật</span>
-            <h2 className="text-4xl font-black text-zinc-900">Mọi thứ bạn cần để vận hành giải đấu</h2>
-            <p className="text-zinc-500 mt-3 font-medium">Được xây dựng cho BTC, chủ ngựa và những người đam mê đua ngựa.</p>
+            <span className="inline-block px-4 py-1.5 bg-zinc-100 text-zinc-600 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Key Features</span>
+            <h2 className="text-4xl font-black text-zinc-900">Everything You Need to Run the Show</h2>
+            <p className="text-zinc-500 mt-3 font-medium">Built for tournament organizers, horse owners, and racing enthusiasts alike.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
                 icon: Zap, color: "bg-amber-100 text-amber-600",
-                title: "Dự đoán AI thông minh",
-                desc: "Mô hình AI phân tích lịch sử thi đấu, điều kiện đường đua và phong độ ngựa để đưa ra dự đoán chính xác.",
-                badge: "Mới 🔥",
+                title: "Smart AI Predictions",
+                desc: "Our AI models analyze race history, track conditions, and horse form to deliver highly accurate outcome forecasts.",
+                badge: "New 🔥",
                 badgeColor: "bg-red-100 text-red-600"
               },
               {
                 icon: Trophy, color: "bg-emerald-100 text-emerald-600",
                 title: "Tournament Hub",
-                desc: "Tổ chức toàn bộ giải đấu, lên lịch vòng đấu, và duy trì bảng xếp hạng trực tiếp — tất cả ở một nơi.",
-                badge: "Phổ biến ⭐",
+                desc: "Organize full tournaments, schedule race brackets, and maintain live leaderboards — all in one seamless place.",
+                badge: "Popular ⭐",
                 badgeColor: "bg-amber-100 text-amber-700"
               },
               {
                 icon: Shield, color: "bg-blue-100 text-blue-600",
-                title: "Minh bạch & Công bằng",
-                desc: "Công cụ trọng tài và phân quyền toàn diện đảm bảo mọi kết quả đều rõ ràng, công bằng cho tất cả.",
-                badge: "Tin cậy ✓",
+                title: "Transparent & Fair",
+                desc: "Referee tools and comprehensive permission management ensure every result is clear and fair for all parties.",
+                badge: "Trusted ✓",
                 badgeColor: "bg-blue-100 text-blue-600"
               },
             ].map((f, i) => (
@@ -345,7 +343,7 @@ function Home() {
                   <h3 className="text-xl font-bold text-zinc-900 mb-3">{f.title}</h3>
                   <p className="text-zinc-500 font-medium leading-relaxed">{f.desc}</p>
                   <div className="mt-6 flex items-center gap-1 text-sm font-bold text-zinc-900 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                    <span>Xem chi tiết</span>
+                    <span>View details</span>
                     <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
@@ -361,17 +359,17 @@ function Home() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(255,255,255,0.1),transparent_60%)]" />
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 drop-shadow">
-            Sẵn sàng nâng tầm giải đấu của bạn?
+            Ready to Elevate Your Tournament?
           </h2>
           <p className="text-white/90 text-xl font-medium mb-10 max-w-2xl mx-auto">
-            Hàng trăm ban tổ chức đã tin tưởng HorseRaceTMS. Giờ là lượt của bạn.
+            Hundreds of organizers already trust HorseRaceTMS. Now it's your turn.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/register" className="group flex items-center gap-2 px-8 py-4 bg-white text-zinc-900 rounded-full font-black text-lg hover:-translate-y-1 transition-all shadow-2xl hover:shadow-white/30">
-              Đăng ký miễn phí <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              Sign Up for Free <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
             <div className="flex items-center gap-2 text-white/90 font-semibold">
-              <CheckCircle className="w-5 h-5" /> Không cần thẻ tín dụng
+              <CheckCircle className="w-5 h-5" /> No credit card required
             </div>
           </div>
         </div>
