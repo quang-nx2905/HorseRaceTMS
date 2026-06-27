@@ -15,7 +15,11 @@ function UserDropdown() {
       import("../../api/axiosClient").then(({ default: axiosClient }) => {
         axiosClient.get("/Profile/Me")
           .then(res => {
-            setUser(prev => ({ ...prev, avatarUrl: res.data.avatarUrl || null, name: res.data.fullName || prev?.name }));
+            setUser(prev => {
+              const updatedUser = { ...prev, avatarUrl: res.data.avatarUrl || null, name: res.data.fullName || prev?.name };
+              localStorage.setItem("user", JSON.stringify(updatedUser));
+              return updatedUser;
+            });
           })
           .catch(err => console.error("Failed to fetch user profile in dropdown:", err));
       });

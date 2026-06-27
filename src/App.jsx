@@ -17,6 +17,7 @@ import GoogleCallback from "./pages/GoogleCallback";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Horses from "./pages/Horses";
+import MyHorses from "./pages/MyHorses";
 import Tournaments from "./pages/Tournaments";
 import Jockeys from "./pages/Jockeys";
 import Predictions from "./pages/Predictions";
@@ -54,9 +55,20 @@ function App() {
           <Route
             path="/horses"
             element={
-              <ProtectedRoute allowedRoles={["Admin", "Referee", "HorseOwner"]}>
+              <ProtectedRoute allowedRoles={["Admin", "Referee", "HorseOwner", "Jockey", "Spectator"]}>
                 <DashboardLayout>
                   <Horses />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/my-horses"
+            element={
+              <ProtectedRoute allowedRoles={["Admin", "HorseOwner"]}>
+                <DashboardLayout>
+                  <MyHorses />
                 </DashboardLayout>
               </ProtectedRoute>
             }

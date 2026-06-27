@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
     Eye,
     Pencil,
@@ -9,49 +10,69 @@ import {
     Trophy,
     Activity,
     Filter,
+    ClipboardList,
+    Ban,
+    CheckCircle,
+    FileEdit
 } from "lucide-react";
 
 import HorseDetailsModal from "../components/horses/HorseDetailsModal";
-import CreateHorseModal from "../components/horses/CreateHorseModal";
+import PendingHorsesModal from "../components/horses/PendingHorsesModal";
+import ReviewUpdateModal from "../components/horses/ReviewUpdateModal";
 import EditHorseModal from "../components/horses/EditHorseModal";
 import ConfirmModal from "../components/common/ConfirmModal";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
 
 const healthConfig = {
-    Excellent: { color: "bg-emerald-100 text-emerald-700 ring-emerald-200",  dot: "bg-emerald-500" },
-    Good:      { color: "bg-blue-100 text-blue-700 ring-blue-200",           dot: "bg-blue-500"    },
-    Fair:      { color: "bg-yellow-100 text-yellow-700 ring-yellow-200",     dot: "bg-yellow-500"  },
-    Poor:      { color: "bg-red-100 text-red-600 ring-red-200",              dot: "bg-red-500"     },
+    Excellent: { color: "bg-emerald-100 text-emerald-700 ring-emerald-200", dot: "bg-emerald-500" },
+    Good: { color: "bg-blue-100 text-blue-700 ring-blue-200", dot: "bg-blue-500" },
+    Fair: { color: "bg-yellow-100 text-yellow-700 ring-yellow-200", dot: "bg-yellow-500" },
+    Poor: { color: "bg-red-100 text-red-600 ring-red-200", dot: "bg-red-500" },
+};
+
+const statusConfig = {
+    Pending:  { color: "bg-orange-100 text-orange-700 ring-orange-200", icon: "🕒" },
+    Approved: { color: "bg-emerald-100 text-emerald-700 ring-emerald-200", icon: "✅" },
+    Rejected: { color: "bg-red-100 text-red-600 ring-red-200", icon: "❌" },
+    Suspended: { color: "bg-zinc-100 text-zinc-700 ring-zinc-300", icon: "🚫" },
+    Retired: { color: "bg-slate-100 text-slate-600 ring-slate-300", icon: "💤" },
 };
 
 const breedColors = {
-    Arabian:      "from-amber-400 to-orange-500",
+    Arabian: "from-amber-400 to-orange-500",
     Thoroughbred: "from-blue-400 to-indigo-500",
-    Mustang:      "from-violet-400 to-purple-500",
-    Quarter:      "from-emerald-400 to-teal-500",
-    Appaloosa:    "from-rose-400 to-pink-500",
+    Mustang: "from-violet-400 to-purple-500",
+    Quarter: "from-emerald-400 to-teal-500",
+    Appaloosa: "from-rose-400 to-pink-500",
 };
 
-function HorseCard({ horse, onView, onEdit, onDelete }) {
-    const health  = healthConfig[horse.health]  || healthConfig.Fair;
-    const gradient = breedColors[horse.breed]   || "from-zinc-400 to-zinc-600";
+function HorseCard({ horse, onView, onEdit, onDelete, onSuspend, onReinstate, isAdmin }) {
+    const health = healthConfig[horse.health] || healthConfig.Fair;
+    const gradient = breedColors[horse.breed] || "from-zinc-400 to-zinc-600";
+    const status = statusConfig[horse.status] || statusConfig.Pending;
 
     return (
         <div className="bg-white border border-zinc-200 rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
 
             {/* Card top banner */}
-            <div className={`h-24 bg-gradient-to-br ${gradient} relative`}>
-                <div className="absolute inset-0 opacity-20"
-                    style={{ backgroundImage: "radial-gradient(circle at 70% 50%, white 1px, transparent 1px)", backgroundSize: "18px 18px" }}
-                />
-                {/* Avatar */}
-                <div className="absolute -bottom-7 left-6 w-14 h-14 rounded-2xl bg-white shadow-lg flex items-center justify-center border-2 border-white">
-                    <GanttChartSquare size={24} className="text-zinc-700" />
-                </div>
+            <div className={`relative h-48 ${!horse.imageUrl ? "bg-gradient-to-br " + gradient : "bg-zinc-100"}`}>
+                {horse.imageUrl ? (
+                    <img src={horse.imageUrl} alt={horse.name} className="w-full h-full object-cover" />
+                ) : (
+                    <>
+                        <div className="absolute inset-0 opacity-20"
+                            style={{ backgroundImage: "radial-gradient(circle at 70% 50%, white 1px, transparent 1px)", backgroundSize: "18px 18px" }}
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <GanttChartSquare size={48} className="text-white/50" />
+                        </div>
+                    </>
+                )}
             </div>
 
             {/* Card body */}
-            <div className="pt-10 px-6 pb-5">
+            <div className="pt-5 px-6 pb-5">
                 <div className="flex items-start justify-between mb-3">
                     <div>
                         <h3 className="font-black text-zinc-900 text-lg leading-tight">
@@ -59,10 +80,17 @@ function HorseCard({ horse, onView, onEdit, onDelete }) {
                         </h3>
                         <p className="text-zinc-400 text-sm mt-0.5">{horse.breed}</p>
                     </div>
-                    <span className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ring-1 ${health.color}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${health.dot}`} />
-                        {horse.health}
-                    </span>
+                    <div className="flex flex-col gap-1.5 items-end">
+                        {isAdmin && (
+                            <span className={`flex items-center justify-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-md ring-1 ${status.color}`}>
+                                {status.icon} {horse.status || "Pending"}
+                            </span>
+                        )}
+                        <span className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ring-1 ${health.color}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${health.dot}`} />
+                            {horse.health}
+                        </span>
+                    </div>
                 </div>
 
                 {/* Stats row */}
@@ -83,7 +111,6 @@ function HorseCard({ horse, onView, onEdit, onDelete }) {
                     </div>
                 </div>
 
-                {/* Actions */}
                 <div className="flex gap-2">
                     <button
                         onClick={() => onView(horse)}
@@ -91,18 +118,52 @@ function HorseCard({ horse, onView, onEdit, onDelete }) {
                     >
                         <Eye size={14} /> View
                     </button>
-                    <button
-                        onClick={() => onEdit(horse)}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-zinc-100 text-zinc-700 hover:bg-zinc-200 transition-all text-sm font-semibold"
-                    >
-                        <Pencil size={14} /> Edit
-                    </button>
-                    <button
-                        onClick={() => onDelete(horse)}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-all text-sm font-semibold"
-                    >
-                        <Trash2 size={14} /> Delete
-                    </button>
+                    {isAdmin && horse.status === "Approved" && (
+                        <>
+                            <button
+                                onClick={() => onEdit(horse)}
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-zinc-100 text-zinc-700 hover:bg-zinc-200 transition-all text-xs font-semibold"
+                            >
+                                <Pencil size={14} /> Edit
+                            </button>
+                            <button
+                                onClick={() => onSuspend(horse)}
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-orange-50 text-orange-600 hover:bg-orange-100 transition-all text-xs font-semibold"
+                            >
+                                <Ban size={14} /> Suspend
+                            </button>
+                            <button
+                                onClick={() => onDelete(horse)}
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-all text-xs font-semibold"
+                            >
+                                <Trash2 size={14} /> Retire
+                            </button>
+                        </>
+                    )}
+                    {isAdmin && horse.status === "Suspended" && (
+                        <>
+                            <button
+                                onClick={() => onReinstate(horse)}
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-all text-xs font-semibold"
+                            >
+                                <CheckCircle size={14} /> Reinstate
+                            </button>
+                            <button
+                                onClick={() => onDelete(horse)}
+                                className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-all text-xs font-semibold"
+                            >
+                                <Trash2 size={14} /> Retire
+                            </button>
+                        </>
+                    )}
+                    {isAdmin && horse.status === "Retired" && (
+                        <button
+                            onClick={() => onReinstate(horse)}
+                            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all text-xs font-semibold"
+                        >
+                            <CheckCircle size={14} /> Reinstate to Approved
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -111,40 +172,91 @@ function HorseCard({ horse, onView, onEdit, onDelete }) {
 }
 
 function Horses() {
-    const [search,      setSearch]      = useState("");
+    const { user } = useAuth();
+    const isAdmin = user?.role === 'Admin';
+    const [search, setSearch] = useState("");
     const [filterHealth, setFilterHealth] = useState("All");
+    const [filterStatus, setFilterStatus] = useState("All");
     const [openDetails, setOpenDetails] = useState(false);
-    const [openCreate,  setOpenCreate]  = useState(false);
-    const [openEdit,    setOpenEdit]    = useState(false);
-    const [openDelete,  setOpenDelete]  = useState(false);
+    const [openPending, setOpenPending] = useState(false);
+    const [openEdit, setOpenEdit] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
     const [selectedHorse, setSelectedHorse] = useState(null);
 
-    const [horses, setHorses] = useState([
-        { id: 1, name: "Thunder Bolt",   breed: "Arabian",      age: 4, health: "Excellent", wins: 18 },
-        { id: 2, name: "Golden Sprint",  breed: "Thoroughbred", age: 5, health: "Good",      wins: 12 },
-        { id: 3, name: "Night Fury",     breed: "Mustang",      age: 6, health: "Poor",      wins: 8  },
-        { id: 4, name: "Silver Arrow",   breed: "Arabian",      age: 3, health: "Excellent", wins: 22 },
-        { id: 5, name: "Storm Chaser",   breed: "Quarter",      age: 7, health: "Fair",      wins: 5  },
-        { id: 6, name: "Blaze Runner",   breed: "Thoroughbred", age: 4, health: "Good",      wins: 15 },
-    ]);
+    const [openPendingUpdates, setOpenPendingUpdates] = useState(false);
+    const [openReviewUpdate, setOpenReviewUpdate] = useState(false);
+    const [horseToReviewUpdate, setHorseToReviewUpdate] = useState(null);
+
+    const [openSuspend, setOpenSuspend] = useState(false);
+    const [horseToSuspend, setHorseToSuspend] = useState(null);
+
+    const [openReinstate, setOpenReinstate] = useState(false);
+    const [horseToReinstate, setHorseToReinstate] = useState(null);
+
+    const [horses, setHorses] = useState([]);
+
+    const fetchHorses = async () => {
+        try {
+            const response = await axios.get("https://localhost:7179/api/horses");
+            if (response.data && response.data.data) {
+                const mappedHorses = response.data.data.map(h => {
+                    const latestVer = h.horseVerifications && h.horseVerifications.length > 0
+                        ? h.horseVerifications[h.horseVerifications.length - 1]
+                        : null;
+                    
+                    let pendingUpdate = null;
+                    if (latestVer && latestVer.result === "Update_Pending" && latestVer.notes) {
+                        try {
+                            pendingUpdate = JSON.parse(latestVer.notes);
+                        } catch (e) { console.error("Error parsing update notes:", e); }
+                    }
+
+                    return {
+                        id: h.horseId,
+                        name: h.horseName,
+                        breed: h.breed || "Unknown",
+                        age: h.age || 0,
+                        weight: h.weight,
+                        gender: h.gender,
+                        health: h.healthStatus || "Fair",
+                        wins: 0,
+                        status: h.status || "Pending",
+                        imageUrl: h.imageUrl,
+                        inspectionUrl: latestVer ? latestVer.inspectionUrl : "",
+                        healthCertUrl: latestVer ? latestVer.healthCertUrl : "",
+                        pendingUpdate: pendingUpdate
+                    };
+                });
+                setHorses(mappedHorses);
+            }
+        } catch (error) {
+            console.error("Error fetching horses:", error);
+            toast.error("Failed to load horses from server.");
+        }
+    };
+
+    useEffect(() => {
+        fetchHorses();
+    }, []);
 
     const healthFilters = ["All", "Excellent", "Good", "Fair", "Poor"];
 
-    const filtered = horses.filter((h) => {
+    const pendingHorses = horses.filter((h) => h.status === "Pending");
+    const pendingUpdatesHorses = horses.filter((h) => h.pendingUpdate != null);
+    const approvedHorses = isAdmin
+        ? horses.filter((h) => h.status !== "Pending")
+        : horses.filter((h) => h.status === "Approved");
+
+    const filtered = approvedHorses.filter((h) => {
         const matchSearch = h.name.toLowerCase().includes(search.toLowerCase()) ||
-                            h.breed.toLowerCase().includes(search.toLowerCase());
+            h.breed.toLowerCase().includes(search.toLowerCase());
         const matchHealth = filterHealth === "All" || h.health === filterHealth;
-        return matchSearch && matchHealth;
+        const matchStatus = isAdmin ? (filterStatus === "All" || h.status === filterStatus) : true;
+        return matchSearch && matchHealth && matchStatus;
     });
 
-    // Summary stats
-    const totalWins     = horses.reduce((s, h) => s + h.wins, 0);
-    const excellentCount = horses.filter((h) => h.health === "Excellent").length;
-
-    const handleCreateHorse = (horse) => {
-        setHorses((prev) => [horse, ...prev]);
-        toast.success("Horse created successfully!");
-    };
+    const totalWins = approvedHorses.reduce((s, h) => s + h.wins, 0);
+    const excellentCount = approvedHorses.filter((h) => h.health === "Excellent").length;
 
     const handleUpdateHorse = (updated) => {
         setHorses((prev) => prev.map((h) => (h.id === updated.id ? updated : h)));
@@ -156,11 +268,99 @@ function Horses() {
         toast.success("Horse deleted successfully!");
     };
 
-    const handleConfirmDelete = () => {
+    const handleConfirmDelete = async () => {
         if (!selectedHorse) return;
-        handleDeleteHorse(selectedHorse.id);
-        setOpenDelete(false);
-        setSelectedHorse(null);
+        try {
+            await axios.delete(`https://localhost:7179/api/horses/${selectedHorse.id}`);
+            setHorses((prev) => prev.map((h) => h.id === selectedHorse.id ? { ...h, status: "Retired" } : h));
+            toast.success("Horse retired successfully!");
+        } catch (error) {
+            console.error("Error retiring horse:", error);
+            toast.error("Failed to retire horse");
+        } finally {
+            setOpenDelete(false);
+            setSelectedHorse(null);
+        }
+    };
+
+    const handleConfirmSuspend = async () => {
+        if (!horseToSuspend) return;
+        try {
+            await axios.put(`https://localhost:7179/api/horses/${horseToSuspend.id}/suspend`);
+            setHorses((prev) => prev.map((h) => h.id === horseToSuspend.id ? { ...h, status: "Suspended" } : h));
+            toast.success("Horse suspended successfully!");
+        } catch (error) {
+            console.error("Error suspending horse:", error);
+            toast.error("Failed to suspend horse");
+        } finally {
+            setOpenSuspend(false);
+            setHorseToSuspend(null);
+        }
+    };
+
+    const handleConfirmReinstate = async () => {
+        if (!horseToReinstate) return;
+        try {
+            await axios.put(`https://localhost:7179/api/horses/${horseToReinstate.id}/reinstate`);
+            setHorses((prev) => prev.map((h) => h.id === horseToReinstate.id ? { ...h, status: "Approved" } : h));
+            toast.success("Horse reinstated successfully!");
+        } catch (error) {
+            console.error("Error reinstating horse:", error);
+            toast.error("Failed to reinstate horse");
+        } finally {
+            setOpenReinstate(false);
+            setHorseToReinstate(null);
+        }
+    };
+
+    const handleVerifyHorse = async (horse, newStatus) => {
+        try {
+            const response = await axios.put(`https://localhost:7179/api/horses/${horse.id}/verify`, {
+                status: newStatus,
+                notes: `Verified by Admin`,
+                verifiedBy: user?.id ? parseInt(user.id) : 0
+            });
+            if (response.data && response.data.data) {
+                setHorses(prev => prev.map(h => h.id === horse.id ? { ...h, status: newStatus } : h));
+                toast.success(`Horse ${newStatus.toLowerCase()} successfully!`);
+                setOpenDetails(false);
+            }
+        } catch (error) {
+            console.error("Error verifying horse:", error);
+            toast.error("Failed to verify horse.");
+        }
+    };
+
+    const handleApproveUpdate = async (horse) => {
+        try {
+            await axios.put(`https://localhost:7179/api/horses/${horse.id}/approve-update`, {
+                status: "Update_Approved",
+                notes: "Approved by admin",
+                verifiedBy: user?.id ? parseInt(user.id) : 0
+            });
+            toast.success("Horse update approved!");
+            setOpenReviewUpdate(false);
+            fetchHorses();
+        } catch (error) {
+            console.error("Error approving update:", error);
+            toast.error("Failed to approve update.");
+        }
+    };
+
+    const handleRejectUpdate = async (horse) => {
+        try {
+            await axios.put(`https://localhost:7179/api/horses/${horse.id}/reject-update`, {
+                status: "Update_Rejected",
+                notes: "Rejected by admin",
+                verifiedBy: user?.id ? parseInt(user.id) : 0
+            });
+            toast.success("Horse update rejected!");
+            setOpenReviewUpdate(false);
+            fetchHorses();
+        } catch (error) {
+            console.error("Error rejecting update:", error);
+            toast.error("Failed to reject update.");
+        }
     };
 
     return (
@@ -178,21 +378,42 @@ function Horses() {
                     </p>
                 </div>
 
-                <button
-                    onClick={() => setOpenCreate(true)}
-                    className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5"
-                >
-                    <Plus size={18} />
-                    Add Horse
-                </button>
+                {isAdmin && (
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setOpenPendingUpdates(true)}
+                            className="relative flex items-center gap-2 bg-yellow-50 text-yellow-600 border border-yellow-200 hover:bg-yellow-100 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-100/50 hover:-translate-y-0.5"
+                        >
+                            <FileEdit size={18} />
+                            Pending Updates
+                            {pendingUpdatesHorses.length > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-black w-6 h-6 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
+                                    {pendingUpdatesHorses.length}
+                                </span>
+                            )}
+                        </button>
+                        <button
+                            onClick={() => setOpenPending(true)}
+                            className="relative flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5"
+                        >
+                            <ClipboardList size={18} />
+                            Review Applications
+                            {pendingHorses.length > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-black w-6 h-6 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
+                                    {pendingHorses.length}
+                                </span>
+                            )}
+                        </button>
+                    </div>
+                )}
             </div>
 
             {/* ── SUMMARY STATS ── */}
             <div className="grid grid-cols-3 gap-4">
                 {[
-                    { label: "Total Horses", value: horses.length, icon: GanttChartSquare, color: "bg-yellow-400", iconColor: "text-yellow-900" },
-                    { label: "Total Wins",   value: totalWins,      icon: Trophy,           color: "bg-emerald-400", iconColor: "text-emerald-900" },
-                    { label: "Top Health",   value: excellentCount, icon: Activity,         color: "bg-blue-400",   iconColor: "text-blue-900"    },
+                    { label: "Total Approved", value: approvedHorses.length, icon: GanttChartSquare, color: "bg-yellow-400", iconColor: "text-yellow-900" },
+                    { label: "Total Wins", value: totalWins, icon: Trophy, color: "bg-emerald-400", iconColor: "text-emerald-900" },
+                    { label: "Top Health", value: excellentCount, icon: Activity, color: "bg-blue-400", iconColor: "text-blue-900" },
                 ].map(({ label, value, icon: Icon, color, iconColor }) => (
                     <div key={label} className="bg-white border border-zinc-200 rounded-2xl p-5 flex items-center gap-4">
                         <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
@@ -228,27 +449,44 @@ function Horses() {
                         <button
                             key={f}
                             onClick={() => setFilterHealth(f)}
-                            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                                filterHealth === f
+                            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${filterHealth === f
                                     ? "bg-zinc-900 text-white"
                                     : "bg-white border border-zinc-200 text-zinc-500 hover:border-zinc-400"
-                            }`}
+                                }`}
                         >
                             {f}
                         </button>
                     ))}
                 </div>
+
+                {/* Status filter chips (Admin only) */}
+                {isAdmin && (
+                    <div className="flex items-center gap-2 border-l border-zinc-200 pl-4 ml-1">
+                        {["All", "Approved", "Rejected", "Suspended", "Retired"].map((s) => (
+                            <button
+                                key={s}
+                                onClick={() => setFilterStatus(s)}
+                                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${filterStatus === s
+                                        ? "bg-zinc-900 text-white"
+                                        : "bg-white border border-zinc-200 text-zinc-500 hover:border-zinc-400"
+                                    }`}
+                            >
+                                {s}
+                            </button>
+                        ))}
+                    </div>
+                )}
             </div>
 
             {/* ── COUNT ── */}
             <p className="text-sm text-zinc-400 font-medium">
                 Showing <span className="text-zinc-900 font-bold">{filtered.length}</span> of{" "}
-                <span className="text-zinc-900 font-bold">{horses.length}</span> horses
+                <span className="text-zinc-900 font-bold">{approvedHorses.length}</span> horses
             </p>
 
-            {/* ── CARD GRID ── */}
+            {/* ── HORSE GRID ── */}
             {filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 text-center">
+                <div className="text-center py-20 bg-white rounded-3xl border border-zinc-200 border-dashed">
                     <div className="w-16 h-16 rounded-2xl bg-zinc-100 flex items-center justify-center mb-4">
                         <GanttChartSquare size={28} className="text-zinc-400" />
                     </div>
@@ -261,37 +499,83 @@ function Horses() {
                         <HorseCard
                             key={horse.id}
                             horse={horse}
+                            isAdmin={isAdmin}
                             onView={(h) => { setSelectedHorse(h); setOpenDetails(true); }}
-                            onEdit={(h) => { setSelectedHorse(h); setOpenEdit(true);    }}
+                            onEdit={(h) => { setSelectedHorse(h); setOpenEdit(true); }}
                             onDelete={(h) => { setSelectedHorse(h); setOpenDelete(true); }}
+                            onSuspend={(h) => { setHorseToSuspend(h); setOpenSuspend(true); }}
+                            onReinstate={(h) => { setHorseToReinstate(h); setOpenReinstate(true); }}
                         />
                     ))}
                 </div>
             )}
 
             {/* ── MODALS ── */}
+            <PendingHorsesModal
+                open={openPending}
+                onClose={() => setOpenPending(false)}
+                horses={pendingHorses}
+                onReview={(h) => {
+                    setSelectedHorse(h);
+                    setOpenDetails(true);
+                }}
+            />
+            <PendingHorsesModal
+                open={openPendingUpdates}
+                onClose={() => setOpenPendingUpdates(false)}
+                horses={pendingUpdatesHorses}
+                title="Pending Updates"
+                subtitle="Review and approve changes requested by horse owners."
+                onReview={(h) => {
+                    setHorseToReviewUpdate(h);
+                    setOpenReviewUpdate(true);
+                }}
+            />
+            <ReviewUpdateModal
+                open={openReviewUpdate}
+                onClose={() => setOpenReviewUpdate(false)}
+                horse={horseToReviewUpdate}
+                onApprove={handleApproveUpdate}
+                onReject={handleRejectUpdate}
+            />
             <HorseDetailsModal
                 open={openDetails}
                 onClose={() => setOpenDetails(false)}
                 horse={selectedHorse}
-            />
-            <CreateHorseModal
-                open={openCreate}
-                onClose={() => setOpenCreate(false)}
-                onCreate={handleCreateHorse}
+                onVerify={handleVerifyHorse}
             />
             <EditHorseModal
                 open={openEdit}
                 onClose={() => setOpenEdit(false)}
                 horse={selectedHorse}
                 onSave={handleUpdateHorse}
+                isAdmin={isAdmin}
             />
             <ConfirmModal
                 open={openDelete}
                 onClose={() => setOpenDelete(false)}
                 onConfirm={handleConfirmDelete}
-                title="Delete Horse"
-                message="This action cannot be undone."
+                title="Retire Horse"
+                message="Are you sure you want to retire this horse? This action cannot be undone."
+                confirmLabel="Retire"
+            />
+            <ConfirmModal
+                open={openSuspend}
+                onClose={() => setOpenSuspend(false)}
+                onConfirm={handleConfirmSuspend}
+                title="Suspend Horse"
+                message="Are you sure you want to suspend this horse from racing?"
+                confirmLabel="Suspend"
+                confirmVariant="danger"
+            />
+            <ConfirmModal
+                open={openReinstate}
+                onClose={() => setOpenReinstate(false)}
+                onConfirm={handleConfirmReinstate}
+                title="Reinstate Horse"
+                message="Are you sure you want to reinstate this horse to active duty?"
+                confirmLabel="Reinstate"
+                confirmVariant="success"
             />
 
         </div>

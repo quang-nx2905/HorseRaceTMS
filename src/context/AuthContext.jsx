@@ -39,7 +39,17 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem("token");
     if (token) {
       const decodedUser = extractUserFromToken(token);
-      if (decodedUser) return decodedUser;
+      if (decodedUser) {
+        try {
+          const cachedUser = JSON.parse(localStorage.getItem("user"));
+          if (cachedUser && cachedUser.avatarUrl !== undefined) {
+            decodedUser.avatarUrl = cachedUser.avatarUrl;
+          }
+        } catch (e) {
+          // ignore parsing error
+        }
+        return decodedUser;
+      }
     }
     // Backward compatibility for old fake user data
     const savedUser = localStorage.getItem("user");
