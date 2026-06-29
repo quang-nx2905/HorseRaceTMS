@@ -5,9 +5,16 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import { NotificationProvider } from "./context/NotificationContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+
+// Wraps NotificationProvider inside AuthProvider so it can access the logged-in user
+function NotificationWrapper({ children }) {
+  const { user } = useAuth();
+  return <NotificationProvider user={user}>{children}</NotificationProvider>;
+}
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -32,10 +39,11 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+        <NotificationWrapper>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/auth/callback" element={<GoogleCallback />} />
 
@@ -88,7 +96,7 @@ function App() {
           <Route
             path="/jockeys"
             element={
-              <ProtectedRoute allowedRoles={["Admin", "Referee", "HorseOwner", "Jockey"]}>
+              <ProtectedRoute allowedRoles={["Admin", "Referee", "HorseOwner", "Jockey", "Spectator"]}>
                 <DashboardLayout>
                   <Jockeys />
                 </DashboardLayout>
@@ -174,10 +182,11 @@ function App() {
           />
 
           <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
+          </Routes>
+        </NotificationWrapper>
       </BrowserRouter>
     </AuthProvider>
   );
 }
 
-export default App;
+export default App;

@@ -1,31 +1,19 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-
-  baseURL:
-    import.meta.env.VITE_API_URL || "https://localhost:7179/api",
-
+  baseURL: import.meta.env.VITE_API_URL || "https://localhost:7179/api",
   headers: {
-    "Content-Type":
-      "application/json",
+    "Content-Type": "application/json",
   },
-
 });
 
+// REQUEST INTERCEPTOR
 axiosClient.interceptors.request.use(
-
   (config) => {
-
-    const token =
-      localStorage.getItem("token");
-
+    const token = localStorage.getItem("token");
     if (token) {
-
-      config.headers.Authorization =
-        `Bearer ${token}`;
-
+      config.headers.Authorization = `Bearer ${token}`;
     }
-
     return config;
   }
 );

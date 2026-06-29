@@ -1,4 +1,4 @@
-import { Trophy, Sparkles, Calendar, Bell, Check, Trash2 } from "lucide-react";
+import { Trophy, Sparkles, Calendar, Bell, Check, Trash2, UserCog, ClipboardCheck } from "lucide-react";
 
 function NotificationItem({
     id,
@@ -28,6 +28,16 @@ function NotificationItem({
                     icon: <Calendar size={16} className="text-amber-600" />,
                     bgClass: "bg-amber-50 border border-amber-100",
                 };
+            case "jockey_update":
+                return {
+                    icon: <UserCog size={16} className="text-yellow-600" />,
+                    bgClass: "bg-yellow-50 border border-yellow-200",
+                };
+            case "jockey_review":
+                return {
+                    icon: <ClipboardCheck size={16} className="text-violet-600" />,
+                    bgClass: "bg-violet-50 border border-violet-100",
+                };
             default:
                 return {
                     icon: <Bell size={16} className="text-zinc-600" />,
@@ -35,6 +45,7 @@ function NotificationItem({
                 };
         }
     };
+
 
     const { icon, bgClass } = getIconDetails();
 

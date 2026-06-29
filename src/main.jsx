@@ -10,8 +10,6 @@ import { LayoutProvider } from "./context/LayoutContext";
 
 import { Toaster } from "react-hot-toast";
 
-import { NotificationProvider } from "./context/NotificationContext";
-
 ReactDOM.createRoot(
   document.getElementById("root")
 ).render(
@@ -19,8 +17,6 @@ ReactDOM.createRoot(
   <React.StrictMode>
 
       <LayoutProvider>
-
-        <NotificationProvider>
 
           <Toaster
             position="top-right"
@@ -36,8 +32,6 @@ ReactDOM.createRoot(
           <>
             <App />
           </>
-
-        </NotificationProvider>
 
       </LayoutProvider>
 
