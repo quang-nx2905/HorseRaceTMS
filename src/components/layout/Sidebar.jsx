@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Trophy,
@@ -62,6 +62,7 @@ const getNavGroups = (userRole) => {
 function Sidebar() {
   const { sidebarOpen } = useLayout();
   const location = useLocation();
+  const navigate = useNavigate();
   const { user } = useAuth();
 
   const navGroups = getNavGroups(user?.role);
@@ -85,7 +86,7 @@ function Sidebar() {
 
       {/* ── LOGO / BRAND ── */}
       <div 
-        onClick={() => window.location.reload()}
+        onClick={() => navigate("/")}
         className={`
         relative z-10 flex items-center gap-3
         px-4 py-5 cursor-pointer hover:bg-zinc-900/50 transition-colors

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { getGoogleCallbackToken } from "../api/authApi";
 import { useAuth } from "../context/AuthContext";
@@ -15,18 +15,23 @@ function GoogleCallback() {
     const [error, setError] = useState(null);
     const { login } = useAuth();
 
+    const isProcessed = useRef(false);
+
     useEffect(() => {
+        if (isProcessed.current) return;
+        isProcessed.current = true;
+
         const token = getGoogleCallbackToken();
 
         if (token) {
             // Lưu token và parse user qua context
             login(token);
             // Chuyển về trang chủ
-            navigate("/", { replace: true });
+            navigate("/dashboard", { replace: true });
         } else {
             setError("Đăng nhập Google thất bại. Không nhận được token từ server.");
         }
-    }, [navigate]);
+    }, [navigate, login]);
 
     if (error) {
         return (

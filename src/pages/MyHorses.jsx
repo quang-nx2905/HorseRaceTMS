@@ -9,8 +9,11 @@ import {
     Trophy,
     Activity,
     Filter,
-    CheckCircle
+    CheckCircle,
+    User,
+    ChevronDown
 } from "lucide-react";
+import { useRef } from "react";
 
 import HorseDetailsModal from "../components/horses/HorseDetailsModal";
 import CreateHorseModal from "../components/horses/CreateHorseModal";
@@ -19,6 +22,7 @@ import ConfirmModal from "../components/common/ConfirmModal";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { userApi } from "../api/userApi";
 
 const healthConfig = {
     Excellent: { color: "bg-emerald-100 text-emerald-700 ring-emerald-200",  dot: "bg-emerald-500" },
@@ -155,12 +159,51 @@ function MyHorses() {
     const [openReinstate, setOpenReinstate] = useState(false);
     const [selectedHorse, setSelectedHorse] = useState(null);
 
+    const isAdmin = user?.role === "Admin";
+    const [owners, setOwners] = useState([]);
+    const [selectedOwnerId, setSelectedOwnerId] = useState("");
+    const [ownerSearch, setOwnerSearch] = useState("");
+    const [showOwnerDropdown, setShowOwnerDropdown] = useState(false);
+    const dropdownRef = useRef(null);
+
     const [horses, setHorses] = useState([]);
+
+    // Fetch owners for Admin
+    useEffect(() => {
+        if (isAdmin) {
+            const fetchOwners = async () => {
+                try {
+                    const data = await userApi.getUsers({ role: "HorseOwner", pageSize: 100 });
+                    const items = data.items || [];
+                    setOwners(items);
+                    if (items.length > 0 && !selectedOwnerId) {
+                        setSelectedOwnerId(items[0].id);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch owners", error);
+                }
+            };
+            fetchOwners();
+        }
+    }, [isAdmin]);
+
+    // Close dropdown on click outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowOwnerDropdown(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     useEffect(() => {
         const fetchHorses = async () => {
+            if (isAdmin && !selectedOwnerId) return;
+
             try {
-                const ownerId = user?.id || 4; // fallback to 4 since UserID 1 does not exist
+                const ownerId = isAdmin ? selectedOwnerId : (user?.id || 4); // fallback to 4 since UserID 1 does not exist
                 const response = await axios.get(`https://localhost:7179/api/horses/owner/${ownerId}`);
                 if (response.data?.data) {
                     const mappedHorses = response.data.data.map(h => {
@@ -192,7 +235,7 @@ function MyHorses() {
         };
 
         fetchHorses();
-    }, [user]);
+    }, [user, isAdmin, selectedOwnerId]);
 
     const healthFilters = ["All", "Excellent", "Good", "Fair", "Poor"];
 
@@ -210,7 +253,7 @@ function MyHorses() {
     const handleCreateHorse = async (horse) => {
         try {
             const payload = {
-                OwnerId: user?.id || 4, // fallback to 4 since UserID 1 does not exist in Owner_Profiles
+                OwnerId: horse.ownerId || user?.id || 4, // fallback to 4 since UserID 1 does not exist in Owner_Profiles
                 HorseName: horse.name,
                 Breed: horse.breed,
                 Age: horse.age,
@@ -284,19 +327,84 @@ function MyHorses() {
                     <p className="text-sm font-semibold text-yellow-600 uppercase tracking-widest mb-2">
                         Management
                     </p>
-                    <h1 className="text-5xl font-black text-zinc-900">My Horses</h1>
+                    <h1 className="text-5xl font-black text-zinc-900">{isAdmin ? "Owner's Horses" : "My Horses"}</h1>
                     <p className="text-zinc-500 mt-2 text-base">
-                        Manage and track your registered horses
+                        {isAdmin ? "Manage horses for the selected owner" : "Manage and track your registered horses"}
                     </p>
                 </div>
 
-                <button
-                    onClick={() => setOpenCreate(true)}
-                    className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5"
-                >
-                    <Plus size={18} />
-                    Add Horse
-                </button>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    {isAdmin && (() => {
+                        const filteredOwners = owners.filter(o => 
+                            (o.name || o.fullName || "").toLowerCase().includes(ownerSearch.toLowerCase()) ||
+                            (o.email || "").toLowerCase().includes(ownerSearch.toLowerCase())
+                        );
+                        const selectedOwner = owners.find(o => o.id == selectedOwnerId);
+
+                        return (
+                            <div className="relative min-w-[280px]" ref={dropdownRef}>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowOwnerDropdown(!showOwnerDropdown)}
+                                    className="w-full flex items-center justify-between bg-white border border-zinc-200 rounded-2xl pl-11 pr-5 py-3.5 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium hover:shadow-sm"
+                                >
+                                    <User size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                    <span className={`truncate text-left ${selectedOwner ? "text-zinc-800" : "text-zinc-400"}`}>
+                                        {selectedOwner ? `${selectedOwner.name || selectedOwner.fullName || "No Name"} (${selectedOwner.email})` : "Select Owner"}
+                                    </span>
+                                    <ChevronDown size={18} className="text-zinc-400 flex-shrink-0" />
+                                </button>
+
+                                {/* Dropdown Menu */}
+                                {showOwnerDropdown && (
+                                    <div className="absolute z-50 w-full mt-2 bg-white border border-zinc-200 rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[300px]">
+                                        <div className="p-3 border-b border-zinc-100 bg-white sticky top-0">
+                                            <div className="relative">
+                                                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="Search by name or email..." 
+                                                    className="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-9 pr-4 py-2 text-sm outline-none focus:border-yellow-400 transition-all"
+                                                    value={ownerSearch}
+                                                    onChange={e => setOwnerSearch(e.target.value)}
+                                                    autoFocus
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="overflow-y-auto">
+                                            {filteredOwners.length === 0 ? (
+                                                <div className="p-4 text-center text-zinc-500 text-sm">No owners found.</div>
+                                            ) : (
+                                                filteredOwners.map(o => (
+                                                    <div 
+                                                        key={o.id}
+                                                        onClick={() => {
+                                                            setSelectedOwnerId(o.id);
+                                                            setShowOwnerDropdown(false);
+                                                            setOwnerSearch("");
+                                                        }}
+                                                        className={`px-4 py-3 cursor-pointer hover:bg-zinc-50 flex flex-col border-b border-zinc-50 last:border-0 ${selectedOwnerId == o.id ? 'bg-yellow-50/50' : ''}`}
+                                                    >
+                                                        <span className="font-semibold text-zinc-800 text-sm">{o.name || o.fullName || "No Name"}</span>
+                                                        <span className="text-zinc-500 text-xs">{o.email}</span>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })()}
+
+                    <button
+                        onClick={() => setOpenCreate(true)}
+                        className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5 whitespace-nowrap"
+                    >
+                        <Plus size={18} />
+                        Add Horse
+                    </button>
+                </div>
             </div>
 
             {/* ── SUMMARY STATS ── */}
