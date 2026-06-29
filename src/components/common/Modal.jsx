@@ -12,7 +12,7 @@ function Modal({
 
     return (
         <div className="fixed inset-0 bg-zinc-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className={`bg-white rounded-3xl p-8 ${width} max-w-[100%] shadow-2xl border border-white/20 animate-in fade-in zoom-in-95 duration-200`}>
+            <div className={`bg-white rounded-3xl p-8 ${width} max-w-[100%] max-h-[90vh] overflow-y-auto shadow-2xl border border-white/20 animate-in fade-in zoom-in-95 duration-200`}>
                 <div className="flex items-center justify-between mb-8">
                     <h2 className="text-3xl font-black text-zinc-900 tracking-tight">
                         {title}
