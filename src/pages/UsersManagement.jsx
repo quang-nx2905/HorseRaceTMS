@@ -163,9 +163,16 @@ function UsersManagement() {
     const activeUsersCount = usersList.filter(u => u.status === "Active").length;
     const adminCount = usersList.filter(u => u.role === "Admin").length;
 
-    const handleCreateUser = (newUser) => {
-        setUsersList([newUser, ...usersList]);
-        toast.success("User created successfully!");
+    const handleCreateUser = async (newUser) => {
+        try {
+            const createdUser = await userApi.createUser(newUser);
+            setUsersList([createdUser, ...usersList]);
+            setTotalCount(prev => prev + 1);
+            toast.success("User created successfully!");
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to create user");
+            console.error(error);
+        }
     };
 
     const handleUpdateUser = async (updatedUser) => {

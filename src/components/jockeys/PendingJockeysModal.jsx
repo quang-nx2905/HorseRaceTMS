@@ -27,8 +27,14 @@ function PendingJockeysModal({ open, onClose, jockeys, onReview }) {
                             className="bg-white border border-zinc-200 hover:border-zinc-300 rounded-2xl p-4 flex items-center justify-between transition-all"
                         >
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-xl bg-amber-400 flex items-center justify-center font-black text-amber-950 text-sm">
-                                    {(jockey.user?.fullName || jockey.name || "J").charAt(0)}
+                                <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 border border-amber-200">
+                                    {jockey.avatar ? (
+                                        <img src={jockey.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center font-black text-amber-950 text-sm">
+                                            {(jockey.user?.fullName || jockey.name || "J").charAt(0)}
+                                        </div>
+                                    )}
                                 </div>
                                 <div>
                                     <h4 className="font-bold text-zinc-900 text-sm">
