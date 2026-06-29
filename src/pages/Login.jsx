@@ -45,7 +45,7 @@ function Login() {
             );
             if (response.data && response.data.accessToken) {
                 login(response.data.accessToken);
-                navigate("/", { replace: true });
+                navigate("/dashboard", { replace: true });
             } else {
                 setError("Login failed: Invalid response from server.");
             }
