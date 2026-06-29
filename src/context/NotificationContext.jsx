@@ -2,89 +2,100 @@ import {
     createContext,
     useContext,
     useState,
+    useEffect,
+    useCallback,
 } from "react";
+import { jockeyApi } from "../api/jockeyApi";
 
-const NotificationContext =
-    createContext();
+const NotificationContext = createContext();
 
-export function NotificationProvider({
-    children,
-}) {
+// ── Helpers ──────────────────────────────────────────────────────────────────
+const STORAGE_KEY = "hrtms_notifications";
 
-    const [notifications, setNotifications] =
-        useState([
+const loadFromStorage = (userId) => {
+    try {
+        const raw = localStorage.getItem(`${STORAGE_KEY}_${userId}`);
+        return raw ? JSON.parse(raw) : [];
+    } catch {
+        return [];
+    }
+};
 
-            {
-                id: 1,
-                title: "Race Completed",
-                message:
-                    "Thunder Bolt won the Spring Championship.",
-                time: "2 min ago",
-                unread: true,
-                type: "race",
-            },
+const saveToStorage = (userId, data) => {
+    try {
+        localStorage.setItem(`${STORAGE_KEY}_${userId}`, JSON.stringify(data));
+    } catch {
+        // ignore quota errors
+    }
+};
 
-            {
-                id: 2,
-                title: "AI Prediction Ready",
-                message:
-                    "New AI race prediction has been generated.",
-                time: "10 min ago",
-                unread: true,
-                type: "prediction",
-            },
+const formatTime = (date) => {
+    const now = new Date();
+    const diff = Math.floor((now - new Date(date)) / 1000);
+    if (diff < 60) return "Just now";
+    if (diff < 3600) return `${Math.floor(diff / 60)} min ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)} hour${Math.floor(diff / 3600) > 1 ? "s" : ""} ago`;
+    return new Date(date).toLocaleDateString("vi-VN");
+};
 
-            {
-                id: 3,
-                title: "Tournament Updated",
-                message:
-                    "Summer Cup registration is now open.",
-                time: "1 hour ago",
-                unread: false,
-                type: "tournament",
-            },
+// ── Provider ──────────────────────────────────────────────────────────────────
+export function NotificationProvider({ children, user }) {
+    const userId = user?.id ?? "guest";
+    const userRole = user?.role ?? "";
 
-        ]);
+    const [notifications, setNotifications] = useState(() =>
+        loadFromStorage(userId)
+    );
 
-    // UNREAD COUNT
-    const unreadCount =
-        notifications.filter(
-            (item) => item.unread
-        ).length;
+    // Persist whenever notifications change
+    useEffect(() => {
+        saveToStorage(userId, notifications);
+    }, [notifications, userId]);
 
-    // MARK AS READ (SINGLE)
+    // Re-load when user switches (login/logout)
+    useEffect(() => {
+        setNotifications(loadFromStorage(userId));
+    }, [userId]);
+
+    // ── ADD NOTIFICATION ─────────────────────────────────────────────────────
+    const addNotification = useCallback((notif) => {
+        const newItem = {
+            id: Date.now() + Math.random(),
+            unread: true,
+            time: formatTime(new Date()),
+            createdAt: new Date().toISOString(),
+            ...notif,
+        };
+        setNotifications((prev) => [newItem, ...prev]);
+    }, []);
+
+    // Polling is removed as Admin doesn't need to see notifications when a jockey submits a profile update.
+
+
+    // ── CRUD ACTIONS ─────────────────────────────────────────────────────────
+    const unreadCount = notifications.filter((item) => item.unread).length;
+
     const markAsRead = (id) => {
-        const updated = notifications.map((item) =>
-            item.id === id ? { ...item, unread: false } : item
+        setNotifications((prev) =>
+            prev.map((item) =>
+                item.id === id ? { ...item, unread: false } : item
+            )
         );
-        setNotifications(updated);
     };
 
-    // DELETE NOTIFICATION (SINGLE)
     const deleteNotification = (id) => {
-        const updated = notifications.filter((item) => item.id !== id);
-        setNotifications(updated);
+        setNotifications((prev) => prev.filter((item) => item.id !== id));
     };
 
-    // MARK ALL READ
     const markAllRead = () => {
-
-        const updated =
-            notifications.map((item) => ({
-                ...item,
-                unread: false,
-            }));
-
-        setNotifications(updated);
+        setNotifications((prev) => prev.map((item) => ({ ...item, unread: false })));
     };
 
-    // CLEAR
     const clearAll = () => {
         setNotifications([]);
     };
 
     return (
-
         <NotificationContext.Provider
             value={{
                 notifications,
@@ -94,18 +105,14 @@ export function NotificationProvider({
                 deleteNotification,
                 markAllRead,
                 clearAll,
+                addNotification,
             }}
         >
-
             {children}
-
         </NotificationContext.Provider>
-
     );
 }
 
 export function useNotifications() {
-    return useContext(
-        NotificationContext
-    );
-}
+    return useContext(NotificationContext);
+}

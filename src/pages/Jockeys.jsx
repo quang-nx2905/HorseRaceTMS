@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Plus,
     Search,
@@ -13,13 +13,19 @@ import {
     Medal,
     ChevronLeft,
     ChevronRight,
+    Loader2,
+    AlertTriangle,
 } from "lucide-react";
 
 import JockeyDetailsModal from "../components/jockeys/JockeyDetailsModal";
-import CreateJockeyModal  from "../components/jockeys/CreateJockeyModal";
 import EditJockeyModal    from "../components/jockeys/EditJockeyModal";
+import ReviewJockeyUpdateModal from "../components/jockeys/ReviewJockeyUpdateModal";
+import PendingJockeysModal from "../components/jockeys/PendingJockeysModal";
 import ConfirmModal       from "../components/common/ConfirmModal";
 import toast from "react-hot-toast";
+import { useAuth } from "../context/AuthContext";
+import { useNotifications } from "../context/NotificationContext";
+import { jockeyApi } from "../api/jockeyApi";
 
 // ── Config ──────────────────────────────────────────────
 const statusConfig = {
@@ -61,59 +67,102 @@ const countryFlags = {
     Australia:        "🇦🇺",
     Brazil:           "🇧🇷",
     Germany:          "🇩🇪",
+    Vietnam:          "🇻🇳",
+};
+
+const getJockeyStatus = (exp) => {
+    if (!exp) return "Amateur";
+    if (exp >= 8) return "Elite";
+    if (exp >= 4) return "Professional";
+    if (exp >= 1) return "Rising Star";
+    return "Amateur";
 };
 
 // ── JockeyCard ───────────────────────────────────────────
-function JockeyCard({ jockey, index, onView, onEdit, onDelete }) {
-    const status  = statusConfig[jockey.status] || statusConfig.Amateur;
+function JockeyCard({ jockey, index, onView, onEdit, onDelete, currentUser }) {
+    const jockeyName = jockey.user?.fullName || jockey.name || "Unknown";
+    const experienceText = jockey.experienceYear ? `${jockey.experienceYear} Years` : "No experience";
+    const statusVal = getJockeyStatus(jockey.experienceYear);
+    const status  = statusConfig[statusVal] || statusConfig.Amateur;
     const gradient = avatarColors[index % avatarColors.length];
-    const flag     = countryFlags[jockey.country] || "🌐";
+    
+    const countryName = jockey.user?.country || jockey.country || "Vietnam";
+    const flag     = countryFlags[countryName] || "🌐";
+    
+    // Fallback/Mock wins just for visual win rate bar (wins are not directly exposed as editable DTO field)
+    const wins = jockey.wins || 0;
     const maxWins  = 60;
-    const winPct   = Math.min((jockey.wins / maxWins) * 100, 100);
+    const winPct   = Math.min((wins / maxWins) * 100, 100);
+
+    const isPending = jockey.updateStatus === "Pending";
+    const canEdit = currentUser?.role === "Jockey" && Number(currentUser.id) === jockey.userId;
 
     return (
-        <div className="bg-white border border-zinc-200 rounded-3xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-5">
+        <div className="bg-white border border-zinc-200 rounded-3xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-5 relative">
+            {isPending && (
+                <div className="absolute -top-2.5 right-4 bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-amber-200 shadow-sm">
+                    Pending Approval
+                </div>
+            )}
 
             {/* Top row: avatar + status */}
             <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
                     {/* Avatar */}
-                    <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center text-white text-2xl font-black shadow-sm flex-shrink-0`}>
-                        {jockey.name.charAt(0)}
+                    <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm flex-shrink-0 bg-gradient-to-br bg-zinc-100 border border-zinc-200">
+                        {jockey.avatar ? (
+                            <img src={jockey.avatar} alt={jockeyName} className="w-full h-full object-cover" />
+                        ) : (
+                            <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white text-2xl font-black`}>
+                                {jockeyName.charAt(0)}
+                            </div>
+                        )}
                     </div>
                     <div>
                         <h3 className="font-black text-zinc-900 text-base leading-tight">
-                            {jockey.name}
+                            {jockeyName}
                         </h3>
                         <div className="flex items-center gap-1 mt-1 text-zinc-400 text-xs">
                             <MapPin size={11} />
-                            <span>{flag} {jockey.country}</span>
+                            <span>{flag} {countryName}</span>
                         </div>
                     </div>
                 </div>
 
                 <span className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ring-1 ${status.style}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
-                    {jockey.status}
+                    {statusVal}
                 </span>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-3">
                 <div className="bg-zinc-50 rounded-2xl p-3 text-center">
-                    <p className="text-2xl font-black text-yellow-500">{jockey.wins}</p>
+                    <p className="text-2xl font-black text-yellow-500">{wins}</p>
                     <p className="text-xs text-zinc-400 mt-0.5 font-medium">Total Wins</p>
                 </div>
                 <div className="bg-zinc-50 rounded-2xl p-3 text-center">
-                    <p className="text-2xl font-black text-zinc-900">{jockey.experience}</p>
-                    <p className="text-xs text-zinc-400 mt-0.5 font-medium">Experience</p>
+                    <p className="text-2xl font-black text-zinc-900">{jockey.experienceYear || 0}</p>
+                    <p className="text-xs text-zinc-400 mt-0.5 font-medium">Years Exp</p>
+                </div>
+            </div>
+
+            {/* Additional details */}
+            <div className="text-xs text-zinc-500 border-t border-zinc-100 pt-3 space-y-1">
+                <div className="flex justify-between">
+                    <span>Phone:</span>
+                    <span className="font-semibold text-zinc-700">{jockey.phone || "Not set"}</span>
+                </div>
+                <div className="flex justify-between">
+                    <span>Weight:</span>
+                    <span className="font-semibold text-zinc-700">{jockey.weight ? `${jockey.weight} kg` : "Not set"}</span>
                 </div>
             </div>
 
             {/* Win rate bar */}
             <div>
                 <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs text-zinc-400 font-medium">Win Rate</span>
+                    <span className="text-xs text-zinc-400 font-medium">Win Rate Visual</span>
                     <span className="text-xs font-bold text-zinc-700">{winPct.toFixed(0)}%</span>
                 </div>
                 <div className="w-full h-2 bg-zinc-100 rounded-full overflow-hidden">
@@ -130,84 +179,191 @@ function JockeyCard({ jockey, index, onView, onEdit, onDelete }) {
                     onClick={() => onView(jockey)}
                     className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-zinc-900 text-white hover:bg-zinc-700 transition-all text-xs font-bold"
                 >
-                    <Eye size={13} /> Profile
+                    <Eye size={13} /> View
                 </button>
-                <button
-                    onClick={() => onEdit(jockey)}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-yellow-400 text-black hover:bg-yellow-500 transition-all text-xs font-bold"
-                >
-                    <Pencil size={13} /> Edit
-                </button>
-                <button
-                    onClick={() => onDelete(jockey)}
-                    className="w-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-all"
-                >
-                    <Trash2 size={14} />
-                </button>
+                {canEdit && (
+                    <button
+                        onClick={() => onEdit(jockey)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-yellow-400 text-black hover:bg-yellow-500 transition-all text-xs font-bold"
+                    >
+                        <Pencil size={13} /> Edit
+                    </button>
+                )}
+                {currentUser?.role === "Admin" && (
+                    <button
+                        onClick={() => onDelete(jockey)}
+                        className="w-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-all"
+                    >
+                        <Trash2 size={14} />
+                    </button>
+                )}
             </div>
-
         </div>
     );
 }
 
 // ── Main Page ────────────────────────────────────────────
 function Jockeys() {
-    const [search,      setSearch]      = useState("");
+    const { user } = useAuth();
+    const { addNotification } = useNotifications();
+    const [jockeys, setJockeys] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [search, setSearch] = useState("");
     const [filterStatus, setFilterStatus] = useState("All");
     const [currentPage, setCurrentPage] = useState(1);
+    
+    // Modals visibility
     const [openDetails, setOpenDetails] = useState(false);
-    const [openCreate,  setOpenCreate]  = useState(false);
-    const [openEdit,    setOpenEdit]    = useState(false);
-    const [openDelete,  setOpenDelete]  = useState(false);
+    const [openEdit, setOpenEdit] = useState(false);
+    const [openDelete, setOpenDelete] = useState(false);
+    const [openPending, setOpenPending] = useState(false);
+    const [openReview, setOpenReview] = useState(false);
+
     const [selectedJockey, setSelectedJockey] = useState(null);
+    const [jockeyToReview, setJockeyToReview] = useState(null);
 
     const itemsPerPage = 8;
 
-    const [jockeys, setJockeys] = useState([
-        { id: 1, name: "James Carter",     country: "United Kingdom", wins: 48, experience: "8 Years",  status: "Elite"        },
-        { id: 2, name: "Ryan Cooper",       country: "United States",  wins: 36, experience: "5 Years",  status: "Professional" },
-        { id: 3, name: "Akira Sato",        country: "Japan",          wins: 52, experience: "10 Years", status: "Elite"        },
-        { id: 4, name: "Lucas Fernandez",   country: "Spain",          wins: 21, experience: "3 Years",  status: "Rising Star"  },
-        { id: 5, name: "Pierre Dupont",     country: "France",         wins: 44, experience: "7 Years",  status: "Professional" },
-        { id: 6, name: "Tom Bradley",       country: "Australia",      wins: 58, experience: "12 Years", status: "Elite"        },
-        { id: 7, name: "Carlos Mendez",     country: "Brazil",         wins: 15, experience: "2 Years",  status: "Rising Star"  },
-        { id: 8, name: "Max Schneider",     country: "Germany",        wins: 29, experience: "4 Years",  status: "Professional" },
-    ]);
+    const fetchJockeys = async (isBackground = false) => {
+        if (!isBackground) setIsLoading(true);
+        try {
+            const response = await jockeyApi.getJockeys();
+            setJockeys(response.data || []);
+        } catch (error) {
+            console.error("Failed to load jockeys:", error);
+            if (!isBackground) toast.error("Failed to load jockeys list.");
+        } finally {
+            if (!isBackground) setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchJockeys();
+
+        // Background polling every 15s to sync status updates
+        const interval = setInterval(() => {
+            fetchJockeys(true);
+        }, 15_000);
+
+        // Sync when user tabs back into the browser window
+        const handleFocus = () => {
+            fetchJockeys(true);
+        };
+        window.addEventListener("focus", handleFocus);
+
+        return () => {
+            clearInterval(interval);
+            window.removeEventListener("focus", handleFocus);
+        };
+    }, []);
 
     const statuses = ["All", "Elite", "Professional", "Rising Star", "Amateur"];
 
     const filtered = jockeys.filter((j) => {
-        const matchSearch  = j.name.toLowerCase().includes(search.toLowerCase()) ||
-                             j.country.toLowerCase().includes(search.toLowerCase());
-        const matchStatus  = filterStatus === "All" || j.status === filterStatus;
+        const nameStr = j.user?.fullName || j.name || "";
+        const countryStr = j.user?.country || j.country || "Vietnam";
+        const matchSearch  = nameStr.toLowerCase().includes(search.toLowerCase()) ||
+                             countryStr.toLowerCase().includes(search.toLowerCase());
+        const jockeyStatus = getJockeyStatus(j.experienceYear);
+        const matchStatus  = filterStatus === "All" || jockeyStatus === filterStatus;
         return matchSearch && matchStatus;
     });
 
     const totalPages       = Math.ceil(filtered.length / itemsPerPage);
     const paginated        = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-    const totalWins        = jockeys.reduce((s, j) => s + j.wins, 0);
-    const eliteCount       = jockeys.filter((j) => j.status === "Elite").length;
-    const topJockey        = [...jockeys].sort((a, b) => b.wins - a.wins)[0];
+    const totalWins        = jockeys.reduce((s, j) => s + (j.wins || 0), 0);
+    const eliteCount       = jockeys.filter((j) => getJockeyStatus(j.experienceYear) === "Elite").length;
+    
+    const sortedByWins = [...jockeys].sort((a, b) => (b.wins || 0) - (a.wins || 0));
+    const topJockey        = sortedByWins.length > 0 ? sortedByWins[0] : null;
 
-    const handleCreateJockey = (jockey) => {
-        setJockeys((prev) => [jockey, ...prev]);
-        toast.success("Jockey created successfully!");
+    const handleUpdateJockey = async (formData) => {
+        try {
+            await jockeyApi.requestUpdateJockey(selectedJockey.userId, formData);
+            toast.success("Profile update requested successfully! Pending Admin review.");
+            // Notify the jockey that their request was submitted
+            addNotification({
+                title: "Update Request Submitted",
+                message: "Your profile update request has been submitted and is pending Admin review.",
+                type: "jockey_update",
+            });
+            setOpenEdit(false);
+            fetchJockeys();
+        } catch (error) {
+            console.error("Failed to submit request:", error);
+            toast.error("Failed to submit update request.");
+        }
     };
 
-    const handleUpdateJockey = (updated) => {
-        setJockeys((prev) => prev.map((j) => (j.id === updated.id ? updated : j)));
-        toast.success("Jockey updated successfully!");
+    const handleReviewJockey = async (jockeyId, reviewData) => {
+        try {
+            const adminUserId = user?.id ? Number(user.id) : 0;
+            // Find jockey name for notification message
+            const reviewedJockey = jockeys.find((j) => j.userId === jockeyId);
+            const jockeyName = reviewedJockey?.user?.fullName || reviewedJockey?.name || "The jockey";
+
+            await jockeyApi.reviewJockeyRequest(jockeyId, {
+                ...reviewData,
+                reviewedBy: adminUserId
+            });
+
+            const actionLabel = reviewData.isApproved ? "Approved" : "Rejected";
+            toast.success(reviewData.isApproved ? "Approved profile update!" : "Rejected profile update.");
+
+            // Notify admin of their own action (so they have a record)
+            addNotification({
+                title: `Profile Update ${actionLabel}`,
+                message: `You have ${actionLabel.toLowerCase()} the profile update request from ${jockeyName}.`,
+                type: "jockey_review",
+            });
+
+            // Store notification for the jockey in their storage slot
+            if (reviewedJockey?.userId) {
+                const jockeyStorageKey = `hrtms_notifications_${reviewedJockey.userId}`;
+                try {
+                    const existing = JSON.parse(localStorage.getItem(jockeyStorageKey) || "[]");
+                    const jockeyNotif = {
+                        id: Date.now() + Math.random(),
+                        unread: true,
+                        time: "Just now",
+                        createdAt: new Date().toISOString(),
+                        title: reviewData.isApproved ? "Profile Update Approved ✅" : "Profile Update Rejected ❌",
+                        message: reviewData.isApproved
+                            ? "Your profile update request has been approved by Admin. Changes are now live!"
+                            : `Your profile update request was rejected by Admin.${reviewData.notes ? ` Note: ${reviewData.notes}` : ""}`,
+                        type: "jockey_review",
+                    };
+                    localStorage.setItem(jockeyStorageKey, JSON.stringify([jockeyNotif, ...existing]));
+                } catch {
+                    // ignore storage errors
+                }
+            }
+
+            setOpenReview(false);
+            fetchJockeys();
+        } catch (error) {
+            console.error("Failed to submit review:", error);
+            toast.error("Failed to review request.");
+        }
     };
 
     const handleDeleteJockey = () => {
-        setJockeys((prev) => prev.filter((j) => j.id !== selectedJockey.id));
+        toast.info("To delete a jockey, delete their user account in User Management.");
         setOpenDelete(false);
-        toast.success("Jockey deleted successfully!");
     };
 
-    return (
-        <div className="space-y-7">
+    const pendingJockeys = jockeys.filter((j) => j.updateStatus === "Pending");
 
+    if (isLoading) {
+        return (
+            <div className="flex h-[60vh] items-center justify-center">
+                <Loader2 size={32} className="animate-spin text-yellow-500" />
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-7 animate-in fade-in duration-300">
             {/* ── HEADER ── */}
             <div className="flex items-end justify-between">
                 <div>
@@ -219,23 +375,47 @@ function Jockeys() {
                         Professional jockey management and performance overview
                     </p>
                 </div>
-                <button
-                    onClick={() => setOpenCreate(true)}
-                    className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5"
-                >
-                    <Plus size={18} />
-                    Add Jockey
-                </button>
+                
+                {user?.role === "Admin" && (
+                    <button
+                        onClick={() => toast.info("To register a new jockey, create a user with the Jockey role in User Management.")}
+                        className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5"
+                    >
+                        <Plus size={18} />
+                        Add Jockey
+                    </button>
+                )}
             </div>
 
+            {/* ── ADMIN REVIEW BANNER ── */}
+            {user?.role === "Admin" && pendingJockeys.length > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-3xl p-6 flex items-center justify-between shadow-sm">
+                    <div className="flex items-start gap-3">
+                        <AlertTriangle className="text-amber-500 mt-0.5 flex-shrink-0" size={20} />
+                        <div>
+                            <h3 className="font-bold text-amber-900">Pending Jockey Profile Updates</h3>
+                            <p className="text-amber-700 text-sm mt-0.5">
+                                There are {pendingJockeys.length} profile update requests waiting for approval.
+                            </p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => setOpenPending(true)}
+                        className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-amber-500/20"
+                    >
+                        Review Applications
+                    </button>
+                </div>
+            )}
+
             {/* ── SUMMARY STATS ── */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
                     { label: "Total Jockeys", value: jockeys.length,  icon: Users,      color: "bg-yellow-400",  iconColor: "text-yellow-900" },
                     { label: "Total Wins",    value: totalWins,        icon: Trophy,     color: "bg-emerald-400", iconColor: "text-emerald-900" },
                     { label: "Elite Jockeys", value: eliteCount,       icon: Star,       color: "bg-violet-400",  iconColor: "text-violet-900" },
                 ].map(({ label, value, icon: Icon, color, iconColor }) => (
-                    <div key={label} className="bg-white border border-zinc-200 rounded-2xl p-5 flex items-center gap-4">
+                    <div key={label} className="bg-white border border-zinc-200 rounded-2xl p-5 flex items-center gap-4 shadow-sm">
                         <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
                             <Icon size={20} className={iconColor} />
                         </div>
@@ -249,25 +429,34 @@ function Jockeys() {
 
             {/* ── TOP JOCKEY BANNER ── */}
             {topJockey && (
-                <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-3xl p-6 flex items-center justify-between overflow-hidden relative">
+                <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-3xl p-6 flex items-center justify-between overflow-hidden relative shadow-sm">
                     <div className="absolute right-0 top-0 w-64 h-full opacity-5"
                         style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "20px 20px" }}
                     />
                     <div className="flex items-center gap-5 relative z-10">
-                        <div className="w-14 h-14 rounded-2xl bg-yellow-400 flex items-center justify-center text-2xl font-black text-black">
-                            {topJockey.name.charAt(0)}
+                        <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 bg-white border-2 border-yellow-400">
+                            {topJockey.avatar ? (
+                                <img src={topJockey.avatar} alt={topJockey.user?.fullName} className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full bg-yellow-400 flex items-center justify-center text-2xl font-black text-black">
+                                    {(topJockey.user?.fullName || topJockey.name || "J").charAt(0)}
+                                </div>
+                            )}
                         </div>
                         <div>
                             <div className="flex items-center gap-2 mb-1">
                                 <Medal size={14} className="text-yellow-400" />
                                 <span className="text-yellow-400 text-xs font-bold uppercase tracking-wider">Top Performer</span>
                             </div>
-                            <p className="text-white font-black text-xl">{topJockey.name}</p>
-                            <p className="text-zinc-400 text-sm">{countryFlags[topJockey.country]} {topJockey.country} · {topJockey.experience}</p>
+                            <p className="text-white font-black text-xl">{topJockey.user?.fullName || topJockey.name}</p>
+                            <p className="text-zinc-400 text-sm">
+                                {countryFlags[topJockey.user?.country || topJockey.country || "Vietnam"] || "🌐"}{" "}
+                                {topJockey.user?.country || topJockey.country || "Vietnam"} · {topJockey.experienceYear || 0} Years Exp
+                            </p>
                         </div>
                     </div>
                     <div className="text-right relative z-10">
-                        <p className="text-yellow-400 text-4xl font-black">{topJockey.wins}</p>
+                        <p className="text-yellow-400 text-4xl font-black">{topJockey.wins || 0}</p>
                         <p className="text-zinc-400 text-sm">Total Wins</p>
                     </div>
                 </div>
@@ -282,7 +471,7 @@ function Jockeys() {
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
                         placeholder="Search by name or country..."
-                        className="w-full pl-11 pr-4 py-3 bg-white border border-zinc-200 rounded-2xl outline-none text-sm focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all"
+                        className="w-full pl-11 pr-4 py-3 bg-white border border-zinc-200 rounded-2xl outline-none text-sm focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium"
                     />
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
@@ -321,9 +510,10 @@ function Jockeys() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
                     {paginated.map((jockey, idx) => (
                         <JockeyCard
-                            key={jockey.id ?? idx}
+                            key={jockey.userId ?? idx}
                             jockey={jockey}
                             index={idx}
+                            currentUser={user}
                             onView={(j)   => { setSelectedJockey(j); setOpenDetails(true); }}
                             onEdit={(j)   => { setSelectedJockey(j); setOpenEdit(true);    }}
                             onDelete={(j) => { setSelectedJockey(j); setOpenDelete(true);  }}
@@ -373,17 +563,14 @@ function Jockeys() {
                 onClose={() => setOpenDetails(false)}
                 jockey={selectedJockey}
             />
-            <CreateJockeyModal
-                open={openCreate}
-                onClose={() => setOpenCreate(false)}
-                onCreate={handleCreateJockey}
-            />
+
             <EditJockeyModal
                 open={openEdit}
                 onClose={() => setOpenEdit(false)}
                 jockey={selectedJockey}
                 onUpdate={handleUpdateJockey}
             />
+
             <ConfirmModal
                 open={openDelete}
                 onClose={() => setOpenDelete(false)}
@@ -392,6 +579,23 @@ function Jockeys() {
                 message="Are you sure you want to delete this jockey?"
             />
 
+            {/* Admin review modals */}
+            <PendingJockeysModal
+                open={openPending}
+                onClose={() => setOpenPending(false)}
+                jockeys={pendingJockeys}
+                onReview={(j) => {
+                    setJockeyToReview(j);
+                    setOpenReview(true);
+                }}
+            />
+
+            <ReviewJockeyUpdateModal
+                open={openReview}
+                onClose={() => setOpenReview(false)}
+                jockey={jockeyToReview}
+                onReview={handleReviewJockey}
+            />
         </div>
     );
 }

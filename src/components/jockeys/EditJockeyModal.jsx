@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { User, Phone, Image, Scale, Briefcase, AlertTriangle } from "lucide-react";
 import Modal from "../common/Modal";
 
 function EditJockeyModal({
@@ -7,131 +8,161 @@ function EditJockeyModal({
     jockey,
     onUpdate,
 }) {
-
-    const [formData, setFormData] =
-        useState({
-            name: "",
-            country: "",
-            wins: "",
-            experience: "",
-            status: "",
-        });
+    const [formData, setFormData] = useState({
+        phone: "",
+        avatar: "",
+        weight: "",
+        experienceYear: "",
+    });
 
     useEffect(() => {
-
         if (jockey) {
-
-            setFormData(jockey);
-
+            setFormData({
+                phone: jockey.phone || "",
+                avatar: jockey.avatar || "",
+                weight: jockey.weight || "",
+                experienceYear: jockey.experienceYear || "",
+            });
         }
-
     }, [jockey]);
 
     const handleSubmit = (e) => {
-
         e.preventDefault();
-
-        onUpdate(formData);
-
-        onClose();
-
+        onUpdate({
+            phone: formData.phone || null,
+            avatar: formData.avatar || null,
+            weight: formData.weight ? Number(formData.weight) : null,
+            experienceYear: formData.experienceYear !== "" ? Number(formData.experienceYear) : null,
+        });
     };
 
     if (!jockey) return null;
 
-    return (
+    const isPending = jockey.updateStatus === "Pending";
 
+    return (
         <Modal
             open={open}
             onClose={onClose}
-            title="Edit Jockey"
+            title="Edit Jockey Profile"
+            width="w-[600px]"
         >
+            <p className="text-zinc-500 mb-6 -mt-6">
+                Update your jockey information. Changes will be submitted for Admin review before they are officially applied.
+            </p>
 
-            <form
-                onSubmit={handleSubmit}
-                className="space-y-4"
-            >
+            {isPending && (
+                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3">
+                    <AlertTriangle className="text-amber-500 flex-shrink-0 mt-0.5" size={18} />
+                    <div>
+                        <p className="text-xs font-bold text-amber-900 uppercase tracking-wide">Pending Request Active</p>
+                        <p className="text-xs text-amber-700 mt-0.5">
+                            You already have an active profile update request. Submitting this form will replace your pending request.
+                        </p>
+                    </div>
+                </div>
+            )}
 
-                <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) =>
-                        setFormData({
-                            ...formData,
-                            name: e.target.value,
-                        })
-                    }
-                    className="w-full border rounded-xl p-3"
-                />
+            <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Read-only Jockey Summary */}
+                <div className="bg-zinc-50 rounded-2xl p-4 flex items-center gap-4 border border-zinc-200/60 mb-2">
+                    <div className="w-12 h-12 rounded-xl bg-zinc-900 flex items-center justify-center text-white text-xl font-black">
+                        {(jockey.user?.fullName || jockey.name || "J").charAt(0)}
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-zinc-900 text-sm">{jockey.user?.fullName || jockey.name}</h4>
+                        <p className="text-xs text-zinc-400 font-medium">{jockey.user?.email || "No Email"}</p>
+                    </div>
+                </div>
 
-                <input
-                    type="text"
-                    value={formData.country}
-                    onChange={(e) =>
-                        setFormData({
-                            ...formData,
-                            country: e.target.value,
-                        })
-                    }
-                    className="w-full border rounded-xl p-3"
-                />
+                {/* Phone */}
+                <div>
+                    <label className="block mb-1.5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Phone Number</label>
+                    <div className="relative">
+                        <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                        <input
+                            type="text"
+                            maxLength={20}
+                            value={formData.phone}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            placeholder="Enter phone number"
+                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-11 pr-4 py-3 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium text-sm"
+                        />
+                    </div>
+                </div>
 
-                <input
-                    type="number"
-                    value={formData.wins}
-                    onChange={(e) =>
-                        setFormData({
-                            ...formData,
-                            wins: e.target.value,
-                        })
-                    }
-                    className="w-full border rounded-xl p-3"
-                />
+                {/* Avatar URL */}
+                <div>
+                    <label className="block mb-1.5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Avatar Image URL</label>
+                    <div className="relative">
+                        <Image size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                        <input
+                            type="url"
+                            maxLength={255}
+                            value={formData.avatar}
+                            onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
+                            placeholder="Enter avatar image URL"
+                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-11 pr-4 py-3 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium text-sm"
+                        />
+                    </div>
+                </div>
 
-                <input
-                    type="text"
-                    value={formData.experience}
-                    onChange={(e) =>
-                        setFormData({
-                            ...formData,
-                            experience: e.target.value,
-                        })
-                    }
-                    className="w-full border rounded-xl p-3"
-                />
+                <div className="grid grid-cols-2 gap-4">
+                    {/* Weight */}
+                    <div>
+                        <label className="block mb-1.5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Weight (kg)</label>
+                        <div className="relative">
+                            <Scale size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                            <input
+                                required
+                                type="number"
+                                min={30}
+                                max={150}
+                                step="0.1"
+                                value={formData.weight}
+                                onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+                                placeholder="Weight in kg"
+                                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-11 pr-4 py-3 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium text-sm"
+                            />
+                        </div>
+                    </div>
 
-                <select
-                    value={formData.status}
-                    onChange={(e) =>
-                        setFormData({
-                            ...formData,
-                            status: e.target.value,
-                        })
-                    }
-                    className="w-full border rounded-xl p-3"
-                >
-                    <option>Elite</option>
-                    <option>Professional</option>
-                    <option>Rising Star</option>
-                </select>
+                    {/* Experience Year */}
+                    <div>
+                        <label className="block mb-1.5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Experience (years)</label>
+                        <div className="relative">
+                            <Briefcase size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                            <input
+                                required
+                                type="number"
+                                min={0}
+                                max={60}
+                                value={formData.experienceYear}
+                                onChange={(e) => setFormData({ ...formData, experienceYear: e.target.value })}
+                                placeholder="Years of experience"
+                                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-11 pr-4 py-3 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium text-sm"
+                            />
+                        </div>
+                    </div>
+                </div>
 
-                <button
-                    type="submit"
-                    className="
-            w-full
-            bg-yellow-400
-            py-3
-            rounded-xl
-            font-semibold
-          "
-                >
-                    Update
-                </button>
-
+                <div className="flex justify-end gap-3 pt-4 border-t border-zinc-100">
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        className="px-5 py-2.5 rounded-xl bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 transition-all font-bold text-sm"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-amber-950 font-bold transition-all text-sm shadow-sm hover:shadow hover:shadow-yellow-400/20"
+                    >
+                        Submit Request
+                    </button>
+                </div>
             </form>
-
         </Modal>
-
     );
 }
 
