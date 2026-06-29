@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import { useState, useEffect, useMemo } from "react";
+import { useAuth } from "../context/AuthContext";
 
 import CreateTournamentModal from "../components/modals/CreateTournamentModal";
 import TournamentDetailsDrawer from "../components/tournaments/TournamentDetailsDrawer";
@@ -89,6 +90,7 @@ function StatusBadge({ status }) {
 }
 
 function Tournaments() {
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [openModal, setOpenModal] = useState(false);
@@ -287,14 +289,16 @@ function Tournaments() {
             </div>
 
             <div className="flex flex-col sm:flex-row lg:flex-col gap-4">
-              <button
-                onClick={() => setOpenModal(true)}
-                id="create-tournament-btn"
-                className="group inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-zinc-950 rounded-2xl font-bold transition-all shadow-lg shadow-amber-500/25 hover:shadow-amber-400/40 hover:scale-[1.02]"
-              >
-                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
-                Create Tournament
-              </button>
+              {user?.role === "Admin" && (
+                <button
+                  onClick={() => setOpenModal(true)}
+                  id="create-tournament-btn"
+                  className="group inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-zinc-950 rounded-2xl font-bold transition-all shadow-lg shadow-amber-500/25 hover:shadow-amber-400/40 hover:scale-[1.02]"
+                >
+                  <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" />
+                  Create Tournament
+                </button>
+              )}
 
               <div className="flex items-center gap-5 px-5 py-3 bg-white/5 border border-white/10 rounded-2xl">
                 <div className="text-center">
