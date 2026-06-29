@@ -44,3 +44,10 @@ export const resetPasswordApi = async (data) => {
   const response = await api.post("/auth/reset-password", data);
   return response.data;
 };
+
+export const refreshTokenApi = async () => {
+  const response = await api.post("/auth/refresh-token", {}, {
+    withCredentials: true
+  });
+  return response.data;
+};
