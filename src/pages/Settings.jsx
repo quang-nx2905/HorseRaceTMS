@@ -103,7 +103,7 @@ function Settings() {
                 if (data.message) {
                     errorMsg = data.message;
                 } else if (data.errors) {
-                    // Trích xuất lỗi đầu tiên từ object errors của DataAnnotations
+                    // Extract the first error from DataAnnotations errors object
                     const firstErrorKey = Object.keys(data.errors)[0];
                     errorMsg = data.errors[firstErrorKey][0];
                 } else if (data.title) {

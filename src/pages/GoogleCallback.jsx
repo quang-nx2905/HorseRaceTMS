@@ -4,11 +4,11 @@ import { getGoogleCallbackToken } from "../api/authApi";
 import { useAuth } from "../context/AuthContext";
 
 /**
- * Trang này được load sau khi backend hoàn tất Google OAuth
- * và redirect về: /auth/callback?token=<accessToken>
+ * This page is loaded after backend completes Google OAuth
+ * and redirects to: /auth/callback?token=<accessToken>
  *
- * Nó đọc token từ URL, lưu vào localStorage rồi điều hướng về dashboard.
- * Nếu không tìm thấy token (URL sai / lỗi), hiện thông báo lỗi.
+ * It reads the token from the URL, saves it to context, and navigates to the dashboard.
+ * If no token is found (URL is incorrect / error), it displays an error message.
  */
 function GoogleCallback() {
     const navigate = useNavigate();
@@ -24,12 +24,12 @@ function GoogleCallback() {
         const token = getGoogleCallbackToken();
 
         if (token) {
-            // Lưu token và parse user qua context
+            // Save token and parse user via context
             login(token);
-            // Chuyển về trang chủ
+            // Navigate to dashboard
             navigate("/dashboard", { replace: true });
         } else {
-            setError("Đăng nhập Google thất bại. Không nhận được token từ server.");
+            setError("Google login failed. Did not receive token from server.");
         }
     }, [navigate, login]);
 
@@ -44,14 +44,14 @@ function GoogleCallback() {
                         </svg>
                     </div>
                     <div>
-                        <h1 className="text-white font-bold text-xl mb-2">Đăng nhập thất bại</h1>
+                        <h1 className="text-white font-bold text-xl mb-2">Login Failed</h1>
                         <p className="text-zinc-400 text-sm leading-6">{error}</p>
                     </div>
                     <button
                         onClick={() => navigate("/login", { replace: true })}
                         className="w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-3 rounded-2xl transition-all duration-200 text-sm"
                     >
-                        Quay về trang đăng nhập
+                        Return to Login
                     </button>
                 </div>
             </div>
@@ -63,7 +63,7 @@ function GoogleCallback() {
             <div className="text-center space-y-4">
                 {/* Spinner */}
                 <div className="w-12 h-12 border-4 border-yellow-400/20 border-t-yellow-400 rounded-full animate-spin mx-auto" />
-                <p className="text-zinc-400 text-sm font-medium">Đang xác thực tài khoản Google...</p>
+                <p className="text-zinc-400 text-sm font-medium">Authenticating Google account...</p>
             </div>
         </div>
     );
