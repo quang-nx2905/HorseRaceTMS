@@ -172,6 +172,7 @@ function UsersManagement() {
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to create user");
             console.error(error);
+            throw error;
         }
     };
 
@@ -192,6 +193,7 @@ function UsersManagement() {
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to update user");
             console.error(error);
+            throw error;
         }
     };
 

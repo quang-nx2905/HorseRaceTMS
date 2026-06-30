@@ -25,6 +25,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "../context/AuthContext";
 
 import CreateTournamentModal from "../components/modals/CreateTournamentModal";
+import tournamentApi from "../api/tournamentApi";
 import TournamentDetailsDrawer from "../components/tournaments/TournamentDetailsDrawer";
 import TournamentCardSkeleton from "../components/skeletons/TournamentCardSkeleton";
 import Pagination from "../components/common/Pagination";
@@ -101,112 +102,40 @@ function Tournaments() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 1800);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
     setCurrentPage(1);
   }, [search, filter]);
 
-  const [tournaments, setTournaments] = useState([
-    {
-      id: 1,
-      name: "Golden Derby Championship",
-      location: "Tokyo Arena",
-      date: "12 Jun 2026",
-      prize: "$250,000",
-      status: "Live",
-      participants: 32,
-      audience: "18.2K",
-      revenue: "$1.4M",
-      featured: true,
-    },
-    {
-      id: 2,
-      name: "Royal Horse Cup",
-      location: "London Stadium",
-      date: "20 Jun 2026",
-      prize: "$180,000",
-      status: "Upcoming",
-      participants: 24,
-      audience: "12.5K",
-      revenue: "$0.9M",
-      featured: false,
-    },
-    {
-      id: 3,
-      name: "Thunder Racing League",
-      location: "New York Track",
-      date: "02 Jul 2026",
-      prize: "$320,000",
-      status: "Completed",
-      participants: 40,
-      audience: "24.1K",
-      revenue: "$2.1M",
-      featured: false,
-    },
-    {
-      id: 4,
-      name: "Equine Masters",
-      location: "Dubai Racing Club",
-      date: "18 Jul 2026",
-      prize: "$500,000",
-      status: "Upcoming",
-      participants: 48,
-      audience: "30K",
-      revenue: "$3.2M",
-      featured: false,
-    },
-    {
-      id: 5,
-      name: "Spring Derby",
-      location: "Sydney",
-      date: "28 Jul 2026",
-      prize: "$120,000",
-      status: "Upcoming",
-      participants: 16,
-      audience: "9.8K",
-      revenue: "$0.7M",
-      featured: false,
-    },
-    {
-      id: 6,
-      name: "Autumn Cup",
-      location: "Paris",
-      date: "03 Aug 2026",
-      prize: "$210,000",
-      status: "Live",
-      participants: 28,
-      audience: "15.6K",
-      revenue: "$1.2M",
-      featured: false,
-    },
-    {
-      id: 7,
-      name: "World Racing Championship",
-      location: "Singapore",
-      date: "11 Aug 2026",
-      prize: "$650,000",
-      status: "Upcoming",
-      participants: 56,
-      audience: "42K",
-      revenue: "$4.5M",
-      featured: false,
-    },
-    {
-      id: 8,
-      name: "Thunder Cup",
-      location: "Berlin",
-      date: "20 Aug 2026",
-      prize: "$175,000",
-      status: "Completed",
-      participants: 22,
-      audience: "11.3K",
-      revenue: "$0.8M",
-      featured: false,
-    },
-  ]);
+  const [tournaments, setTournaments] = useState([]);
+
+  useEffect(() => {
+    const fetchTournaments = async () => {
+      try {
+        setLoading(true);
+        const res = await tournamentApi.getAll({ page: 1, pageSize: 100 });
+        const items = res.data?.items || res.items || (res.data && res.data.data && res.data.data.items) || [];
+        
+        const mapped = items.map(t => ({
+          id: t.tourId,
+          name: t.tourName,
+          location: t.location || "Unknown",
+          date: t.startDate ? new Date(t.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "TBA",
+          endDate: t.endDate ? new Date(t.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "TBA",
+          prize: t.prizePool ? `$${t.prizePool.toLocaleString()}` : "$0",
+          status: t.status || "Upcoming",
+          participants: 0,
+          featured: false,
+        }));
+        
+        setTournaments(mapped);
+      } catch (err) {
+        console.error("Failed to fetch tournaments", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTournaments();
+  }, []);
 
   const filteredTournaments = useMemo(() => {
     return tournaments.filter((item) => {
@@ -496,7 +425,7 @@ function Tournaments() {
                     </div>
                     <div className="flex items-center gap-2 px-3 py-2 bg-zinc-50 border border-zinc-100 rounded-xl text-xs font-semibold text-zinc-600">
                       <Users className="w-3.5 h-3.5 text-zinc-400" />
-                      {tournament.participants} Entries
+                      {tournament.participants} Participants
                     </div>
                     <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-xl text-xs font-bold text-amber-700">
                       <Trophy className="w-3.5 h-3.5 text-amber-500" />
@@ -507,15 +436,14 @@ function Tournaments() {
                   {/* Mini stats */}
                   <div className="grid grid-cols-2 gap-3 mb-6 p-4 bg-zinc-50/80 rounded-2xl border border-zinc-100">
                     <div>
-                      <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider mb-0.5">Audience</p>
-                      <p className="text-base font-black text-zinc-800 flex items-baseline gap-1">
-                        {tournament.audience}
-                        <TrendingUp className="w-3 h-3 text-emerald-500" />
+                      <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider mb-0.5">Start Date</p>
+                      <p className="text-sm font-bold text-zinc-800 truncate">
+                        {tournament.date}
                       </p>
                     </div>
                     <div>
-                      <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider mb-0.5">Revenue</p>
-                      <p className="text-base font-black text-zinc-800">{tournament.revenue}</p>
+                      <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider mb-0.5">End Date</p>
+                      <p className="text-sm font-bold text-zinc-800 truncate">{tournament.endDate}</p>
                     </div>
                   </div>
 

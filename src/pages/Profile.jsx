@@ -71,13 +71,20 @@ function Profile() {
             await axiosClient.put("/Profile/Me", {
                 fullName: profile.name,
                 email: profile.email,
-                phone: profile.phone,
+                phone: profile.phone || null,
                 avatarUrl: profile.avatarUrl
             });
             toast.success("Profile updated successfully!");
         } catch (error) {
             console.error("Failed to update profile:", error);
-            toast.error("Failed to update profile.");
+            let errorMessage = "Failed to update profile.";
+            if (error.response?.data?.message) {
+                errorMessage = error.response.data.message;
+            } else if (error.response?.data?.errors) {
+                const firstErrorKey = Object.keys(error.response.data.errors)[0];
+                errorMessage = error.response.data.errors[firstErrorKey][0];
+            }
+            toast.error(errorMessage);
         } finally {
             setIsSaving(false);
         }

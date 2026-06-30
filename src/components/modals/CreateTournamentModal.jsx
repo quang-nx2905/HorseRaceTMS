@@ -25,6 +25,7 @@ function CreateTournamentModal({ open, onClose }) {
 
     const [availableHorses, setAvailableHorses] = useState([]);
     const [availableJockeys, setAvailableJockeys] = useState([]);
+    const [availableReferees, setAvailableReferees] = useState([]);
 
     useEffect(() => {
         if (open) {
@@ -49,6 +50,9 @@ function CreateTournamentModal({ open, onClose }) {
                     
                     const jockeysResponse = await userApi.getUsers({ role: 'Jockey', page: 1, pageSize: 100 });
                     setAvailableJockeys(jockeysResponse.items || jockeysResponse.data?.items || []);
+
+                    const refereesResponse = await userApi.getUsers({ role: 'Referee', page: 1, pageSize: 100 });
+                    setAvailableReferees(refereesResponse.items || refereesResponse.data?.items || []);
                 } catch (error) {
                     toast.error("Failed to load horses and jockeys");
                 }
@@ -65,6 +69,7 @@ function CreateTournamentModal({ open, onClose }) {
             name: `Round ${i + 1}`,
             dateTime: "",
             distance: "",
+            refereeIds: [],
             participants: Array.from({ length: basicInfo.lanesPerRace }, (_, j) => ({
                 lane: j + 1,
                 horseId: "",
@@ -99,7 +104,7 @@ function CreateTournamentModal({ open, onClose }) {
 
         for (let i = 0; i < races.length; i++) {
             const race = races[i];
-            if (!race.name || !race.dateTime || !race.distance) {
+            if (!race.name || !race.dateTime || !race.distance || !race.refereeIds || race.refereeIds.length === 0) {
                 isValid = false;
                 break;
             }
@@ -138,6 +143,7 @@ function CreateTournamentModal({ open, onClose }) {
                 RaceName: r.name,
                 RaceDateTime: r.dateTime,
                 Distance: parseFloat(r.distance || 0),
+                RefereeIds: r.refereeIds.map(id => parseInt(id)),
                 Participants: r.participants.map(p => ({
                     LaneNumber: p.lane,
                     HorseId: parseInt(p.horseId),
@@ -164,6 +170,17 @@ function CreateTournamentModal({ open, onClose }) {
     const updateParticipant = (raceIndex, pIndex, field, value) => {
         const newRaces = [...races];
         newRaces[raceIndex].participants[pIndex][field] = value;
+        setRaces(newRaces);
+    };
+
+    const toggleReferee = (raceIndex, refereeId) => {
+        const newRaces = [...races];
+        const currentReferees = newRaces[raceIndex].refereeIds || [];
+        if (currentReferees.includes(refereeId)) {
+            newRaces[raceIndex].refereeIds = currentReferees.filter(id => id !== refereeId);
+        } else {
+            newRaces[raceIndex].refereeIds = [...currentReferees, refereeId];
+        }
         setRaces(newRaces);
     };
 
@@ -225,6 +242,7 @@ function CreateTournamentModal({ open, onClose }) {
                             <input
                                 type="date"
                                 value={basicInfo.startDate}
+                                min={new Date().toISOString().split('T')[0]}
                                 onChange={e => setBasicInfo({ ...basicInfo, startDate: e.target.value })}
                                 className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-3.5 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium text-zinc-700"
                             />
@@ -238,6 +256,7 @@ function CreateTournamentModal({ open, onClose }) {
                             <input
                                 type="date"
                                 value={basicInfo.endDate}
+                                min={basicInfo.startDate}
                                 onChange={e => setBasicInfo({ ...basicInfo, endDate: e.target.value })}
                                 className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-3.5 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium text-zinc-700"
                             />
@@ -386,6 +405,33 @@ function CreateTournamentModal({ open, onClose }) {
                             {/* Participants Configuration */}
                             <div>
                                 <h4 className="font-bold text-zinc-800 mb-4 flex items-center gap-2">
+                                    <Users size={18} className="text-zinc-500" /> Referees Assignment
+                                </h4>
+                                <div className="bg-zinc-50 rounded-2xl border border-zinc-100 mb-6 max-h-60 overflow-y-auto">
+                                    {availableReferees.length === 0 ? (
+                                        <p className="text-sm text-zinc-500 p-4">No referees available.</p>
+                                    ) : (
+                                        <div className="flex flex-col divide-y divide-zinc-100">
+                                            {availableReferees.map(ref => {
+                                                const refId = ref.id || ref.userId;
+                                                const refName = ref.name || ref.fullName || `Referee #${refId}`;
+                                                const isSelected = (activeRace.refereeIds || []).includes(refId.toString());
+                                                return (
+                                                    <label key={refId} className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all hover:bg-zinc-100/50 ${isSelected ? 'bg-amber-50/50' : 'bg-white'}`}>
+                                                        <input 
+                                                            type="checkbox" 
+                                                            className="accent-amber-500 w-4 h-4 rounded border-zinc-300 focus:ring-amber-400"
+                                                            checked={isSelected}
+                                                            onChange={() => toggleReferee(activeRaceIndex, refId.toString())}
+                                                        />
+                                                        <span className={`font-medium text-sm ${isSelected ? 'text-amber-900 font-semibold' : 'text-zinc-700'}`}>{refName}</span>
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                                <h4 className="font-bold text-zinc-800 mb-4 flex items-center gap-2">
                                     <Users size={18} className="text-zinc-500" /> Lane Assignments (Pairs)
                                 </h4>
                                 <div className="space-y-3">
@@ -487,15 +533,36 @@ function CreateTournamentModal({ open, onClose }) {
                     You are about to create <strong>{basicInfo.name}</strong> with <strong>{races.length} races</strong> and a total of <strong>{races.length * basicInfo.lanesPerRace} participants</strong>.
                 </p>
 
-                <div className="bg-zinc-50 rounded-2xl p-6 text-left mb-10 max-h-64 overflow-y-auto border border-zinc-100 text-sm font-mono text-zinc-600">
-                    // Payload Preview
-                    <br />
-                    {JSON.stringify({
-                        TourName: basicInfo.name,
-                        StartDate: basicInfo.startDate,
-                        PrizePool: basicInfo.prizePool,
-                        RacesCount: races.length
-                    }, null, 2)}
+                <div className="bg-zinc-50 rounded-3xl p-6 md:p-8 text-left mb-10 border border-zinc-100">
+                    <h4 className="font-bold text-zinc-800 mb-6 flex items-center gap-2 border-b border-zinc-200 pb-4">
+                        <Trophy size={20} className="text-amber-500" /> Tournament Summary
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+                        <div>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><Trophy size={14}/> Name</p>
+                            <p className="font-black text-zinc-900 truncate" title={basicInfo.name}>{basicInfo.name}</p>
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><DollarSign size={14}/> Prize Pool</p>
+                            <p className="font-black text-emerald-600">${basicInfo.prizePool || "0"}</p>
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><MapPin size={14}/> Location</p>
+                            <p className="font-bold text-zinc-800 truncate">{basicInfo.location || "N/A"}</p>
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><Calendar size={14}/> Start Date</p>
+                            <p className="font-bold text-zinc-800">{basicInfo.startDate || "N/A"}</p>
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><Calendar size={14}/> End Date</p>
+                            <p className="font-bold text-zinc-800">{basicInfo.endDate || "N/A"}</p>
+                        </div>
+                        <div>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><Flag size={14}/> Total Races</p>
+                            <p className="font-bold text-zinc-800">{races.length}</p>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="flex gap-4 justify-center">
