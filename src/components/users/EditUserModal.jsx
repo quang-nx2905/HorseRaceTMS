@@ -9,7 +9,6 @@ function EditUserModal({ open, onClose, onSave, user }) {
         role: "User",
         status: "Active",
         phone: "",
-        weight: "",
         experienceYear: "",
         expYears: "",
         totalPoints: "",
@@ -24,7 +23,6 @@ function EditUserModal({ open, onClose, onSave, user }) {
                 role: user.role === "User" ? "Spectator" : user.role,
                 status: user.status || "Active",
                 phone: user.phone || "",
-                weight: user.weight || "",
                 experienceYear: user.experienceYear || user.expYears || "",
                 expYears: user.expYears || user.experienceYear || "",
                 totalPoints: user.totalPoints || "",
@@ -108,14 +106,7 @@ function EditUserModal({ open, onClose, onSave, user }) {
 
                 {formData.role === "Jockey" && (
                     <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block mb-2 font-semibold text-zinc-700">Weight (kg)</label>
-                            <div className="relative">
-                                <Scale size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                                <input type="number" step="0.1" value={formData.weight} onChange={(e) => setFormData({ ...formData, weight: e.target.value })} className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium" />
-                            </div>
-                        </div>
-                        <div>
+                        <div className="col-span-2">
                             <label className="block mb-2 font-semibold text-zinc-700">Experience (Years)</label>
                             <div className="relative">
                                 <Clock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
