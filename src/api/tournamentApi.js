@@ -2,12 +2,8 @@ import axiosClient from "./axiosClient";
 
 const tournamentApi = {
 
-  getAll() {
-
-    return axiosClient.get(
-      "/tournaments"
-    );
-
+  getAll(params) {
+    return axiosClient.get("/tournaments", { params });
   },
 
   getById(id) {

@@ -63,6 +63,7 @@ function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", f
             onClose();
         } catch (error) {
             console.error(error);
+            setError(error.response?.data?.message || error.message || "Failed to create user.");
         } finally {
             setIsSubmitting(false);
         }

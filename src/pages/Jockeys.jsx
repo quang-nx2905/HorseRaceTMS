@@ -301,6 +301,7 @@ function Jockeys() {
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to create jockey");
             console.error(error);
+            throw error;
         }
     };
 

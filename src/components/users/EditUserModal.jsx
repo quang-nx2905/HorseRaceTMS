@@ -14,6 +14,8 @@ function EditUserModal({ open, onClose, onSave, user }) {
         totalPoints: "",
         removeAvatar: false,
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         if (user) {
@@ -28,16 +30,26 @@ function EditUserModal({ open, onClose, onSave, user }) {
                 totalPoints: user.totalPoints || "",
                 removeAvatar: false,
             });
+            setError("");
         }
     }, [user]);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSave({
-            ...user,
-            ...formData,
-        });
-        onClose();
+        setError("");
+        setIsSubmitting(true);
+        try {
+            await onSave({
+                ...user,
+                ...formData,
+            });
+            onClose();
+        } catch (err) {
+            console.error(err);
+            setError(err.response?.data?.message || err.message || "Failed to save changes.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -135,9 +147,17 @@ function EditUserModal({ open, onClose, onSave, user }) {
                         </div>
                     </div>
                 )}
+                {error && (
+                    <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-medium mt-4">
+                        {error}
+                    </div>
+                )}
+
                 <div className="flex justify-end gap-4 mt-8">
-                    <button type="button" onClick={onClose} className="px-6 py-3.5 rounded-xl bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 transition-all font-bold">Cancel</button>
-                    <button type="submit" className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-amber-950 transition-all font-bold shadow-lg shadow-yellow-500/30 hover:shadow-yellow-500/40 hover:-translate-y-0.5">Save Changes</button>
+                    <button type="button" disabled={isSubmitting} onClick={onClose} className="px-6 py-3.5 rounded-xl bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 transition-all font-bold disabled:opacity-50">Cancel</button>
+                    <button type="submit" disabled={isSubmitting} className="px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white transition-all font-bold shadow-lg shadow-blue-500/30 hover:shadow-blue-500/40 hover:-translate-y-0.5 disabled:opacity-50">
+                        {isSubmitting ? "Saving..." : "Save Changes"}
+                    </button>
                 </div>
             </form>
         </Modal>
