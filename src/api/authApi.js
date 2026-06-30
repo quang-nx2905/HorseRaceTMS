@@ -1,9 +1,9 @@
 import api from "./axios";
 
 /**
- * Redirect trình duyệt sang backend để bắt đầu Google OAuth flow.
- * Backend sẽ redirect tới Google, sau đó Google redirect về /auth/callback
- * kèm theo query param ?token=<accessToken>
+ * Redirect browser to backend to start Google OAuth flow.
+ * Backend will redirect to Google, then Google redirects back to /auth/callback
+ * with query param ?token=<accessToken>
  */
 export const loginWithGoogle = () => {
   const apiBaseUrl =
@@ -12,8 +12,8 @@ export const loginWithGoogle = () => {
 };
 
 /**
- * Đọc token từ URL query string sau khi backend redirect về.
- * Trả về accessToken nếu có, ngược lại trả null.
+ * Read token from URL query string after backend redirects back.
+ * Returns accessToken if present, otherwise returns null.
  */
 export const getGoogleCallbackToken = () => {
   const params = new URLSearchParams(window.location.search);

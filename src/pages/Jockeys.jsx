@@ -16,6 +16,7 @@ import {
     Loader2,
     AlertTriangle,
     ClipboardEdit,
+    Unlock,
 } from "lucide-react";
 
 import JockeyDetailsModal from "../components/jockeys/JockeyDetailsModal";
@@ -29,6 +30,7 @@ import { useNotifications } from "../context/NotificationContext";
 import { jockeyApi } from "../api/jockeyApi";
 import { userApi } from "../api/userApi";
 import CreateUserModal from "../components/users/CreateUserModal";
+import EditUserModal from "../components/users/EditUserModal";
 
 // ── Config ──────────────────────────────────────────────
 const statusConfig = {
@@ -82,7 +84,7 @@ const getJockeyStatus = (exp) => {
 };
 
 // ── JockeyCard ───────────────────────────────────────────
-function JockeyCard({ jockey, index, onView, onEdit, onDelete, onReview, currentUser }) {
+function JockeyCard({ jockey, index, onView, onEdit, onAdminEdit, onDelete, onReview, currentUser }) {
     const jockeyName = jockey.user?.fullName || jockey.name || "Unknown";
     const experienceText = jockey.experienceYear ? `${jockey.experienceYear} Years` : "No experience";
     const statusVal = getJockeyStatus(jockey.experienceYear);
@@ -98,9 +100,10 @@ function JockeyCard({ jockey, index, onView, onEdit, onDelete, onReview, current
     const winPct   = Math.min((wins / maxWins) * 100, 100);
 
     const isPending = jockey.updateStatus === "Pending";
+    const isActive = jockey.user ? jockey.user.isActive : true;
 
     return (
-        <div className="bg-white border border-zinc-200 rounded-3xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-5 relative">
+        <div className={`border rounded-3xl p-6 transition-all duration-300 flex flex-col gap-5 relative ${isActive ? 'bg-white border-zinc-200 hover:shadow-xl hover:-translate-y-1' : 'border-red-100 bg-red-50/30 opacity-90'}`}>
             {isPending && (
                 <div className="absolute -top-2.5 right-4 bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-amber-200 shadow-sm">
                     Pending Approval
@@ -121,7 +124,7 @@ function JockeyCard({ jockey, index, onView, onEdit, onDelete, onReview, current
                         )}
                     </div>
                     <div>
-                        <h3 className="font-black text-zinc-900 text-base leading-tight">
+                        <h3 className={`font-black text-base leading-tight ${isActive ? 'text-zinc-900' : 'text-zinc-500 line-through decoration-zinc-300'}`}>
                             {jockeyName}
                         </h3>
                         <div className="flex items-center gap-1 mt-1 text-zinc-400 text-xs">
@@ -193,10 +196,22 @@ function JockeyCard({ jockey, index, onView, onEdit, onDelete, onReview, current
                 )}
                 {currentUser?.role === "Admin" && (
                     <button
-                        onClick={() => onDelete(jockey)}
-                        className="w-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-all"
+                        onClick={() => onAdminEdit(jockey)}
+                        className="w-10 flex items-center justify-center rounded-xl transition-all bg-yellow-50 text-yellow-600 hover:bg-yellow-100"
+                        title="Edit Jockey"
                     >
-                        <Trash2 size={14} />
+                        <Pencil size={14} />
+                    </button>
+                )}
+                {currentUser?.role === "Admin" && (
+                    <button
+                        onClick={() => onDelete(jockey)}
+                        className={`w-10 flex items-center justify-center rounded-xl transition-all ${
+                            isActive ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100'
+                        }`}
+                        title={isActive ? "Deactivate Jockey" : "Reactivate Jockey"}
+                    >
+                        {isActive ? <Trash2 size={14} /> : <Unlock size={14} />}
                     </button>
                 )}
             </div>
@@ -221,6 +236,7 @@ function Jockeys() {
     const [openPending, setOpenPending] = useState(false);
     const [openReview, setOpenReview] = useState(false);
     const [openCreate, setOpenCreate] = useState(false);
+    const [openAdminEdit, setOpenAdminEdit] = useState(false);
 
     const [selectedJockey, setSelectedJockey] = useState(null);
     const [jockeyToReview, setJockeyToReview] = useState(null);
@@ -362,9 +378,47 @@ function Jockeys() {
         }
     };
 
-    const handleDeleteJockey = () => {
-        toast.info("To delete a jockey, delete their user account in User Management.");
-        setOpenDelete(false);
+    const handleDeleteJockey = async () => {
+        if (!selectedJockey) return;
+
+        const targetUserId = selectedJockey.user?.id || selectedJockey.userId || selectedJockey.id;
+        if (!targetUserId) {
+            toast.error("User ID not found for this jockey.");
+            setOpenDelete(false);
+            return;
+        }
+
+        try {
+            await userApi.toggleUserStatus(targetUserId);
+            const isNowActive = selectedJockey.user?.isActive === false;
+            
+            // Manually update local state for immediate feedback
+            setJockeys((prev) =>
+                prev.map((j) => {
+                    const jUserId = j.user?.id || j.userId || j.id;
+                    if (jUserId === targetUserId) {
+                        return {
+                            ...j,
+                            user: {
+                                ...j.user,
+                                isActive: isNowActive
+                            }
+                        };
+                    }
+                    return j;
+                })
+            );
+
+            toast.success(`Jockey account has been ${isNowActive ? "reactivated" : "deactivated"} successfully!`);
+            
+            // Optionally fetch in background to sync
+            fetchJockeys(true);
+        } catch (error) {
+            toast.error("Failed to update jockey status");
+        } finally {
+            setOpenDelete(false);
+            setSelectedJockey(null);
+        }
     };
 
     const pendingJockeys = jockeys.filter((j) => j.updateStatus === "Pending");
@@ -550,6 +604,7 @@ function Jockeys() {
                             currentUser={user}
                             onView={(j)   => { setSelectedJockey(j); setOpenDetails(true); }}
                             onEdit={(j)   => { setSelectedJockey(j); setOpenEdit(true);    }}
+                            onAdminEdit={(j) => { setSelectedJockey(j); setOpenAdminEdit(true); }}
                             onDelete={(j) => { setSelectedJockey(j); setOpenDelete(true);  }}
                             onReview={(j) => { setJockeyToReview(j); setOpenReview(true);  }}
                         />
@@ -610,8 +665,14 @@ function Jockeys() {
                 open={openDelete}
                 onClose={() => setOpenDelete(false)}
                 onConfirm={handleDeleteJockey}
-                title="Delete Jockey"
-                message="Are you sure you want to delete this jockey?"
+                title={selectedJockey?.user?.isActive === false ? "Reactivate Jockey Account" : "Deactivate Jockey Account"}
+                message={
+                    selectedJockey?.user?.isActive === false
+                        ? `Are you sure you want to reactivate ${selectedJockey?.user?.fullName || selectedJockey?.name}? They will be able to log in again.`
+                        : `Are you sure you want to deactivate ${selectedJockey?.user?.fullName || selectedJockey?.name}? They will no longer be able to log in.`
+                }
+                confirmLabel={selectedJockey?.user?.isActive === false ? "Restore Account" : "Deactivate"}
+                confirmVariant={selectedJockey?.user?.isActive === false ? "success" : "danger"}
             />
 
             {/* Admin review modals */}
@@ -638,6 +699,43 @@ function Jockeys() {
                 onCreate={handleCreateJockey}
                 initialRole="Jockey"
                 fixedRole={true}
+            />
+
+            <EditUserModal
+                open={openAdminEdit}
+                onClose={() => setOpenAdminEdit(false)}
+                user={selectedJockey ? {
+                    id: selectedJockey.userId || selectedJockey.user?.id,
+                    name: selectedJockey.user?.fullName || selectedJockey.name,
+                    email: selectedJockey.user?.email,
+                    role: "Jockey",
+                    status: selectedJockey.user?.isActive === false ? "Inactive" : "Active",
+                    phone: selectedJockey.phone,
+                    weight: selectedJockey.weight,
+                    experienceYear: selectedJockey.experienceYear,
+                    avatar: selectedJockey.avatar
+                } : null}
+                onSave={async (updatedUser) => {
+                    try {
+                        await userApi.updateUser(updatedUser.id, {
+                            fullName: updatedUser.name,
+                            email: updatedUser.email,
+                            role: updatedUser.role,
+                            phone: updatedUser.phone,
+                            weight: updatedUser.weight ? parseFloat(updatedUser.weight) : null,
+                            experienceYear: updatedUser.experienceYear ? parseInt(updatedUser.experienceYear) : null,
+                            expYears: updatedUser.expYears ? parseInt(updatedUser.expYears) : null,
+                            totalPoints: updatedUser.totalPoints ? parseInt(updatedUser.totalPoints) : null,
+                            removeAvatar: updatedUser.removeAvatar || false
+                        });
+                        toast.success("Jockey profile updated successfully!");
+                        setOpenAdminEdit(false);
+                        fetchJockeys();
+                    } catch (error) {
+                        toast.error(error.response?.data?.message || "Failed to update jockey");
+                        console.error(error);
+                    }
+                }}
             />
         </div>
     );

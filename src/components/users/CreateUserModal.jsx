@@ -14,6 +14,7 @@ function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", f
         totalPoints: "",
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState("");
 
     const roleStyles = {
         Admin: { color: "purple", focus: "focus:border-purple-400 focus:ring-purple-400/10", button: "from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 shadow-purple-500/30" },
@@ -27,6 +28,42 @@ function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", f
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError("");
+
+        if (!formData.name.trim() || !formData.email.trim() || !formData.phone?.trim()) {
+            setError("Please fill in all basic fields (Full Name, Email, Phone).");
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            setError("Invalid email format.");
+            return;
+        }
+
+        const phoneRegex = /^[0-9]{10,11}$/;
+        if (!phoneRegex.test(formData.phone)) {
+            setError("Invalid phone number (10-11 digits required).");
+            return;
+        }
+
+        if (formData.role === "Jockey") {
+            if (!formData.weight || !formData.experienceYear) {
+                setError("Please enter weight and experience for Jockey.");
+                return;
+            }
+        } else if (formData.role === "Referee") {
+            if (!formData.expYears) {
+                setError("Please enter experience years for Referee.");
+                return;
+            }
+        } else if (formData.role === "Spectator") {
+            if (!formData.totalPoints) {
+                setError("Please enter total points for Spectator.");
+                return;
+            }
+        }
+
         setIsSubmitting(true);
         try {
             await onCreate({
@@ -69,7 +106,7 @@ function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", f
                     <label className="block mb-2 font-semibold text-zinc-700">Role</label>
                     <div className="relative">
                         <ShieldAlert size={18} className={`absolute left-4 top-1/2 -translate-y-1/2 text-${currentStyle.color}-500`} />
-                        <select disabled={isSubmitting || fixedRole} value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} className={`w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none transition-all font-bold appearance-none text-${currentStyle.color}-700 ${currentStyle.focus} ${fixedRole ? "opacity-75 cursor-not-allowed" : ""}`}>
+                        <select disabled={isSubmitting || fixedRole} value={formData.role} onChange={(e) => { setFormData({ ...formData, role: e.target.value }); setError(""); }} className={`w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none transition-all font-bold appearance-none text-${currentStyle.color}-700 ${currentStyle.focus} ${fixedRole ? "opacity-75 cursor-not-allowed" : ""}`}>
                             <option value="Spectator">Spectator</option>
                             <option value="Admin">Admin</option>
                             <option value="Referee">Referee</option>
@@ -123,6 +160,12 @@ function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", f
                             <Star size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
                             <input disabled={isSubmitting} type="number" value={formData.totalPoints} onChange={(e) => setFormData({ ...formData, totalPoints: e.target.value })} className={`w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none transition-all font-medium ${currentStyle.focus}`} />
                         </div>
+                    </div>
+                )}
+                
+                {error && (
+                    <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-medium">
+                        {error}
                     </div>
                 )}
                 

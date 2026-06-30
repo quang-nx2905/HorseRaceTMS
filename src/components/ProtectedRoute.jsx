@@ -4,17 +4,17 @@ import { useAuth } from "../context/AuthContext";
 export function ProtectedRoute({ children, allowedRoles }) {
   const { user } = useAuth();
 
-  // ĐỌC THÊM TOKEN TỪ LOCALSTORAGE
+  // READ TOKEN FROM LOCALSTORAGE
   const token = localStorage.getItem("token");
 
-  // Nếu cả biến hệ thống (user) và token trong trình duyệt đều không có -> Mới bắt đăng nhập
+  // If both system variable (user) and browser token are missing -> Force login
   if (!user && !token) {
     return <Navigate to="/login" replace />;
   }
 
-  // Phân quyền Role (nếu route có yêu cầu role cụ thể)
+  // Role authorization (if route requires a specific role)
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-    // Nếu không có quyền, đẩy về dashboard (hoặc trang 403)
+    // If no permission, redirect to dashboard (or 403 page)
     return <Navigate to="/dashboard" replace />;
   }
 
