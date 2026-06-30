@@ -2,11 +2,11 @@ import { useState } from "react";
 import { User, Mail, ShieldAlert, Phone, Scale, Clock, Star } from "lucide-react";
 import Modal from "../common/Modal";
 
-function CreateUserModal({ open, onClose, onCreate }) {
+function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", fixedRole = false }) {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
-        role: "Spectator",
+        role: initialRole,
         phone: "",
         weight: "",
         experienceYear: "",
@@ -39,7 +39,7 @@ function CreateUserModal({ open, onClose, onCreate }) {
                 expYears: formData.expYears ? parseInt(formData.expYears) : null,
                 totalPoints: formData.totalPoints ? parseInt(formData.totalPoints) : null,
             });
-            setFormData({ name: "", email: "", role: "Spectator", phone: "", weight: "", experienceYear: "", expYears: "", totalPoints: "" });
+            setFormData({ name: "", email: "", role: initialRole, phone: "", weight: "", experienceYear: "", expYears: "", totalPoints: "" });
             onClose();
         } catch (error) {
             console.error(error);
@@ -69,7 +69,7 @@ function CreateUserModal({ open, onClose, onCreate }) {
                     <label className="block mb-2 font-semibold text-zinc-700">Role</label>
                     <div className="relative">
                         <ShieldAlert size={18} className={`absolute left-4 top-1/2 -translate-y-1/2 text-${currentStyle.color}-500`} />
-                        <select disabled={isSubmitting} value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} className={`w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none transition-all font-bold appearance-none text-${currentStyle.color}-700 ${currentStyle.focus}`}>
+                        <select disabled={isSubmitting || fixedRole} value={formData.role} onChange={(e) => setFormData({ ...formData, role: e.target.value })} className={`w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none transition-all font-bold appearance-none text-${currentStyle.color}-700 ${currentStyle.focus} ${fixedRole ? "opacity-75 cursor-not-allowed" : ""}`}>
                             <option value="Spectator">Spectator</option>
                             <option value="Admin">Admin</option>
                             <option value="Referee">Referee</option>
