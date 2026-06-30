@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { User, Phone, Image, Scale, Briefcase, AlertTriangle } from "lucide-react";
 import Modal from "../common/Modal";
+import ImageUpload from "../common/ImageUpload";
 
 function EditJockeyModal({
     open,
@@ -66,8 +67,14 @@ function EditJockeyModal({
             <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Read-only Jockey Summary */}
                 <div className="bg-zinc-50 rounded-2xl p-4 flex items-center gap-4 border border-zinc-200/60 mb-2">
-                    <div className="w-12 h-12 rounded-xl bg-zinc-900 flex items-center justify-center text-white text-xl font-black">
-                        {(jockey.user?.fullName || jockey.name || "J").charAt(0)}
+                    <div className="w-12 h-12 rounded-xl overflow-hidden shadow-sm flex-shrink-0 border border-zinc-200">
+                        {formData.avatar || jockey.avatar ? (
+                            <img src={formData.avatar || jockey.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center text-amber-950 text-xl font-black">
+                                {(jockey.user?.fullName || jockey.name || "J").charAt(0)}
+                            </div>
+                        )}
                     </div>
                     <div>
                         <h4 className="font-bold text-zinc-900 text-sm">{jockey.user?.fullName || jockey.name}</h4>
@@ -91,20 +98,13 @@ function EditJockeyModal({
                     </div>
                 </div>
 
-                {/* Avatar URL */}
+                {/* Avatar Image Upload */}
                 <div>
-                    <label className="block mb-1.5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Avatar Image URL</label>
-                    <div className="relative">
-                        <Image size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                        <input
-                            type="url"
-                            maxLength={255}
-                            value={formData.avatar}
-                            onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
-                            placeholder="Enter avatar image URL"
-                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-11 pr-4 py-3 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium text-sm"
-                        />
-                    </div>
+                    <label className="block mb-1.5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Avatar Image</label>
+                    <ImageUpload 
+                        value={formData.avatar}
+                        onChange={(url) => setFormData({ ...formData, avatar: url || "" })}
+                    />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">

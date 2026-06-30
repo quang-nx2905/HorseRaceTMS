@@ -12,7 +12,11 @@ axiosClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      if (config.headers && typeof config.headers.set === 'function') {
+        config.headers.set("Authorization", `Bearer ${token}`);
+      } else {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   }
@@ -62,8 +66,17 @@ axiosClient.interceptors.response.use(
         const { accessToken } = response.data;
         
         localStorage.setItem("token", accessToken);
-        axiosClient.defaults.headers.common['Authorization'] = 'Bearer ' + accessToken;
-        originalRequest.headers['Authorization'] = 'Bearer ' + accessToken;
+        if (axiosClient.defaults.headers.common && typeof axiosClient.defaults.headers.common.set === 'function') {
+            axiosClient.defaults.headers.common.set('Authorization', 'Bearer ' + accessToken);
+        } else {
+            axiosClient.defaults.headers.common['Authorization'] = 'Bearer ' + accessToken;
+        }
+
+        if (originalRequest.headers && typeof originalRequest.headers.set === 'function') {
+            originalRequest.headers.set('Authorization', 'Bearer ' + accessToken);
+        } else {
+            originalRequest.headers['Authorization'] = 'Bearer ' + accessToken;
+        }
         
         processQueue(null, accessToken);
         return axiosClient(originalRequest);

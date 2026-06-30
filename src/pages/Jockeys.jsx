@@ -15,6 +15,7 @@ import {
     ChevronRight,
     Loader2,
     AlertTriangle,
+    ClipboardEdit,
 } from "lucide-react";
 
 import JockeyDetailsModal from "../components/jockeys/JockeyDetailsModal";
@@ -79,7 +80,7 @@ const getJockeyStatus = (exp) => {
 };
 
 // ── JockeyCard ───────────────────────────────────────────
-function JockeyCard({ jockey, index, onView, onEdit, onDelete, currentUser }) {
+function JockeyCard({ jockey, index, onView, onEdit, onDelete, onReview, currentUser }) {
     const jockeyName = jockey.user?.fullName || jockey.name || "Unknown";
     const experienceText = jockey.experienceYear ? `${jockey.experienceYear} Years` : "No experience";
     const statusVal = getJockeyStatus(jockey.experienceYear);
@@ -95,7 +96,6 @@ function JockeyCard({ jockey, index, onView, onEdit, onDelete, currentUser }) {
     const winPct   = Math.min((wins / maxWins) * 100, 100);
 
     const isPending = jockey.updateStatus === "Pending";
-    const canEdit = currentUser?.role === "Jockey" && Number(currentUser.id) === jockey.userId;
 
     return (
         <div className="bg-white border border-zinc-200 rounded-3xl p-6 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col gap-5 relative">
@@ -181,12 +181,12 @@ function JockeyCard({ jockey, index, onView, onEdit, onDelete, currentUser }) {
                 >
                     <Eye size={13} /> View
                 </button>
-                {canEdit && (
+                {currentUser?.role === "Admin" && isPending && (
                     <button
-                        onClick={() => onEdit(jockey)}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-yellow-400 text-black hover:bg-yellow-500 transition-all text-xs font-bold"
+                        onClick={() => onReview(jockey)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-amber-500 text-white hover:bg-amber-600 transition-all text-xs font-bold"
                     >
-                        <Pencil size={13} /> Edit
+                        <ClipboardEdit size={13} /> Review Edit
                     </button>
                 )}
                 {currentUser?.role === "Admin" && (
@@ -376,15 +376,34 @@ function Jockeys() {
                     </p>
                 </div>
                 
-                {user?.role === "Admin" && (
-                    <button
-                        onClick={() => toast.info("To register a new jockey, create a user with the Jockey role in User Management.")}
-                        className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5"
-                    >
-                        <Plus size={18} />
-                        Add Jockey
-                    </button>
-                )}
+                <div className="flex items-center gap-3">
+                    {user?.role === "Jockey" && (
+                        <button
+                            onClick={() => {
+                                const myCard = jockeys.find((j) => Number(j.userId) === Number(user?.id));
+                                if (myCard) {
+                                    setSelectedJockey(myCard);
+                                    setOpenEdit(true);
+                                } else {
+                                    toast.error("Your jockey profile could not be found.");
+                                }
+                            }}
+                            className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5"
+                        >
+                            <Pencil size={18} />
+                            Edit My Profile
+                        </button>
+                    )}
+                    {user?.role === "Admin" && (
+                        <button
+                            onClick={() => toast.info("To register a new jockey, create a user with the Jockey role in User Management.")}
+                            className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5"
+                        >
+                            <Plus size={18} />
+                            Add Jockey
+                        </button>
+                    )}
+                </div>
             </div>
 
             {/* ── ADMIN REVIEW BANNER ── */}
@@ -517,6 +536,7 @@ function Jockeys() {
                             onView={(j)   => { setSelectedJockey(j); setOpenDetails(true); }}
                             onEdit={(j)   => { setSelectedJockey(j); setOpenEdit(true);    }}
                             onDelete={(j) => { setSelectedJockey(j); setOpenDelete(true);  }}
+                            onReview={(j) => { setJockeyToReview(j); setOpenReview(true);  }}
                         />
                     ))}
                 </div>

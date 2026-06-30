@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { UploadCloud, X, Loader2, Image as ImageIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import axiosClient from "../../api/axiosClient";
@@ -8,6 +8,10 @@ export default function ImageUpload({ value, onChange, className = "" }) {
     const [preview, setPreview] = useState(value || null);
     const [isDragging, setIsDragging] = useState(false);
     const fileInputRef = useRef(null);
+
+    useEffect(() => {
+        setPreview(value || null);
+    }, [value]);
 
     const handleUpload = async (file) => {
         if (!file) return;

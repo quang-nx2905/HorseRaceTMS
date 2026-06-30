@@ -60,9 +60,9 @@ function ReviewJockeyUpdateModal({ open, onClose, jockey, onReview }) {
                                     {jockey.avatar ? (
                                         <img src={jockey.avatar} alt="Current Avatar" className="w-full h-full object-cover" />
                                     ) : (
-                                        <span className="text-lg font-black text-zinc-400">
+                                        <div className="w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center font-black text-amber-950 text-xl">
                                             {(jockey.user?.fullName || jockey.name || "J").charAt(0)}
-                                        </span>
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -114,9 +114,9 @@ function ReviewJockeyUpdateModal({ open, onClose, jockey, onReview }) {
                                     ) : jockey.avatar ? (
                                         <img src={jockey.avatar} alt="Existing Avatar" className="w-full h-full object-cover opacity-60" />
                                     ) : (
-                                        <span className="text-lg font-black text-zinc-400">
+                                        <div className="w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center font-black text-amber-950 text-xl">
                                             {(jockey.user?.fullName || jockey.name || "J").charAt(0)}
-                                        </span>
+                                        </div>
                                     )}
                                 </div>
                                 {jockey.pendingAvatar && jockey.pendingAvatar !== jockey.avatar && (
