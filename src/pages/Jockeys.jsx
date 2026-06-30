@@ -27,6 +27,8 @@ import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import { useNotifications } from "../context/NotificationContext";
 import { jockeyApi } from "../api/jockeyApi";
+import { userApi } from "../api/userApi";
+import CreateUserModal from "../components/users/CreateUserModal";
 
 // ── Config ──────────────────────────────────────────────
 const statusConfig = {
@@ -218,6 +220,7 @@ function Jockeys() {
     const [openDelete, setOpenDelete] = useState(false);
     const [openPending, setOpenPending] = useState(false);
     const [openReview, setOpenReview] = useState(false);
+    const [openCreate, setOpenCreate] = useState(false);
 
     const [selectedJockey, setSelectedJockey] = useState(null);
     const [jockeyToReview, setJockeyToReview] = useState(null);
@@ -276,6 +279,18 @@ function Jockeys() {
     
     const sortedByWins = [...jockeys].sort((a, b) => (b.wins || 0) - (a.wins || 0));
     const topJockey        = sortedByWins.length > 0 ? sortedByWins[0] : null;
+
+    const handleCreateJockey = async (newUser) => {
+        try {
+            await userApi.createUser(newUser);
+            toast.success("Jockey created successfully!");
+            setOpenCreate(false);
+            fetchJockeys();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to create jockey");
+            console.error(error);
+        }
+    };
 
     const handleUpdateJockey = async (formData) => {
         try {
@@ -396,7 +411,7 @@ function Jockeys() {
                     )}
                     {user?.role === "Admin" && (
                         <button
-                            onClick={() => toast.info("To register a new jockey, create a user with the Jockey role in User Management.")}
+                            onClick={() => setOpenCreate(true)}
                             className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5"
                         >
                             <Plus size={18} />
@@ -615,6 +630,14 @@ function Jockeys() {
                 onClose={() => setOpenReview(false)}
                 jockey={jockeyToReview}
                 onReview={handleReviewJockey}
+            />
+
+            <CreateUserModal
+                open={openCreate}
+                onClose={() => setOpenCreate(false)}
+                onCreate={handleCreateJockey}
+                initialRole="Jockey"
+                fixedRole={true}
             />
         </div>
     );
