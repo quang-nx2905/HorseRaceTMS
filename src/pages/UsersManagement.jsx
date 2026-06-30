@@ -182,7 +182,6 @@ function UsersManagement() {
                 email: updatedUser.email,
                 role: updatedUser.role,
                 phone: updatedUser.phone,
-                weight: updatedUser.weight ? parseFloat(updatedUser.weight) : null,
                 experienceYear: updatedUser.experienceYear ? parseInt(updatedUser.experienceYear) : null,
                 expYears: updatedUser.expYears ? parseInt(updatedUser.expYears) : null,
                 totalPoints: updatedUser.totalPoints ? parseInt(updatedUser.totalPoints) : null,

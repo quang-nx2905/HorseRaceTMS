@@ -66,13 +66,6 @@ function JockeyDetailsModal({
                         <span className="text-sm font-semibold text-zinc-800">{jockey.phone || "Not set"}</span>
                     </div>
 
-                    <div className="flex justify-between items-center py-2 border-b border-zinc-100">
-                        <span className="text-xs text-zinc-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                            <Scale size={13} /> Weight
-                        </span>
-                        <span className="text-sm font-semibold text-zinc-800">{jockey.weight ? `${jockey.weight} kg` : "Not set"}</span>
-                    </div>
-
                     <div className="flex justify-between items-center py-2">
                         <span className="text-xs text-zinc-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
                             <Briefcase size={13} /> Experience

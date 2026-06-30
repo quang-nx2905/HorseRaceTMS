@@ -76,15 +76,6 @@ function ReviewJockeyUpdateModal({ open, onClose, jockey, onReview }) {
                                 </p>
                             </div>
 
-                            {/* Weight */}
-                            <div className="space-y-1">
-                                <label className="text-xs text-zinc-400 font-bold uppercase tracking-wider block">Weight</label>
-                                <p className="font-semibold text-zinc-800 text-sm flex items-center gap-1.5">
-                                    <Scale size={14} className="text-zinc-400" />
-                                    {jockey.weight ? `${jockey.weight} kg` : "Not set"}
-                                </p>
-                            </div>
-
                             {/* Experience */}
                             <div className="space-y-1">
                                 <label className="text-xs text-zinc-400 font-bold uppercase tracking-wider block">Experience</label>
@@ -130,15 +121,6 @@ function ReviewJockeyUpdateModal({ open, onClose, jockey, onReview }) {
                                 <p className={`font-semibold text-sm flex items-center gap-1.5 ${jockey.pendingPhone && jockey.pendingPhone !== jockey.phone ? "text-yellow-600 font-black" : "text-zinc-800"}`}>
                                     <Phone size={14} className={jockey.pendingPhone && jockey.pendingPhone !== jockey.phone ? "text-yellow-500" : "text-zinc-400"} />
                                     {jockey.pendingPhone || jockey.phone || "Not set"}
-                                </p>
-                            </div>
-
-                            {/* Pending Weight */}
-                            <div className="space-y-1">
-                                <label className="text-xs text-zinc-400 font-bold uppercase tracking-wider block">Proposed Weight</label>
-                                <p className={`font-semibold text-sm flex items-center gap-1.5 ${jockey.pendingWeight && jockey.pendingWeight !== jockey.weight ? "text-yellow-600 font-black" : "text-zinc-800"}`}>
-                                    <Scale size={14} className={jockey.pendingWeight && jockey.pendingWeight !== jockey.weight ? "text-yellow-500" : "text-zinc-400"} />
-                                    {jockey.pendingWeight ? `${jockey.pendingWeight} kg` : (jockey.weight ? `${jockey.weight} kg` : "Not set")}
                                 </p>
                             </div>
 

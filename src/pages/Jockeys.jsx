@@ -158,10 +158,6 @@ function JockeyCard({ jockey, index, onView, onEdit, onAdminEdit, onDelete, onRe
                     <span>Phone:</span>
                     <span className="font-semibold text-zinc-700">{jockey.phone || "Not set"}</span>
                 </div>
-                <div className="flex justify-between">
-                    <span>Weight:</span>
-                    <span className="font-semibold text-zinc-700">{jockey.weight ? `${jockey.weight} kg` : "Not set"}</span>
-                </div>
             </div>
 
             {/* Win rate bar */}
@@ -711,7 +707,6 @@ function Jockeys() {
                     role: "Jockey",
                     status: selectedJockey.user?.isActive === false ? "Inactive" : "Active",
                     phone: selectedJockey.phone,
-                    weight: selectedJockey.weight,
                     experienceYear: selectedJockey.experienceYear,
                     avatar: selectedJockey.avatar
                 } : null}
@@ -722,7 +717,6 @@ function Jockeys() {
                             email: updatedUser.email,
                             role: updatedUser.role,
                             phone: updatedUser.phone,
-                            weight: updatedUser.weight ? parseFloat(updatedUser.weight) : null,
                             experienceYear: updatedUser.experienceYear ? parseInt(updatedUser.experienceYear) : null,
                             expYears: updatedUser.expYears ? parseInt(updatedUser.expYears) : null,
                             totalPoints: updatedUser.totalPoints ? parseInt(updatedUser.totalPoints) : null,

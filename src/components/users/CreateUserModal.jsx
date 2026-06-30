@@ -8,7 +8,6 @@ function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", f
         email: "",
         role: initialRole,
         phone: "",
-        weight: "",
         experienceYear: "",
         expYears: "",
         totalPoints: "",
@@ -31,7 +30,7 @@ function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", f
         setError("");
 
         if (!formData.name.trim() || !formData.email.trim() || !formData.phone?.trim()) {
-            setError("Please fill in all basic fields (Full Name, Email, Phone).");
+            setError("Please fill in all required fields.");
             return;
         }
 
@@ -47,22 +46,7 @@ function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", f
             return;
         }
 
-        if (formData.role === "Jockey") {
-            if (!formData.weight || !formData.experienceYear) {
-                setError("Please enter weight and experience for Jockey.");
-                return;
-            }
-        } else if (formData.role === "Referee") {
-            if (!formData.expYears) {
-                setError("Please enter experience years for Referee.");
-                return;
-            }
-        } else if (formData.role === "Spectator") {
-            if (!formData.totalPoints) {
-                setError("Please enter total points for Spectator.");
-                return;
-            }
-        }
+        // Optional fields are allowed to be empty. Defaults to 0 will be applied below.
 
         setIsSubmitting(true);
         try {
@@ -71,12 +55,11 @@ function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", f
                 email: formData.email,
                 role: formData.role,
                 phone: formData.phone || null,
-                weight: formData.weight ? parseFloat(formData.weight) : null,
-                experienceYear: formData.experienceYear ? parseInt(formData.experienceYear) : null,
-                expYears: formData.expYears ? parseInt(formData.expYears) : null,
-                totalPoints: formData.totalPoints ? parseInt(formData.totalPoints) : null,
+                experienceYear: formData.experienceYear !== "" ? parseInt(formData.experienceYear) : 0,
+                expYears: formData.expYears !== "" ? parseInt(formData.expYears) : 0,
+                totalPoints: formData.totalPoints !== "" ? parseInt(formData.totalPoints) : 0,
             });
-            setFormData({ name: "", email: "", role: initialRole, phone: "", weight: "", experienceYear: "", expYears: "", totalPoints: "" });
+            setFormData({ name: "", email: "", role: initialRole, phone: "", experienceYear: "", expYears: "", totalPoints: "" });
             onClose();
         } catch (error) {
             console.error(error);
@@ -86,7 +69,7 @@ function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", f
     };
 
     return (
-        <Modal open={open} onClose={onClose} title="Create New User" width="w-[600px]">
+        <Modal open={open} onClose={onClose} title={fixedRole ? `Add ${initialRole}` : "Create New User"} width="w-[600px]">
             <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                     <label className="block mb-2 font-semibold text-zinc-700">Full Name</label>
@@ -125,20 +108,11 @@ function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", f
                 </div>
 
                 {formData.role === "Jockey" && (
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block mb-2 font-semibold text-zinc-700">Weight (kg)</label>
-                            <div className="relative">
-                                <Scale size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                                <input disabled={isSubmitting} type="number" step="0.1" value={formData.weight} onChange={(e) => setFormData({ ...formData, weight: e.target.value })} className={`w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none transition-all font-medium ${currentStyle.focus}`} />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block mb-2 font-semibold text-zinc-700">Experience (Years)</label>
-                            <div className="relative">
-                                <Clock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                                <input disabled={isSubmitting} type="number" value={formData.experienceYear} onChange={(e) => setFormData({ ...formData, experienceYear: e.target.value, expYears: e.target.value })} className={`w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none transition-all font-medium ${currentStyle.focus}`} />
-                            </div>
+                    <div>
+                        <label className="block mb-2 font-semibold text-zinc-700">Experience (Years)</label>
+                        <div className="relative">
+                            <Clock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                            <input disabled={isSubmitting} type="number" value={formData.experienceYear} onChange={(e) => setFormData({ ...formData, experienceYear: e.target.value, expYears: e.target.value })} className={`w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none transition-all font-medium ${currentStyle.focus}`} />
                         </div>
                     </div>
                 )}
@@ -162,17 +136,17 @@ function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", f
                         </div>
                     </div>
                 )}
-                
+
                 {error && (
                     <div className="p-4 bg-red-50 border border-red-200 text-red-600 rounded-xl text-sm font-medium">
                         {error}
                     </div>
                 )}
-                
+
                 <div className="flex justify-end gap-4 mt-8">
                     <button type="button" disabled={isSubmitting} onClick={onClose} className="px-6 py-3.5 rounded-xl bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50 transition-all font-bold disabled:opacity-50">Cancel</button>
                     <button type="submit" disabled={isSubmitting} className={`px-8 py-3.5 rounded-xl bg-gradient-to-r text-white transition-all font-bold shadow-lg hover:-translate-y-0.5 disabled:opacity-50 ${currentStyle.button}`}>
-                        {isSubmitting ? "Creating..." : "Create User"}
+                        {isSubmitting ? (fixedRole ? "Adding..." : "Creating...") : (fixedRole ? `Add ${initialRole}` : "Create User")}
                     </button>
                 </div>
             </form>

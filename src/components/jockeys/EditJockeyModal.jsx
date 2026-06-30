@@ -12,7 +12,6 @@ function EditJockeyModal({
     const [formData, setFormData] = useState({
         phone: "",
         avatar: "",
-        weight: "",
         experienceYear: "",
     });
 
@@ -21,7 +20,6 @@ function EditJockeyModal({
             setFormData({
                 phone: jockey.phone || "",
                 avatar: jockey.avatar || "",
-                weight: jockey.weight || "",
                 experienceYear: jockey.experienceYear || "",
             });
         }
@@ -32,7 +30,6 @@ function EditJockeyModal({
         onUpdate({
             phone: formData.phone || null,
             avatar: formData.avatar || null,
-            weight: formData.weight ? Number(formData.weight) : null,
             experienceYear: formData.experienceYear !== "" ? Number(formData.experienceYear) : null,
         });
     };
@@ -107,25 +104,7 @@ function EditJockeyModal({
                     />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                    {/* Weight */}
-                    <div>
-                        <label className="block mb-1.5 text-xs font-bold text-zinc-500 uppercase tracking-wider">Weight (kg)</label>
-                        <div className="relative">
-                            <Scale size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                            <input
-                                required
-                                type="number"
-                                min={30}
-                                max={150}
-                                step="0.1"
-                                value={formData.weight}
-                                onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                                placeholder="Weight in kg"
-                                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-11 pr-4 py-3 outline-none focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all font-medium text-sm"
-                            />
-                        </div>
-                    </div>
+                <div className="grid grid-cols-1 gap-4">
 
                     {/* Experience Year */}
                     <div>
