@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 import { User, Mail, ShieldAlert, Phone, Scale, Clock, Star, Trash2, ImageOff } from "lucide-react";
 import Modal from "../common/Modal";
 
@@ -37,6 +38,20 @@ function EditUserModal({ open, onClose, onSave, user }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
+
+        if (user && user.role === "HorseOwner" && formData.role !== "HorseOwner") {
+            try {
+                const response = await axios.get(`https://localhost:7179/api/horses/owner/${user.id}`);
+                const horses = response.data?.data || [];
+                if (horses.length > 0) {
+                    setError("Cannot change role. This user currently has registered horses.");
+                    return;
+                }
+            } catch (err) {
+                console.error("Failed to check owner's horses:", err);
+            }
+        }
+
         setIsSubmitting(true);
         try {
             await onSave({

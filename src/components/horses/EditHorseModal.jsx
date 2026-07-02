@@ -38,12 +38,19 @@ function EditHorseModal({ open, onClose, horse, onSave, isAdmin }) {
 
                 <div>
                     <label className="block text-sm font-bold text-zinc-700 mb-1.5 ml-1">Breed</label>
-                    <input
+                    <select
                         value={form.breed}
                         onChange={(e) => setForm({ ...form, breed: e.target.value })}
-                        placeholder="e.g. Arabian"
                         className="w-full border border-zinc-200 bg-zinc-50/50 rounded-2xl px-4 py-3.5 focus:bg-white focus:ring-4 focus:ring-yellow-400/20 focus:border-yellow-400 outline-none transition-all font-medium text-zinc-900"
-                    />
+                    >
+                        <option value="" disabled>Select Breed</option>
+                        <option value="Arabian">Arabian</option>
+                        <option value="Thoroughbred">Thoroughbred</option>
+                        <option value="Mustang">Mustang</option>
+                        <option value="Quarter">Quarter</option>
+                        <option value="Appaloosa">Appaloosa</option>
+                        <option value="Other">Other</option>
+                    </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
