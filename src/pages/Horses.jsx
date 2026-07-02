@@ -258,9 +258,32 @@ function Horses() {
     const totalWins = approvedHorses.reduce((s, h) => s + h.wins, 0);
     const excellentCount = approvedHorses.filter((h) => h.health === "Excellent").length;
 
-    const handleUpdateHorse = (updated) => {
-        setHorses((prev) => prev.map((h) => (h.id === updated.id ? updated : h)));
-        toast.success("Horse updated successfully!");
+    const handleUpdateHorse = async (updated) => {
+        try {
+            const payload = {
+                HorseName: updated.name,
+                Breed: updated.breed,
+                Age: updated.age,
+                Weight: updated.weight,
+                Gender: updated.gender,
+                HealthStatus: updated.health,
+                ImageUrl: updated.imageUrl,
+                Status: updated.status
+            };
+            // Since there is no direct PUT /api/horses/{id} endpoint, 
+            // Admin updates by submitting a request and auto-approving it.
+            await axios.post(`https://localhost:7179/api/horses/${updated.id}/update-request`, payload);
+            await axios.put(`https://localhost:7179/api/horses/${updated.id}/approve-update`, {
+                status: "Update_Approved",
+                notes: "Auto-approved by admin",
+                verifiedBy: user?.id ? parseInt(user.id) : 0
+            });
+            setHorses((prev) => prev.map((h) => (h.id === updated.id ? updated : h)));
+            toast.success("Horse updated successfully!");
+        } catch (error) {
+            console.error("Failed to update horse:", error);
+            toast.error("Failed to update horse.");
+        }
     };
 
     const handleDeleteHorse = (id) => {

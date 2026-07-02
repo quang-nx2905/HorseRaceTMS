@@ -221,6 +221,7 @@ function CreateHorseModal({
                                     <option value="Mustang">Mustang</option>
                                     <option value="Quarter">Quarter</option>
                                     <option value="Appaloosa">Appaloosa</option>
+                                    <option value="Other">Other</option>
                                 </select>
                             </div>
                         </div>

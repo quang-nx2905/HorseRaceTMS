@@ -296,11 +296,25 @@ function MyHorses() {
                 ImageUrl: updated.imageUrl,
                 Status: updated.status
             };
-            await axios.post(`https://localhost:7179/api/horses/${updated.id}/update-request`, payload);
-            toast.success("Update requested! Pending admin approval.");
+            
+            if (isAdmin) {
+                // Since there is no direct PUT /api/horses/{id} endpoint, 
+                // Admin updates by submitting a request and auto-approving it.
+                await axios.post(`https://localhost:7179/api/horses/${updated.id}/update-request`, payload);
+                await axios.put(`https://localhost:7179/api/horses/${updated.id}/approve-update`, {
+                    status: "Update_Approved",
+                    notes: "Auto-approved by admin",
+                    verifiedBy: user?.id ? parseInt(user.id) : 0
+                });
+                setHorses((prev) => prev.map((h) => (h.id === updated.id ? updated : h)));
+                toast.success("Horse updated successfully!");
+            } else {
+                await axios.post(`https://localhost:7179/api/horses/${updated.id}/update-request`, payload);
+                toast.success("Update requested! Pending admin approval.");
+            }
         } catch (error) {
-            console.error("Failed to request update:", error);
-            toast.error("Failed to submit update request.");
+            console.error("Failed to request/update:", error);
+            toast.error(isAdmin ? "Failed to update horse." : "Failed to submit update request.");
         }
     };
 
