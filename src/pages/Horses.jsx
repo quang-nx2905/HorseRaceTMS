@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../api/axios";
 import {
     Eye,
     Pencil,
@@ -197,7 +197,7 @@ function Horses() {
 
     const fetchHorses = async () => {
         try {
-            const response = await axios.get("https://localhost:7179/api/horses");
+            const response = await api.get("/horses");
             if (response.data && response.data.data) {
                 const mappedHorses = response.data.data.map(h => {
                     const latestVer = h.horseVerifications && h.horseVerifications.length > 0
@@ -272,8 +272,8 @@ function Horses() {
             };
             // Since there is no direct PUT /api/horses/{id} endpoint, 
             // Admin updates by submitting a request and auto-approving it.
-            await axios.post(`https://localhost:7179/api/horses/${updated.id}/update-request`, payload);
-            await axios.put(`https://localhost:7179/api/horses/${updated.id}/approve-update`, {
+            await api.post(`/horses/${updated.id}/update-request`, payload);
+            await api.put(`/horses/${updated.id}/approve-update`, {
                 status: "Update_Approved",
                 notes: "Auto-approved by admin",
                 verifiedBy: user?.id ? parseInt(user.id) : 0
@@ -294,7 +294,7 @@ function Horses() {
     const handleConfirmDelete = async () => {
         if (!selectedHorse) return;
         try {
-            await axios.delete(`https://localhost:7179/api/horses/${selectedHorse.id}`);
+            await api.delete(`/horses/${selectedHorse.id}`);
             setHorses((prev) => prev.map((h) => h.id === selectedHorse.id ? { ...h, status: "Retired" } : h));
             toast.success("Horse retired successfully!");
         } catch (error) {
@@ -309,7 +309,7 @@ function Horses() {
     const handleConfirmSuspend = async () => {
         if (!horseToSuspend) return;
         try {
-            await axios.put(`https://localhost:7179/api/horses/${horseToSuspend.id}/suspend`);
+            await api.put(`/horses/${horseToSuspend.id}/suspend`);
             setHorses((prev) => prev.map((h) => h.id === horseToSuspend.id ? { ...h, status: "Suspended" } : h));
             toast.success("Horse suspended successfully!");
         } catch (error) {
@@ -324,7 +324,7 @@ function Horses() {
     const handleConfirmReinstate = async () => {
         if (!horseToReinstate) return;
         try {
-            await axios.put(`https://localhost:7179/api/horses/${horseToReinstate.id}/reinstate`);
+            await api.put(`/horses/${horseToReinstate.id}/reinstate`);
             setHorses((prev) => prev.map((h) => h.id === horseToReinstate.id ? { ...h, status: "Approved" } : h));
             toast.success("Horse reinstated successfully!");
         } catch (error) {
@@ -338,25 +338,39 @@ function Horses() {
 
     const handleVerifyHorse = async (horse, newStatus) => {
         try {
-            const response = await axios.put(`https://localhost:7179/api/horses/${horse.id}/verify`, {
+            const response = await api.put(`/horses/${horse.id}/verify`, {
                 status: newStatus,
                 notes: `Verified by Admin`,
                 verifiedBy: user?.id ? parseInt(user.id) : 0
             });
             if (response.data && response.data.data) {
+                // Update local state immediately
                 setHorses(prev => prev.map(h => h.id === horse.id ? { ...h, status: newStatus } : h));
-                toast.success(`Horse ${newStatus.toLowerCase()} successfully!`);
+                toast.success(`Horse ${newStatus === "Approved" ? "approved" : "rejected"} successfully!`);
+                // Close both the details modal and the pending list modal
                 setOpenDetails(false);
+                setOpenPending(false);
+                // Re-fetch to get accurate data from server
+                fetchHorses();
+            } else {
+                // Response succeeded but no data returned - still treat as success
+                setHorses(prev => prev.map(h => h.id === horse.id ? { ...h, status: newStatus } : h));
+                toast.success(`Horse ${newStatus === "Approved" ? "approved" : "rejected"} successfully!`);
+                setOpenDetails(false);
+                setOpenPending(false);
+                fetchHorses();
             }
         } catch (error) {
-            console.error("Error verifying horse:", error);
-            toast.error("Failed to verify horse.");
+            const status = error?.response?.status;
+            const msg = error?.response?.data?.message || error?.response?.data?.error || error?.message;
+            console.error(`[VerifyHorse] HTTP ${status}:`, error?.response?.data || error);
+            toast.error(`Lỗi ${status ?? ""}: ${msg ?? "Failed to verify horse."}`);
         }
     };
 
     const handleApproveUpdate = async (horse) => {
         try {
-            await axios.put(`https://localhost:7179/api/horses/${horse.id}/approve-update`, {
+            await api.put(`/horses/${horse.id}/approve-update`, {
                 status: "Update_Approved",
                 notes: "Approved by admin",
                 verifiedBy: user?.id ? parseInt(user.id) : 0
@@ -372,7 +386,7 @@ function Horses() {
 
     const handleRejectUpdate = async (horse) => {
         try {
-            await axios.put(`https://localhost:7179/api/horses/${horse.id}/reject-update`, {
+            await api.put(`/horses/${horse.id}/reject-update`, {
                 status: "Update_Rejected",
                 notes: "Rejected by admin",
                 verifiedBy: user?.id ? parseInt(user.id) : 0
@@ -542,6 +556,8 @@ function Horses() {
                     setSelectedHorse(h);
                     setOpenDetails(true);
                 }}
+                title="Pending Registrations"
+                subtitle="Review and approve new horse registration applications."
             />
             <PendingHorsesModal
                 open={openPendingUpdates}

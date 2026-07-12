@@ -34,6 +34,7 @@ import Spectator from "./pages/Spectator";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import UsersManagement from "./pages/UsersManagement";
+import Invitations from "./pages/Invitations";
 
 function App() {
   return (
@@ -176,6 +177,17 @@ function App() {
               <ProtectedRoute allowedRoles={["Admin"]}>
                 <DashboardLayout>
                   <UsersManagement />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/invitations"
+            element={
+              <ProtectedRoute allowedRoles={["HorseOwner", "Jockey"]}>
+                <DashboardLayout>
+                  <Invitations />
                 </DashboardLayout>
               </ProtectedRoute>
             }

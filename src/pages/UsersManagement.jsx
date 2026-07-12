@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Search, Filter, Shield, User, Pencil, Trash2, Mail, ShieldAlert, BadgeCheck, Unlock, Crown, Flag, Eye } from "lucide-react";
+import { Plus, Search, Filter, Shield, User, Pencil, Trash2, Mail, ShieldAlert, BadgeCheck, Unlock, Crown, Flag, Eye, Ban } from "lucide-react";
 import toast from "react-hot-toast";
 
 import CreateUserModal from "../components/users/CreateUserModal";
@@ -37,7 +37,7 @@ const roleConfig = {
     },
 };
 
-function UserCard({ user, onEdit, onDelete }) {
+function UserCard({ user, onEdit, onToggleStatus, onDelete }) {
     const config = roleConfig[user.role] || roleConfig.Spectator;
     const Icon = config.icon;
     const isActive = user.status === "Active";
@@ -93,14 +93,24 @@ function UserCard({ user, onEdit, onDelete }) {
                         <Pencil size={16} />
                     </button>
                     <button
-                        onClick={() => canEditDelete && onDelete(user)}
+                        onClick={() => canEditDelete && onToggleStatus(user)}
                         disabled={!canEditDelete}
                         className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${!canEditDelete ? 'bg-zinc-50/50 text-zinc-300 cursor-not-allowed' :
-                            isActive ? 'bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600' : 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100 hover:text-emerald-600'
+                            isActive ? 'bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700' : 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100 hover:text-emerald-600'
                             }`}
                         title={isActive ? "Deactivate User" : "Reactivate User"}
                     >
-                        {isActive ? <Trash2 size={16} /> : <Unlock size={16} />}
+                        {isActive ? <Ban size={16} /> : <Unlock size={16} />}
+                    </button>
+                    <button
+                        onClick={() => canEditDelete && onDelete(user)}
+                        disabled={!canEditDelete}
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${!canEditDelete ? 'bg-zinc-50/50 text-zinc-300 cursor-not-allowed' :
+                            'bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600'
+                            }`}
+                        title="Permanently Delete User"
+                    >
+                        <Trash2 size={16} />
                     </button>
                 </div>
             </div>
@@ -116,6 +126,7 @@ function UsersManagement() {
     const [openCreate, setOpenCreate] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const [openDelete, setOpenDelete] = useState(false);
+    const [openPermanentDelete, setOpenPermanentDelete] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
 
     const [usersList, setUsersList] = useState([]);
@@ -212,6 +223,22 @@ function UsersManagement() {
             toast.error("Failed to update user status");
         } finally {
             setOpenDelete(false);
+            setSelectedUser(null);
+        }
+    };
+
+    const handleConfirmPermanentDelete = async () => {
+        if (!selectedUser) return;
+
+        try {
+            await userApi.deleteUser(selectedUser.id);
+            setUsersList(usersList.filter(u => u.id !== selectedUser.id));
+            setTotalCount(prev => prev - 1);
+            toast.success("User permanently deleted!");
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to delete user permanently");
+        } finally {
+            setOpenPermanentDelete(false);
             setSelectedUser(null);
         }
     };
@@ -316,7 +343,8 @@ function UsersManagement() {
                                 key={user.id}
                                 user={user}
                                 onEdit={(u) => { setSelectedUser(u); setOpenEdit(true); }}
-                                onDelete={(u) => { setSelectedUser(u); setOpenDelete(true); }}
+                                onToggleStatus={(u) => { setSelectedUser(u); setOpenDelete(true); }}
+                                onDelete={(u) => { setSelectedUser(u); setOpenPermanentDelete(true); }}
                             />
                         ))}
                     </div>
@@ -356,6 +384,16 @@ function UsersManagement() {
                 }
                 confirmLabel={selectedUser?.status === "Active" ? "Deactivate" : "Restore Account"}
                 confirmVariant={selectedUser?.status === "Active" ? "danger" : "success"}
+            />
+
+            <ConfirmModal
+                open={openPermanentDelete}
+                onClose={() => setOpenPermanentDelete(false)}
+                onConfirm={handleConfirmPermanentDelete}
+                title="Permanently Delete User Account"
+                message={`Are you sure you want to PERMANENTLY delete ${selectedUser?.name}? This action CANNOT be undone and will delete all associated data (horses, results, details).`}
+                confirmLabel="Permanently Delete"
+                confirmVariant="danger"
             />
         </div>
     );
