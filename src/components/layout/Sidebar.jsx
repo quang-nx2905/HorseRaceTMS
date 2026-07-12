@@ -11,6 +11,8 @@ import {
   Zap,
   ChevronRight,
   UserCog,
+  Mail,
+  Send,
 } from "lucide-react";
 import { useLayout } from "../../context/LayoutContext";
 import { useAuth } from "../../context/AuthContext";
@@ -41,6 +43,8 @@ const getNavGroups = (userRole) => {
       items: [
         { name: "Referee", path: "/referee", icon: Shield, roles: ["Admin", "Referee"] },
         { name: "Spectator", path: "/spectator", icon: Eye, roles: ["Admin", "Spectator"] },
+        { name: "My Invites", path: "/invitations/my", icon: Mail, roles: ["Jockey"] },
+        { name: "Sent Invites", path: "/invitations/sent", icon: Send, roles: ["HorseOwner"] },
       ],
     },
     {

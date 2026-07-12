@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import tournamentApi from "../../api/tournamentApi";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-hot-toast";
 
 const STATUS_CONFIG = {
     Live: {
@@ -57,6 +59,7 @@ function InfoRow({ icon: Icon, label, value, accent }) {
 }
 
 function TournamentDetailsDrawer({ open, onClose, tournament }) {
+    const { user } = useAuth();
     const [detail, setDetail] = useState(null);
     const [loading, setLoading] = useState(false);
     const [expandedRace, setExpandedRace] = useState(null);
@@ -80,6 +83,21 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
             console.error("Failed to fetch tournament detail:", error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCancelTournament = async () => {
+        if (window.confirm("Are you sure you want to cancel this tournament? This action cannot be undone.")) {
+            try {
+                await tournamentApi.cancel(tournament.id);
+                toast.success("Tournament cancelled successfully");
+                onClose();
+                // Optionally reload window or trigger a refresh in the parent component
+                window.location.reload();
+            } catch (error) {
+                toast.error("Failed to cancel tournament");
+                console.error(error);
+            }
         }
     };
 
@@ -345,13 +363,23 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                     </div>
                 )}
 
-                {/* Close button */}
-                <button
-                    onClick={onClose}
-                    className="w-full py-4 bg-zinc-950 hover:bg-zinc-800 text-white rounded-2xl font-bold text-sm transition-all shadow-md"
-                >
-                    Close Panel
-                </button>
+                {/* Action buttons */}
+                <div className="flex flex-col gap-2 p-8">
+                    {user?.role === "Admin" && tournament.status === "Upcoming" && (
+                        <button
+                            onClick={handleCancelTournament}
+                            className="w-full py-4 bg-red-50 hover:bg-red-100 text-red-500 rounded-2xl font-bold text-sm transition-all shadow-sm border border-red-200"
+                        >
+                            Cancel Tournament
+                        </button>
+                    )}
+                    <button
+                        onClick={onClose}
+                        className="w-full py-4 bg-zinc-950 hover:bg-zinc-800 text-white rounded-2xl font-bold text-sm transition-all shadow-md"
+                    >
+                        Close Panel
+                    </button>
+                </div>
             </div>
         </div>
     );
