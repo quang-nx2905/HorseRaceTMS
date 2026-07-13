@@ -16,5 +16,9 @@ export const userApi = {
     createUser: async (data) => {
         const response = await api.post("/users", data);
         return response.data;
+    },
+    deleteUser: async (id) => {
+        const response = await api.delete(`/users/${id}`);
+        return response.data;
     }
 };

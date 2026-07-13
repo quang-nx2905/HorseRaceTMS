@@ -29,6 +29,7 @@ const getNavGroups = (userRole) => {
         { name: "Horses", path: "/horses", icon: GanttChartSquare, roles: ["Admin", "Referee", "HorseOwner", "Jockey", "Spectator"] },
         { name: "My Horse", path: "/my-horses", icon: GanttChartSquare, roles: ["Admin", "HorseOwner"] },
         { name: "Jockeys", path: "/jockeys", icon: Users, roles: ["Admin", "Referee", "HorseOwner", "Jockey", "Spectator"] },
+        { name: "Invitations", path: "/invitations", icon: Mail, roles: ["HorseOwner", "Jockey"] },
       ],
     },
     {

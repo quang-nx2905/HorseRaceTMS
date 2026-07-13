@@ -80,12 +80,18 @@ function CreateTournamentModal({ open, onClose }) {
     };
 
     const handleNextStep1 = () => {
-        if (!basicInfo.name || !basicInfo.startDate || !basicInfo.totalRaces || !basicInfo.lanesPerRace) {
-            toast.error("Please fill in all required fields (Name, Start Date, Total Races, Lanes).");
+        const missingFields = [];
+        if (!basicInfo.name) missingFields.push("Tournament Name");
+        if (!basicInfo.startDate) missingFields.push("Start Date");
+        if (!basicInfo.totalRaces) missingFields.push("Total Races");
+        if (!basicInfo.lanesPerRace) missingFields.push("Lanes per Race");
+
+        if (missingFields.length > 0) {
+            toast.error(`Please fill in required fields: ${missingFields.join(", ")}`);
             return;
         }
 
-        const parsedPrize = parseFloat(basicInfo.prizePool.replace(/[,.]/g, '') || 0);
+        const parsedPrize = parseFloat(basicInfo.prizePool.toString().replace(/[,.]/g, '') || 0);
         if (parsedPrize <= 0 || isNaN(parsedPrize)) {
             toast.error("Prize Pool must be a valid positive number.");
             return;
@@ -242,7 +248,6 @@ function CreateTournamentModal({ open, onClose }) {
                             <input
                                 type="date"
                                 value={basicInfo.startDate}
-                                min={new Date().toISOString().split('T')[0]}
                                 onChange={e => setBasicInfo({ ...basicInfo, startDate: e.target.value })}
                                 className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-3.5 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium text-zinc-700"
                             />
@@ -256,7 +261,6 @@ function CreateTournamentModal({ open, onClose }) {
                             <input
                                 type="date"
                                 value={basicInfo.endDate}
-                                min={basicInfo.startDate}
                                 onChange={e => setBasicInfo({ ...basicInfo, endDate: e.target.value })}
                                 className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-3.5 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium text-zinc-700"
                             />
