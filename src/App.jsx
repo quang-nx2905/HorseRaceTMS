@@ -34,7 +34,8 @@ import Spectator from "./pages/Spectator";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import UsersManagement from "./pages/UsersManagement";
-import Invitations from "./pages/Invitations";
+import MyInvites from "./pages/MyInvites";
+import SentInvites from "./pages/SentInvites";
 
 function App() {
   return (
@@ -183,11 +184,22 @@ function App() {
           />
 
           <Route
-            path="/invitations"
+            path="/invitations/my"
             element={
-              <ProtectedRoute allowedRoles={["HorseOwner", "Jockey"]}>
+              <ProtectedRoute allowedRoles={["Jockey"]}>
                 <DashboardLayout>
-                  <Invitations />
+                  <MyInvites />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/invitations/sent"
+            element={
+              <ProtectedRoute allowedRoles={["HorseOwner"]}>
+                <DashboardLayout>
+                  <SentInvites />
                 </DashboardLayout>
               </ProtectedRoute>
             }
@@ -201,4 +213,4 @@ function App() {
   );
 }
 
-export default App;
+export default App;

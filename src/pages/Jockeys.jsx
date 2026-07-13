@@ -20,15 +20,17 @@ import {
 } from "lucide-react";
 
 import JockeyDetailsModal from "../components/jockeys/JockeyDetailsModal";
-import EditJockeyModal    from "../components/jockeys/EditJockeyModal";
+import EditJockeyModal from "../components/jockeys/EditJockeyModal";
 import ReviewJockeyUpdateModal from "../components/jockeys/ReviewJockeyUpdateModal";
 import PendingJockeysModal from "../components/jockeys/PendingJockeysModal";
-import ConfirmModal       from "../components/common/ConfirmModal";
+import SendInviteModal from "../components/jockeys/SendInviteModal";
+import ConfirmModal from "../components/common/ConfirmModal";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import { useNotifications } from "../context/NotificationContext";
 import { jockeyApi } from "../api/jockeyApi";
 import { userApi } from "../api/userApi";
+import { invitationApi } from "../api/invitationApi";
 import CreateUserModal from "../components/users/CreateUserModal";
 import EditUserModal from "../components/users/EditUserModal";
 
@@ -36,19 +38,19 @@ import EditUserModal from "../components/users/EditUserModal";
 const statusConfig = {
     Elite: {
         style: "bg-yellow-100 text-yellow-800 ring-yellow-300",
-        dot:   "bg-yellow-500",
+        dot: "bg-yellow-500",
     },
     Professional: {
         style: "bg-blue-100 text-blue-700 ring-blue-300",
-        dot:   "bg-blue-500",
+        dot: "bg-blue-500",
     },
     "Rising Star": {
         style: "bg-emerald-100 text-emerald-700 ring-emerald-300",
-        dot:   "bg-emerald-500",
+        dot: "bg-emerald-500",
     },
     Amateur: {
         style: "bg-zinc-100 text-zinc-600 ring-zinc-300",
-        dot:   "bg-zinc-400",
+        dot: "bg-zinc-400",
     },
 };
 
@@ -65,14 +67,14 @@ const avatarColors = [
 
 const countryFlags = {
     "United Kingdom": "🇬🇧",
-    "United States":  "🇺🇸",
-    Japan:            "🇯🇵",
-    Spain:            "🇪🇸",
-    France:           "🇫🇷",
-    Australia:        "🇦🇺",
-    Brazil:           "🇧🇷",
-    Germany:          "🇩🇪",
-    Vietnam:          "🇻🇳",
+    "United States": "🇺🇸",
+    Japan: "🇯🇵",
+    Spain: "🇪🇸",
+    France: "🇫🇷",
+    Australia: "🇦🇺",
+    Brazil: "🇧🇷",
+    Germany: "🇩🇪",
+    Vietnam: "🇻🇳",
 };
 
 const getJockeyStatus = (exp) => {
@@ -84,20 +86,20 @@ const getJockeyStatus = (exp) => {
 };
 
 // ── JockeyCard ───────────────────────────────────────────
-function JockeyCard({ jockey, index, onView, onEdit, onAdminEdit, onDelete, onReview, currentUser }) {
+function JockeyCard({ jockey, index, onView, onEdit, onAdminEdit, onDelete, onReview, onSendInvite, currentUser }) {
     const jockeyName = jockey.user?.fullName || jockey.name || "Unknown";
     const experienceText = jockey.experienceYear ? `${jockey.experienceYear} Years` : "No experience";
     const statusVal = getJockeyStatus(jockey.experienceYear);
-    const status  = statusConfig[statusVal] || statusConfig.Amateur;
+    const status = statusConfig[statusVal] || statusConfig.Amateur;
     const gradient = avatarColors[index % avatarColors.length];
-    
+
     const countryName = jockey.user?.country || jockey.country || "Vietnam";
-    const flag     = countryFlags[countryName] || "🌐";
-    
+    const flag = countryFlags[countryName] || "🌐";
+
     // Fallback/Mock wins just for visual win rate bar (wins are not directly exposed as editable DTO field)
     const wins = jockey.wins || 0;
-    const maxWins  = 60;
-    const winPct   = Math.min((wins / maxWins) * 100, 100);
+    const maxWins = 60;
+    const winPct = Math.min((wins / maxWins) * 100, 100);
 
     const isPending = jockey.updateStatus === "Pending";
     const isActive = jockey.user ? jockey.user.isActive : true;
@@ -182,6 +184,14 @@ function JockeyCard({ jockey, index, onView, onEdit, onAdminEdit, onDelete, onRe
                 >
                     <Eye size={13} /> View
                 </button>
+                {currentUser?.role === "HorseOwner" && (
+                    <button
+                        onClick={() => onSendInvite(jockey)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-yellow-400 text-black hover:bg-yellow-500 transition-all text-xs font-bold"
+                    >
+                        Send Invite
+                    </button>
+                )}
                 {currentUser?.role === "Admin" && isPending && (
                     <button
                         onClick={() => onReview(jockey)}
@@ -202,9 +212,8 @@ function JockeyCard({ jockey, index, onView, onEdit, onAdminEdit, onDelete, onRe
                 {currentUser?.role === "Admin" && (
                     <button
                         onClick={() => onDelete(jockey)}
-                        className={`w-10 flex items-center justify-center rounded-xl transition-all ${
-                            isActive ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100'
-                        }`}
+                        className={`w-10 flex items-center justify-center rounded-xl transition-all ${isActive ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100'
+                            }`}
                         title={isActive ? "Deactivate Jockey" : "Reactivate Jockey"}
                     >
                         {isActive ? <Trash2 size={14} /> : <Unlock size={14} />}
@@ -224,7 +233,7 @@ function Jockeys() {
     const [search, setSearch] = useState("");
     const [filterStatus, setFilterStatus] = useState("All");
     const [currentPage, setCurrentPage] = useState(1);
-    
+
     // Modals visibility
     const [openDetails, setOpenDetails] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
@@ -233,6 +242,7 @@ function Jockeys() {
     const [openReview, setOpenReview] = useState(false);
     const [openCreate, setOpenCreate] = useState(false);
     const [openAdminEdit, setOpenAdminEdit] = useState(false);
+    const [openSendInvite, setOpenSendInvite] = useState(false);
 
     const [selectedJockey, setSelectedJockey] = useState(null);
     const [jockeyToReview, setJockeyToReview] = useState(null);
@@ -277,20 +287,20 @@ function Jockeys() {
     const filtered = jockeys.filter((j) => {
         const nameStr = j.user?.fullName || j.name || "";
         const countryStr = j.user?.country || j.country || "Vietnam";
-        const matchSearch  = nameStr.toLowerCase().includes(search.toLowerCase()) ||
-                             countryStr.toLowerCase().includes(search.toLowerCase());
+        const matchSearch = nameStr.toLowerCase().includes(search.toLowerCase()) ||
+            countryStr.toLowerCase().includes(search.toLowerCase());
         const jockeyStatus = getJockeyStatus(j.experienceYear);
-        const matchStatus  = filterStatus === "All" || jockeyStatus === filterStatus;
+        const matchStatus = filterStatus === "All" || jockeyStatus === filterStatus;
         return matchSearch && matchStatus;
     });
 
-    const totalPages       = Math.ceil(filtered.length / itemsPerPage);
-    const paginated        = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
-    const totalWins        = jockeys.reduce((s, j) => s + (j.wins || 0), 0);
-    const eliteCount       = jockeys.filter((j) => getJockeyStatus(j.experienceYear) === "Elite").length;
-    
+    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const paginated = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+    const totalWins = jockeys.reduce((s, j) => s + (j.wins || 0), 0);
+    const eliteCount = jockeys.filter((j) => getJockeyStatus(j.experienceYear) === "Elite").length;
+
     const sortedByWins = [...jockeys].sort((a, b) => (b.wins || 0) - (a.wins || 0));
-    const topJockey        = sortedByWins.length > 0 ? sortedByWins[0] : null;
+    const topJockey = sortedByWins.length > 0 ? sortedByWins[0] : null;
 
     const handleCreateJockey = async (newUser) => {
         try {
@@ -388,7 +398,7 @@ function Jockeys() {
         try {
             await userApi.toggleUserStatus(targetUserId);
             const isNowActive = selectedJockey.user?.isActive === false;
-            
+
             // Manually update local state for immediate feedback
             setJockeys((prev) =>
                 prev.map((j) => {
@@ -407,7 +417,7 @@ function Jockeys() {
             );
 
             toast.success(`Jockey account has been ${isNowActive ? "reactivated" : "deactivated"} successfully!`);
-            
+
             // Optionally fetch in background to sync
             fetchJockeys(true);
         } catch (error) {
@@ -415,6 +425,17 @@ function Jockeys() {
         } finally {
             setOpenDelete(false);
             setSelectedJockey(null);
+        }
+    };
+
+    const handleSendInvite = async (inviteData) => {
+        try {
+            await invitationApi.sendInvitation(inviteData);
+            toast.success("Invitation sent successfully!");
+            setOpenSendInvite(false);
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to send invitation");
+            console.error(error);
         }
     };
 
@@ -441,7 +462,7 @@ function Jockeys() {
                         Professional jockey management and performance overview
                     </p>
                 </div>
-                
+
                 <div className="flex items-center gap-3">
                     {user?.role === "Jockey" && (
                         <button
@@ -496,9 +517,9 @@ function Jockeys() {
             {/* ── SUMMARY STATS ── */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                    { label: "Total Jockeys", value: jockeys.length,  icon: Users,      color: "bg-yellow-400",  iconColor: "text-yellow-900" },
-                    { label: "Total Wins",    value: totalWins,        icon: Trophy,     color: "bg-emerald-400", iconColor: "text-emerald-900" },
-                    { label: "Elite Jockeys", value: eliteCount,       icon: Star,       color: "bg-violet-400",  iconColor: "text-violet-900" },
+                    { label: "Total Jockeys", value: jockeys.length, icon: Users, color: "bg-yellow-400", iconColor: "text-yellow-900" },
+                    { label: "Total Wins", value: totalWins, icon: Trophy, color: "bg-emerald-400", iconColor: "text-emerald-900" },
+                    { label: "Elite Jockeys", value: eliteCount, icon: Star, color: "bg-violet-400", iconColor: "text-violet-900" },
                 ].map(({ label, value, icon: Icon, color, iconColor }) => (
                     <div key={label} className="bg-white border border-zinc-200 rounded-2xl p-5 flex items-center gap-4 shadow-sm">
                         <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
@@ -564,11 +585,10 @@ function Jockeys() {
                         <button
                             key={s}
                             onClick={() => { setFilterStatus(s); setCurrentPage(1); }}
-                            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
-                                filterStatus === s
+                            className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${filterStatus === s
                                     ? "bg-zinc-900 text-white"
                                     : "bg-white border border-zinc-200 text-zinc-500 hover:border-zinc-400"
-                            }`}
+                                }`}
                         >
                             {s}
                         </button>
@@ -599,11 +619,12 @@ function Jockeys() {
                             jockey={jockey}
                             index={idx}
                             currentUser={user}
-                            onView={(j)   => { setSelectedJockey(j); setOpenDetails(true); }}
-                            onEdit={(j)   => { setSelectedJockey(j); setOpenEdit(true);    }}
+                            onView={(j) => { setSelectedJockey(j); setOpenDetails(true); }}
+                            onEdit={(j) => { setSelectedJockey(j); setOpenEdit(true); }}
                             onAdminEdit={(j) => { setSelectedJockey(j); setOpenAdminEdit(true); }}
-                            onDelete={(j) => { setSelectedJockey(j); setOpenDelete(true);  }}
-                            onReview={(j) => { setJockeyToReview(j); setOpenReview(true);  }}
+                            onDelete={(j) => { setSelectedJockey(j); setOpenDelete(true); }}
+                            onReview={(j) => { setJockeyToReview(j); setOpenReview(true); }}
+                            onSendInvite={(j) => { setSelectedJockey(j); setOpenSendInvite(true); }}
                         />
                     ))}
                 </div>
@@ -624,11 +645,10 @@ function Jockeys() {
                         <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`w-9 h-9 rounded-xl text-sm font-bold transition-all ${
-                                currentPage === page
+                            className={`w-9 h-9 rounded-xl text-sm font-bold transition-all ${currentPage === page
                                     ? "bg-yellow-400 text-black"
                                     : "border border-zinc-200 text-zinc-500 hover:bg-zinc-100"
-                            }`}
+                                }`}
                         >
                             {page}
                         </button>
@@ -731,6 +751,13 @@ function Jockeys() {
                         console.error(error);
                     }
                 }}
+            />
+
+            <SendInviteModal
+                open={openSendInvite}
+                onClose={() => setOpenSendInvite(false)}
+                jockey={selectedJockey}
+                onSubmit={handleSendInvite}
             />
         </div>
     );

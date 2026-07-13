@@ -337,6 +337,11 @@ function Horses() {
     };
 
     const handleVerifyHorse = async (horse, newStatus) => {
+        console.log("verify payload:", {
+            status: newStatus,
+            notes: `Verified by Admin`,
+            verifiedBy: user?.id ? parseInt(user.id) : 0
+        });
         try {
             const response = await api.put(`/horses/${horse.id}/verify`, {
                 status: newStatus,

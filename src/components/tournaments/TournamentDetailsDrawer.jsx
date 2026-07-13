@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import tournamentApi from "../../api/tournamentApi";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-hot-toast";
 
 const STATUS_CONFIG = {
     Live: {
@@ -57,6 +59,7 @@ function InfoRow({ icon: Icon, label, value, accent }) {
 }
 
 function TournamentDetailsDrawer({ open, onClose, tournament }) {
+    const { user } = useAuth();
     const [detail, setDetail] = useState(null);
     const [loading, setLoading] = useState(false);
     const [expandedRace, setExpandedRace] = useState(null);
@@ -82,6 +85,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
             setLoading(false);
         }
     };
+
 
     if (!open || !tournament) return null;
 
@@ -260,7 +264,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                 {loading ? (
                     <div className="flex justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div></div>
                 ) : (
-                    <div className="mb-8">
+                    <div className="mb-8 px-8">
                         <div className="flex items-center gap-3 mb-4">
                             <h3 className="font-bold text-zinc-800 text-lg">Races ({detail?.races?.length || 0})</h3>
                         </div>
@@ -345,13 +349,15 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                     </div>
                 )}
 
-                {/* Close button */}
-                <button
-                    onClick={onClose}
-                    className="w-full py-4 bg-zinc-950 hover:bg-zinc-800 text-white rounded-2xl font-bold text-sm transition-all shadow-md"
-                >
-                    Close Panel
-                </button>
+                {/* Action buttons */}
+                <div className="flex flex-col gap-2 p-8">
+                    <button
+                        onClick={onClose}
+                        className="w-full py-4 bg-zinc-950 hover:bg-zinc-800 text-white rounded-2xl font-bold text-sm transition-all shadow-md"
+                    >
+                        Close Panel
+                    </button>
+                </div>
             </div>
         </div>
     );

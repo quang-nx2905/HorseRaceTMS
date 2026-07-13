@@ -12,8 +12,8 @@ import {
   TrendingUp,
   Zap,
   Eye,
+  EyeOff,
   Pencil,
-  Trash2,
   Filter,
   Globe,
   Star,
@@ -97,7 +97,7 @@ function Tournaments() {
   const [openModal, setOpenModal] = useState(false);
   const [openDrawer, setOpenDrawer] = useState(false);
   const [selectedTournament, setSelectedTournament] = useState(null);
-  const [openDelete, setOpenDelete] = useState(false);
+  const [openToggleHide, setOpenToggleHide] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -122,6 +122,7 @@ function Tournaments() {
           endDate: t.endDate ? new Date(t.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "TBA",
           prize: t.prizePool ? `$${t.prizePool.toLocaleString()}` : "$0",
           status: t.status || "Upcoming",
+          isHidden: t.isHidden || false,
           participants: 0,
           featured: false,
         }));
@@ -170,9 +171,21 @@ function Tournaments() {
     setOpenDrawer(true);
   };
 
-  const handleDeleteTournament = () => {
-    setTournaments((prev) => prev.filter((item) => item.id !== selectedTournament.id));
-    setOpenDelete(false);
+  const handleToggleHideTournament = async () => {
+    try {
+      await tournamentApi.toggleHide(selectedTournament.id);
+      setTournaments((prev) => 
+        prev.map((item) => 
+          item.id === selectedTournament.id 
+            ? { ...item, isHidden: !item.isHidden } 
+            : item
+        )
+      );
+    } catch (err) {
+      console.error("Failed to toggle tournament visibility", err);
+    } finally {
+      setOpenToggleHide(false);
+    }
   };
 
   const handleUpdateTournament = (updatedTournament) => {
@@ -397,7 +410,7 @@ function Tournaments() {
               <div
                 key={tournament.id}
                 id={`tournament-card-${tournament.id}`}
-                className="group relative bg-white border border-zinc-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+                className={`group relative border border-zinc-200 rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ${tournament.isHidden ? 'bg-zinc-100 opacity-75' : 'bg-white hover:-translate-y-1'}`}
               >
                 {/* Top accent stripe */}
                 <div className={`h-1.5 w-full bg-gradient-to-r ${accentGradient}`} />
@@ -414,7 +427,14 @@ function Tournaments() {
                         <span className="truncate font-medium">{tournament.location}</span>
                       </div>
                     </div>
-                    <StatusBadge status={tournament.status} />
+                    <div className="flex gap-2 items-center">
+                      {tournament.isHidden && (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-zinc-200 text-zinc-500 border border-zinc-300">
+                          <EyeOff className="w-3 h-3" /> Hidden
+                        </span>
+                      )}
+                      <StatusBadge status={tournament.status} />
+                    </div>
                   </div>
 
                   {/* Info chips */}
@@ -457,26 +477,31 @@ function Tournaments() {
                       <Eye className="w-4 h-4" />
                       View
                     </button>
-                    <button
-                      id={`edit-tournament-${tournament.id}`}
-                      onClick={() => {
-                        setSelectedTournament(tournament);
-                        setOpenEdit(true);
-                      }}
-                      className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-2xl text-sm font-bold transition-all"
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <button
-                      id={`delete-tournament-${tournament.id}`}
-                      onClick={() => {
-                        setSelectedTournament(tournament);
-                        setOpenDelete(true);
-                      }}
-                      className="flex items-center justify-center gap-2 px-4 py-3 bg-red-50 hover:bg-red-100 text-red-500 rounded-2xl text-sm font-bold transition-all border border-red-100 hover:border-red-200"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {user?.role === "Admin" && (
+                      <>
+                        <button
+                          id={`edit-tournament-${tournament.id}`}
+                          onClick={() => {
+                            setSelectedTournament(tournament);
+                            setOpenEdit(true);
+                          }}
+                          className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-2xl text-sm font-bold transition-all"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button
+                          id={`toggle-hide-tournament-${tournament.id}`}
+                          onClick={() => {
+                            setSelectedTournament(tournament);
+                            setOpenToggleHide(true);
+                          }}
+                          className={`flex items-center justify-center gap-2 px-4 py-3 rounded-2xl text-sm font-bold transition-all border ${tournament.isHidden ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-500 border-emerald-100 hover:border-emerald-200' : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-500 border-zinc-100 hover:border-zinc-200'}`}
+                          title={tournament.isHidden ? "Restore Tournament" : "Hide Tournament"}
+                        >
+                          {tournament.isHidden ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -504,11 +529,13 @@ function Tournaments() {
       />
 
       <ConfirmModal
-        open={openDelete}
-        onClose={() => setOpenDelete(false)}
-        onConfirm={handleDeleteTournament}
-        title="Delete Tournament"
-        message="Are you sure you want to permanently delete this tournament? This action cannot be undone."
+        open={openToggleHide}
+        onClose={() => setOpenToggleHide(false)}
+        onConfirm={handleToggleHideTournament}
+        title={selectedTournament?.isHidden ? "Restore Tournament" : "Hide Tournament"}
+        message={selectedTournament?.isHidden ? "Are you sure you want to restore this tournament?" : "Are you sure you want to hide this tournament? It will no longer be visible to normal users."}
+        confirmLabel={selectedTournament?.isHidden ? "Restore" : "Hide"}
+        confirmVariant={selectedTournament?.isHidden ? "success" : "danger"}
       />
 
       <EditTournamentModal

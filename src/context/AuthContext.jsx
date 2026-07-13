@@ -26,8 +26,10 @@ const extractUserFromToken = (token) => {
   const claimRole = decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || decoded.role;
   const claimName = decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name"] || decoded.name || decoded.FullName || decoded.fullname;
 
+  const claimId = decoded.sub || decoded["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"];
+
   return {
-    id: decoded.sub,
+    id: claimId,
     email: claimEmail,
     role: claimRole || "User",
     name: claimName || "User",

@@ -23,6 +23,17 @@ const tournamentApi = {
 
   },
 
+  update(id, data) {
+    return axiosClient.put(`/tournaments/${id}`, data);
+  },
+
+  cancel: (id) => {
+    return axiosClient.put(`/tournaments/${id}/cancel`);
+  },
+  toggleHide: (id) => {
+    return axiosClient.put(`/tournaments/${id}/toggle-hide`);
+  },
+
 };
 
 export default tournamentApi;
