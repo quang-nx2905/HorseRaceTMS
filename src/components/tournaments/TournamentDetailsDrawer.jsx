@@ -86,20 +86,6 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
         }
     };
 
-    const handleCancelTournament = async () => {
-        if (window.confirm("Are you sure you want to cancel this tournament? This action cannot be undone.")) {
-            try {
-                await tournamentApi.cancel(tournament.id);
-                toast.success("Tournament cancelled successfully");
-                onClose();
-                // Optionally reload window or trigger a refresh in the parent component
-                window.location.reload();
-            } catch (error) {
-                toast.error("Failed to cancel tournament");
-                console.error(error);
-            }
-        }
-    };
 
     if (!open || !tournament) return null;
 
@@ -278,7 +264,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                 {loading ? (
                     <div className="flex justify-center p-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div></div>
                 ) : (
-                    <div className="mb-8">
+                    <div className="mb-8 px-8">
                         <div className="flex items-center gap-3 mb-4">
                             <h3 className="font-bold text-zinc-800 text-lg">Races ({detail?.races?.length || 0})</h3>
                         </div>
@@ -365,14 +351,6 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
 
                 {/* Action buttons */}
                 <div className="flex flex-col gap-2 p-8">
-                    {user?.role === "Admin" && tournament.status === "Upcoming" && (
-                        <button
-                            onClick={handleCancelTournament}
-                            className="w-full py-4 bg-red-50 hover:bg-red-100 text-red-500 rounded-2xl font-bold text-sm transition-all shadow-sm border border-red-200"
-                        >
-                            Cancel Tournament
-                        </button>
-                    )}
                     <button
                         onClick={onClose}
                         className="w-full py-4 bg-zinc-950 hover:bg-zinc-800 text-white rounded-2xl font-bold text-sm transition-all shadow-md"
