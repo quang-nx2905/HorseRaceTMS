@@ -1,4 +1,6 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import api from "../../api/axiosClient";
 import {
   LayoutDashboard,
   Trophy,
@@ -69,6 +71,20 @@ function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  
+  const [spectatorPoints, setSpectatorPoints] = useState(0);
+
+  useEffect(() => {
+    if (user?.role?.toLowerCase() === "spectator") {
+      api.get("/Profile/Me")
+        .then(res => {
+          console.log("Profile API Response:", res.data);
+          const points = res.data?.totalPoints ?? res.data?.TotalPoints ?? 0;
+          setSpectatorPoints(points);
+        })
+        .catch(err => console.error("Failed to fetch spectator points", err));
+    }
+  }, [user]);
 
   const navGroups = getNavGroups(user?.role);
 
@@ -90,7 +106,7 @@ function Sidebar() {
       </div>
 
       {/* ── LOGO / BRAND ── */}
-      <div 
+      <div
         onClick={() => navigate("/")}
         className={`
         relative z-10 flex items-center gap-3
@@ -184,9 +200,19 @@ function Sidebar() {
         ))}
       </nav>
 
+      {/* ── SPECTATOR CREDIT BADGE ── */}
+      {sidebarOpen && user?.role?.toLowerCase() === "spectator" && (
+        <div className="relative z-10 mx-3 mb-2 p-3.5 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-900/10 border border-amber-500/20">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-amber-500/80">My Credit</span>
+            <span className="text-sm font-bold text-amber-400">{spectatorPoints ?? 0} pts</span>
+          </div>
+        </div>
+      )}
+
       {/* ── BOTTOM STATUS BADGE ── */}
       {sidebarOpen && (
-        <div className="relative z-10 m-3 p-3.5 rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700/50">
+        <div className="relative z-10 mx-3 mb-3 p-3.5 rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-800 border border-zinc-700/50">
           <div className="flex items-center gap-2.5">
             <div className="relative flex h-2.5 w-2.5 flex-shrink-0">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
