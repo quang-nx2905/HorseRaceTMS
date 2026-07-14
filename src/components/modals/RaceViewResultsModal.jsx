@@ -1,20 +1,58 @@
 import { useState, useEffect } from "react";
-import { X, Trophy, Clock, Medal } from "lucide-react";
+import { X, Trophy, Clock, Medal, DollarSign } from "lucide-react";
 import raceApi from "../../api/raceApi";
+import predictionApi from "../../api/predictionApi";
+import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-hot-toast";
 
-function RaceViewResultsModal({ open, onClose, race }) {
+function RaceViewResultsModal({ open, onClose, race, onSuccess }) {
+    const { user } = useAuth();
     const [results, setResults] = useState([]);
+    const [myBets, setMyBets] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [cancelingId, setCancelingId] = useState(null);
+    const [confirmCancelId, setConfirmCancelId] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         if (open && race) {
             fetchResults();
+            if (user?.role === "Spectator") {
+                fetchMyBets();
+            }
         } else {
             setResults([]);
+            setMyBets([]);
             setError(null);
+            setConfirmCancelId(null);
         }
-    }, [open, race]);
+    }, [open, race, user]);
+
+    const fetchMyBets = async () => {
+        try {
+            const res = await predictionApi.getMyBets();
+            const bets = res.data?.data || res.data || [];
+            const myBetsForRace = bets.filter(b => b.raceId === race.raceId).sort((a, b) => b.predictionId - a.predictionId);
+            setMyBets(myBetsForRace);
+        } catch (err) {
+            console.error("Failed to fetch my bets", err);
+        }
+    };
+
+    const handleCancelBet = async (predictionId) => {
+        try {
+            setCancelingId(predictionId);
+            await predictionApi.cancelBet(predictionId);
+            toast.success("Bet cancelled successfully! 50% points refunded.");
+            fetchMyBets(); // refresh the bets
+            setConfirmCancelId(null);
+            if (onSuccess) onSuccess();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to cancel bet");
+        } finally {
+            setCancelingId(null);
+        }
+    };
 
     const fetchResults = async () => {
         try {
@@ -38,6 +76,11 @@ function RaceViewResultsModal({ open, onClose, race }) {
         if (rank === 3) return "bg-amber-600 text-amber-100 border-amber-700 shadow-amber-600/50 shadow-md";
         return "bg-zinc-100 text-zinc-600 border-zinc-200";
     };
+
+    const evaluatedBets = myBets.filter(b => b.status === 'Won' || b.status === 'Lost');
+    const totalBetOnEvaluated = evaluatedBets.reduce((acc, b) => acc + b.betPoints, 0);
+    const totalReward = evaluatedBets.reduce((acc, b) => acc + (b.rewardPoints || 0), 0);
+    const netGain = totalReward - totalBetOnEvaluated;
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -69,6 +112,130 @@ function RaceViewResultsModal({ open, onClose, race }) {
 
                 {/* Content */}
                 <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+
+                    {/* Net Gain Summary */}
+                    {evaluatedBets.length > 0 && (
+                        <div className={`mb-8 p-6 rounded-2xl border-2 flex items-center justify-between ${
+                            netGain > 0 
+                            ? 'bg-amber-500/10 border-amber-500/30' 
+                            : netGain < 0 
+                            ? 'bg-red-500/10 border-red-500/30' 
+                            : 'bg-zinc-800/50 border-zinc-700'
+                        }`}>
+                            <div>
+                                <p className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-1">Total Return</p>
+                                <p className={`text-3xl font-black ${
+                                    netGain > 0 ? 'text-amber-500' : netGain < 0 ? 'text-red-500' : 'text-zinc-300'
+                                }`}>
+                                    {netGain > 0 ? '+' : ''}{netGain} pts
+                                </p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-sm font-medium text-zinc-400 mb-1">Total Bet: <span className="text-white">{totalBetOnEvaluated} pts</span></p>
+                                <p className="text-sm font-medium text-zinc-400">Total Reward: <span className="text-white">{totalReward} pts</span></p>
+                            </div>
+                        </div>
+                    )}
+                    
+                    {/* My Bets Section */}
+                    {myBets.length > 0 && (
+                        <div className="mb-8">
+                            <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest mb-4">Your Bets ({myBets.length})</h3>
+                            <div className="space-y-3">
+                                {myBets.map(bet => (
+                                    <div key={bet.predictionId} className={`p-5 rounded-2xl border-2 ${
+                                        bet.status === 'Won' 
+                                        ? 'bg-amber-500/10 border-amber-500/30' 
+                                        : bet.status === 'Lost' 
+                                        ? 'bg-red-500/10 border-red-500/30' 
+                                        : bet.status === 'Active'
+                                        ? 'bg-emerald-500/10 border-emerald-500/30'
+                                        : bet.status === 'Cancelled'
+                                        ? 'bg-red-950/20 border-red-900/50 opacity-75'
+                                        : 'bg-zinc-800/50 border-zinc-700'
+                                    }`}>
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-700 overflow-hidden flex-shrink-0">
+                                                    {bet.horseAvatar ? (
+                                                        <img src={bet.horseAvatar} alt={bet.horseName} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-zinc-500 font-bold">
+                                                            #{bet.participantId}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <p className="text-xl font-black text-white">
+                                                        {bet.horseName || `Horse #${bet.participantId}`}
+                                                    </p>
+                                                    <p className="text-sm font-medium text-zinc-400 mt-1">
+                                                        Amount: <span className="text-white">{bet.betPoints} pts</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold mb-2 ${
+                                                    bet.status === 'Won' 
+                                                    ? 'bg-amber-500 text-white' 
+                                                    : bet.status === 'Lost'
+                                                    ? 'bg-red-500 text-white'
+                                                    : bet.status === 'Active'
+                                                    ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                                                    : bet.status === 'Cancelled'
+                                                    ? 'bg-red-950 text-red-400 border border-red-900/50'
+                                                    : 'bg-zinc-700 text-zinc-300'
+                                                }`}>
+                                                    {bet.status === 'Won' ? <Trophy className="w-4 h-4" /> : null}
+                                                    {bet.status}
+                                                </div>
+                                                {bet.status === 'Won' && (
+                                                    <p className="text-sm font-bold text-amber-500">
+                                                        + {bet.rewardPoints} pts
+                                                    </p>
+                                                )}
+                                                {bet.status === 'Active' && race.status === 'Upcoming' && (
+                                                    <div className="mt-4 flex flex-col items-end">
+                                                        {confirmCancelId === bet.predictionId ? (
+                                                            <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl max-w-sm text-right animate-in fade-in zoom-in-95">
+                                                                <p className="text-xs font-semibold text-red-400 mb-3">
+                                                                    Are you sure? You will only be refunded 50% of your points.
+                                                                </p>
+                                                                <div className="flex justify-end gap-2">
+                                                                    <button
+                                                                        onClick={() => setConfirmCancelId(null)}
+                                                                        disabled={cancelingId === bet.predictionId}
+                                                                        className="px-3 py-1.5 text-zinc-400 hover:text-zinc-200 text-xs font-bold transition-colors"
+                                                                    >
+                                                                        No, keep it
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleCancelBet(bet.predictionId)}
+                                                                        disabled={cancelingId === bet.predictionId}
+                                                                        className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center gap-1.5"
+                                                                    >
+                                                                        {cancelingId === bet.predictionId && <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
+                                                                        Yes, cancel bet
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <button
+                                                                onClick={() => setConfirmCancelId(bet.predictionId)}
+                                                                className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg text-xs font-bold transition-colors border border-red-500/20"
+                                                            >
+                                                                Cancel Bet
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                     {loading ? (
                         <div className="flex justify-center p-10">
                             <div className="w-8 h-8 border-4 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />

@@ -25,6 +25,8 @@ import { toast } from "react-hot-toast";
 import raceApi from "../../api/raceApi";
 import RaceResultInputModal from "../modals/RaceResultInputModal";
 import RaceViewResultsModal from "../modals/RaceViewResultsModal";
+import RaceBetModal from "../modals/RaceBetModal";
+import predictionApi from "../../api/predictionApi";
 
 const STATUS_CONFIG = {
     Live: {
@@ -70,7 +72,9 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
     // Modals state
     const [showInputModal, setShowInputModal] = useState(false);
     const [showViewModal, setShowViewModal] = useState(false);
+    const [showBetModal, setShowBetModal] = useState(false);
     const [selectedRaceForModal, setSelectedRaceForModal] = useState(null);
+    const [myBets, setMyBets] = useState([]);
 
     const handleMarkAsCompleted = async (raceId) => {
         try {
@@ -83,14 +87,38 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
         }
     };
 
+    const handleAwardPrizes = async (raceId) => {
+        try {
+            await raceApi.awardPrizes(raceId);
+            toast.success("Prizes awarded successfully!");
+            fetchDetail(); // Refresh data
+        } catch (error) {
+            console.error("Failed to award prizes", error);
+            toast.error(error.response?.data?.message || "Failed to award prizes.");
+        }
+    };
+
     useEffect(() => {
         if (open && tournament) {
             fetchDetail();
+            if (user?.role === "Spectator") {
+                fetchMyBets();
+            }
         } else {
             setDetail(null);
             setExpandedRace(null);
+            setMyBets([]);
         }
-    }, [open, tournament]);
+    }, [open, tournament, user]);
+
+    const fetchMyBets = async () => {
+        try {
+            const res = await predictionApi.getMyBets();
+            setMyBets(res.data?.data || res.data || []);
+        } catch (error) {
+            console.error("Failed to fetch my bets:", error);
+        }
+    };
 
     const fetchDetail = async () => {
         try {
@@ -308,7 +336,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            {race.status !== "Completed" && user?.role === "Admin" && (
+                                            {race.status !== "Completed" && race.status !== "Awarded" && user?.role === "Admin" && (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); handleMarkAsCompleted(race.raceId); }}
                                                     className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
@@ -316,7 +344,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                                     Mark Completed
                                                 </button>
                                             )}
-                                            {race.status === "Completed" && (
+                                            {(race.status === "Completed" || race.status === "Awarded") && (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowViewModal(true); }}
                                                     className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
@@ -324,13 +352,42 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                                     View Results
                                                 </button>
                                             )}
+                                            {race.status === "Upcoming" && user?.role === "Spectator" && (() => {
+                                                const activeBetsCount = myBets.filter(b => b.raceId === race.raceId && b.status === "Active").length;
+                                                return (
+                                                    <div className="flex items-center gap-2">
+                                                        {activeBetsCount > 0 && (
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowViewModal(true); }}
+                                                                className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-lg text-xs font-bold transition-colors shadow-sm whitespace-nowrap"
+                                                            >
+                                                                My Bets ({activeBetsCount})
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowBetModal(true); }}
+                                                            className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition-colors shadow-sm whitespace-nowrap"
+                                                        >
+                                                            Place Bet
+                                                        </button>
+                                                    </div>
+                                                );
+                                            })()}
                                             {race.status === "Completed" && (user?.role === "Admin" || user?.role === "Referee") && (
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowInputModal(true); }}
-                                                    className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
-                                                >
-                                                    Input Results
-                                                </button>
+                                                <>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowInputModal(true); }}
+                                                        className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                    >
+                                                        Input Results
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => { e.stopPropagation(); handleAwardPrizes(race.raceId); }}
+                                                        className="px-3 py-1.5 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                    >
+                                                        Award Prizes
+                                                    </button>
+                                                </>
                                             )}
                                             {expandedRace === race.raceId ? <ChevronUp className="w-5 h-5 text-zinc-400" /> : <ChevronDown className="w-5 h-5 text-zinc-400" />}
                                         </div>
@@ -406,7 +463,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                 </div>
             </div>
         </div>
-
+        {/* Modals */}
             <RaceResultInputModal
                 open={showInputModal}
                 onClose={() => setShowInputModal(false)}
@@ -417,6 +474,16 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                 open={showViewModal}
                 onClose={() => setShowViewModal(false)}
                 race={selectedRaceForModal}
+                onSuccess={() => fetchMyBets()}
+            />
+
+            <RaceBetModal
+                open={showBetModal}
+                onClose={() => setShowBetModal(false)}
+                race={selectedRaceForModal}
+                onSuccess={() => {
+                    fetchMyBets();
+                }}
             />
         </>
     );

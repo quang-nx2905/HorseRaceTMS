@@ -15,9 +15,13 @@ const raceApi = {
     return axiosClient.post(`/Races/${id}/results`, payload);
   },
 
-  // Get race results (Public)
   getResults: (id) => {
     return axiosClient.get(`/Races/${id}/results`);
+  },
+
+  // Award prizes for a race (Admin/Referee)
+  awardPrizes: (id) => {
+    return axiosClient.post(`/Races/${id}/award`);
   },
 };
 
