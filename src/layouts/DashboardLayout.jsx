@@ -3,7 +3,7 @@ import Topbar from "../components/layout/Topbar";
 
 function DashboardLayout({ children }) {
     return (
-        <div className="flex min-h-screen bg-[#f4f4f5]">
+        <div className="flex h-screen overflow-hidden bg-[#f4f4f5]">
             <Sidebar />
 
             <div className="flex-1 flex flex-col min-w-0 overflow-hidden">

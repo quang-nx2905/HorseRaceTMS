@@ -86,6 +86,8 @@ function RaceViewResultsModal({ open, onClose, race }) {
                             {results.map((res, index) => {
                                 const rankDisplay = res.resultStatus === 'Finished' ? res.rankPosition : res.resultStatus;
                                 const isTop3 = res.resultStatus === 'Finished' && res.rankPosition <= 3;
+                                const participant = race?.participants?.find(p => p.participantId === res.participantId) || {};
+                                const horseAvatar = res.horseAvatar || participant.horseAvatar;
 
                                 return (
                                     <div 
@@ -111,7 +113,7 @@ function RaceViewResultsModal({ open, onClose, race }) {
                                             {/* Horse & Jockey */}
                                             <div className="flex items-center gap-4">
                                                 <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-zinc-700 flex-shrink-0 bg-white">
-                                                    <img src={res.horseAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${res.horseName}&backgroundColor=fef3c7`} alt={res.horseName} className="w-full h-full object-cover" />
+                                                    <img src={horseAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${res.horseName}&backgroundColor=fef3c7`} alt={res.horseName} className={`w-full h-full object-cover ${horseAvatar ? '' : 'p-1'}`} />
                                                 </div>
                                                 <div>
                                                     <h3 className="text-lg font-bold text-white leading-tight">{res.horseName}</h3>
