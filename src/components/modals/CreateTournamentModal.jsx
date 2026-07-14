@@ -144,14 +144,14 @@ function CreateTournamentModal({ open, onClose }) {
             Location: basicInfo.location,
             StartDate: basicInfo.startDate,
             EndDate: basicInfo.endDate,
-            PrizePool: parseFloat(basicInfo.prizePool.replace(/[,.]/g, '') || 0),
+            PrizePool: parseFloat(basicInfo.prizePool.toString().replace(/[^0-9.-]+/g, "") || 0),
             Races: races.map(r => ({
                 RaceName: r.name,
                 RaceDateTime: r.dateTime,
                 Distance: parseFloat(r.distance || 0),
                 RefereeIds: r.refereeIds.map(id => parseInt(id)),
                 Participants: r.participants.map(p => ({
-                    LaneNumber: p.lane,
+                    LaneNumber: parseInt(p.lane),
                     HorseId: parseInt(p.horseId),
                     JockeyId: parseInt(p.jockeyId)
                 }))
@@ -163,7 +163,15 @@ function CreateTournamentModal({ open, onClose }) {
             toast.success("Tournament created successfully!");
             onClose();
         } catch (error) {
-            toast.error("Failed to create tournament.");
+            console.error("Create tournament error details:", error.response?.data || error);
+            
+            // Handle validation errors (400 Bad Request)
+            if (error.response?.status === 400 && error.response?.data?.errors) {
+                const errorMessages = Object.values(error.response.data.errors).flat().join(", ");
+                toast.error(`Validation Error: ${errorMessages}`);
+            } else {
+                toast.error(error.response?.data?.message || error.response?.data?.title || "Failed to create tournament.");
+            }
         }
     };
 
