@@ -22,6 +22,9 @@ import { useState, useEffect } from "react";
 import tournamentApi from "../../api/tournamentApi";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
+import raceApi from "../../api/raceApi";
+import RaceResultInputModal from "../modals/RaceResultInputModal";
+import RaceViewResultsModal from "../modals/RaceViewResultsModal";
 
 const STATUS_CONFIG = {
     Live: {
@@ -64,6 +67,22 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
     const [loading, setLoading] = useState(false);
     const [expandedRace, setExpandedRace] = useState(null);
 
+    // Modals state
+    const [showInputModal, setShowInputModal] = useState(false);
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [selectedRaceForModal, setSelectedRaceForModal] = useState(null);
+
+    const handleMarkAsCompleted = async (raceId) => {
+        try {
+            await raceApi.updateStatus(raceId, "Completed");
+            toast.success("Race marked as completed!");
+            fetchDetail(); // Refresh data
+        } catch (error) {
+            console.error("Failed to update race status", error);
+            toast.error("Failed to mark race as completed.");
+        }
+    };
+
     useEffect(() => {
         if (open && tournament) {
             fetchDetail();
@@ -103,7 +122,8 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
     const totalReferees = uniqueReferees.size;
 
     return (
-        <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
+        <>
+            <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
 
@@ -287,7 +307,33 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                                 </p>
                                             </div>
                                         </div>
-                                        {expandedRace === race.raceId ? <ChevronUp className="w-5 h-5 text-zinc-400" /> : <ChevronDown className="w-5 h-5 text-zinc-400" />}
+                                        <div className="flex items-center gap-3">
+                                            {race.status !== "Completed" && user?.role === "Admin" && (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleMarkAsCompleted(race.raceId); }}
+                                                    className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                >
+                                                    Mark Completed
+                                                </button>
+                                            )}
+                                            {race.status === "Completed" && (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowViewModal(true); }}
+                                                    className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                >
+                                                    View Results
+                                                </button>
+                                            )}
+                                            {race.status === "Completed" && (user?.role === "Admin" || user?.role === "Referee") && (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowInputModal(true); }}
+                                                    className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                >
+                                                    Input Results
+                                                </button>
+                                            )}
+                                            {expandedRace === race.raceId ? <ChevronUp className="w-5 h-5 text-zinc-400" /> : <ChevronDown className="w-5 h-5 text-zinc-400" />}
+                                        </div>
                                     </div>
 
                                     {expandedRace === race.raceId && (
@@ -360,6 +406,19 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                 </div>
             </div>
         </div>
+
+            <RaceResultInputModal
+                open={showInputModal}
+                onClose={() => setShowInputModal(false)}
+                race={selectedRaceForModal}
+            />
+
+            <RaceViewResultsModal
+                open={showViewModal}
+                onClose={() => setShowViewModal(false)}
+                race={selectedRaceForModal}
+            />
+        </>
     );
 }
 
