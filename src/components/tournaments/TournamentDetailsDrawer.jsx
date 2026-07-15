@@ -35,6 +35,12 @@ const STATUS_CONFIG = {
         glow: "from-red-600/30 to-rose-600/20",
         pulse: true,
     },
+    Started: {
+        badge: "bg-red-500/15 text-red-500 border border-red-500/25",
+        icon: Flame,
+        glow: "from-red-600/30 to-rose-600/20",
+        pulse: true,
+    },
     Upcoming: {
         badge: "bg-amber-500/15 text-amber-600 border border-amber-500/25",
         icon: Clock,
@@ -75,6 +81,17 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
     const [showBetModal, setShowBetModal] = useState(false);
     const [selectedRaceForModal, setSelectedRaceForModal] = useState(null);
     const [myBets, setMyBets] = useState([]);
+
+    const handleMarkAsStarted = async (raceId) => {
+        try {
+            await raceApi.updateStatus(raceId, "Started");
+            toast.success("Race marked as started!");
+            fetchDetail(); // Refresh data
+        } catch (error) {
+            console.error("Failed to update race status", error);
+            toast.error("Failed to mark race as started.");
+        }
+    };
 
     const handleMarkAsCompleted = async (raceId) => {
         try {
@@ -175,7 +192,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
 
                     <div className="relative z-10">
                         <div className="flex items-center justify-between mb-6">
-                            <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${tournament.status === "Live"
+                            <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border ${tournament.status === "Live" || tournament.status === "Started"
                                 ? "bg-red-500/20 text-red-400 border-red-500/30"
                                 : tournament.status === "Upcoming"
                                     ? "bg-amber-500/20 text-amber-400 border-amber-500/30"
@@ -189,7 +206,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                 ) : (
                                     <Icon className="w-3 h-3" />
                                 )}
-                                {tournament.status === "Live" ? "Live Now" : tournament.status}
+                                {tournament.status === "Live" || tournament.status === "Started" ? "Live Now" : tournament.status}
                             </div>
 
                             <button
@@ -331,19 +348,53 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                             <div>
                                                 <h4 className="font-bold text-zinc-800">{race.raceName} (Round {race.round})</h4>
                                                 <p className="text-xs text-zinc-500 font-medium">
-                                                    {new Date(race.raceDateTime).toLocaleString()} • {race.distance}m • <span className="font-bold text-amber-600">{race.status}</span>
+                                                    {new Date(race.raceDateTime).toLocaleString()} • {race.distance}m • Reward: x{race.rewardRatio || 2.0} • <span className="font-bold text-amber-600">{race.status}</span>
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            {race.status !== "Completed" && race.status !== "Awarded" && user?.role === "Admin" && (
-                                                <button
-                                                    onClick={(e) => { e.stopPropagation(); handleMarkAsCompleted(race.raceId); }}
-                                                    className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
-                                                >
-                                                    Mark Completed
-                                                </button>
-                                            )}
+                                            {(() => {
+                                                // Identify if the user is an assigned referee for this race or an admin
+                                                const isAssignedRef = user?.role === "Referee" && race.referees?.some(ref => String(ref.refereeId) === String(user?.id) || String(ref.refereeId) === String(user?.userId));
+                                                const canManageRace = user?.role === "Admin" || isAssignedRef;
+
+                                                return (
+                                                    <>
+                                                        {race.status === "Upcoming" && canManageRace && (
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleMarkAsStarted(race.raceId); }}
+                                                                className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                            >
+                                                                Mark Started
+                                                            </button>
+                                                        )}
+                                                        {(race.status === "Started" || race.status === "Live") && canManageRace && (
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleMarkAsCompleted(race.raceId); }}
+                                                                className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                            >
+                                                                Mark Completed
+                                                            </button>
+                                                        )}
+                                                        {race.status === "Completed" && canManageRace && (
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowInputModal(true); }}
+                                                                className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                            >
+                                                                Input Results
+                                                            </button>
+                                                        )}
+                                                        {race.status === "Completed" && user?.role === "Admin" && (
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleAwardPrizes(race.raceId); }}
+                                                                className="px-3 py-1.5 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                            >
+                                                                Award Prizes
+                                                            </button>
+                                                        )}
+                                                    </>
+                                                );
+                                            })()}
                                             {(race.status === "Completed" || race.status === "Awarded") && (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowViewModal(true); }}
@@ -352,7 +403,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                                     View Results
                                                 </button>
                                             )}
-                                            {race.status === "Upcoming" && user?.role === "Spectator" && (() => {
+                                            {(race.status === "Upcoming" || race.status === "Started" || race.status === "Live") && user?.role === "Spectator" && (() => {
                                                 const activeBetsCount = myBets.filter(b => b.raceId === race.raceId && b.status === "Active").length;
                                                 return (
                                                     <div className="flex items-center gap-2">
@@ -364,31 +415,17 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                                                 My Bets ({activeBetsCount})
                                                             </button>
                                                         )}
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowBetModal(true); }}
-                                                            className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition-colors shadow-sm whitespace-nowrap"
-                                                        >
-                                                            Place Bet
-                                                        </button>
+                                                        {race.status === "Upcoming" && (
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowBetModal(true); }}
+                                                                className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition-colors shadow-sm whitespace-nowrap"
+                                                            >
+                                                                Place Bet
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 );
                                             })()}
-                                            {race.status === "Completed" && (user?.role === "Admin" || user?.role === "Referee") && (
-                                                <>
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowInputModal(true); }}
-                                                        className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
-                                                    >
-                                                        Input Results
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); handleAwardPrizes(race.raceId); }}
-                                                        className="px-3 py-1.5 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
-                                                    >
-                                                        Award Prizes
-                                                    </button>
-                                                </>
-                                            )}
                                             {expandedRace === race.raceId ? <ChevronUp className="w-5 h-5 text-zinc-400" /> : <ChevronDown className="w-5 h-5 text-zinc-400" />}
                                         </div>
                                     </div>

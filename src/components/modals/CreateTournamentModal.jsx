@@ -69,6 +69,7 @@ function CreateTournamentModal({ open, onClose }) {
             name: `Round ${i + 1}`,
             dateTime: "",
             distance: "",
+            rewardRatio: "2",
             refereeIds: [],
             participants: Array.from({ length: basicInfo.lanesPerRace }, (_, j) => ({
                 lane: j + 1,
@@ -110,7 +111,7 @@ function CreateTournamentModal({ open, onClose }) {
 
         for (let i = 0; i < races.length; i++) {
             const race = races[i];
-            if (!race.name || !race.dateTime || !race.distance || !race.refereeIds || race.refereeIds.length === 0) {
+            if (!race.name || !race.dateTime || !race.distance || !race.rewardRatio || !race.refereeIds || race.refereeIds.length === 0) {
                 isValid = false;
                 break;
             }
@@ -149,6 +150,7 @@ function CreateTournamentModal({ open, onClose }) {
                 RaceName: r.name,
                 RaceDateTime: r.dateTime,
                 Distance: parseFloat(r.distance || 0),
+                RewardRatio: parseFloat(r.rewardRatio || 2),
                 RefereeIds: r.refereeIds.map(id => parseInt(id)),
                 Participants: r.participants.map(p => ({
                     LaneNumber: parseInt(p.lane),
@@ -406,6 +408,21 @@ function CreateTournamentModal({ open, onClose }) {
                                             value={activeRace.distance}
                                             onChange={e => updateRace(activeRaceIndex, 'distance', e.target.value)}
                                             placeholder="1200"
+                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-10 pr-4 py-3 outline-none focus:border-amber-400 font-medium"
+                                        />
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block mb-2 font-semibold text-zinc-700 text-sm">Reward Ratio (x) *</label>
+                                    <div className="relative">
+                                        <Trophy size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                        <input
+                                            type="number"
+                                            step="0.1"
+                                            min="1.1"
+                                            value={activeRace.rewardRatio}
+                                            onChange={e => updateRace(activeRaceIndex, 'rewardRatio', e.target.value)}
+                                            placeholder="2.0"
                                             className="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-10 pr-4 py-3 outline-none focus:border-amber-400 font-medium"
                                         />
                                     </div>
