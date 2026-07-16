@@ -7,11 +7,11 @@ export const invitationApi = {
     cancelInvitation: (id) => {
         return axiosClient.delete(`/invitations/${id}`);
     },
-    getMyInvitations: () => {
-        return axiosClient.get("/invitations/my");
+    getMyInvitations: (status) => {
+        return axiosClient.get("/invitations/my", { params: status ? { status } : {} });
     },
-    getSentInvitations: () => {
-        return axiosClient.get("/invitations/sent");
+    getSentInvitations: (status) => {
+        return axiosClient.get("/invitations/sent", { params: status ? { status } : {} });
     },
     respondToInvitation: (id, isAccepted) => {
         return axiosClient.put(`/invitations/${id}/respond`, { isAccepted });
