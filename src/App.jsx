@@ -36,6 +36,7 @@ import Profile from "./pages/Profile";
 import UsersManagement from "./pages/UsersManagement";
 import MyInvites from "./pages/MyInvites";
 import SentInvites from "./pages/SentInvites";
+import Invitations from "./pages/Invitations";
 
 function App() {
   return (
@@ -189,6 +190,17 @@ function App() {
               <ProtectedRoute allowedRoles={["Jockey"]}>
                 <DashboardLayout>
                   <MyInvites />
+                </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/invitations"
+            element={
+              <ProtectedRoute allowedRoles={["HorseOwner", "Jockey"]}>
+                <DashboardLayout>
+                  <Invitations />
                 </DashboardLayout>
               </ProtectedRoute>
             }
