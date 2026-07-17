@@ -106,6 +106,7 @@ function Tournaments() {
   }, [search, filter]);
 
   const [tournaments, setTournaments] = useState([]);
+  const [backendTotalPrize, setBackendTotalPrize] = useState(0);
 
   useEffect(() => {
     const fetchTournaments = async () => {
@@ -121,6 +122,7 @@ function Tournaments() {
           date: t.startDate ? new Date(t.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "TBA",
           endDate: t.endDate ? new Date(t.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "TBA",
           prize: t.prizePool ? `$${t.prizePool.toLocaleString()}` : "$0",
+          rawPrize: t.prizePool || 0,
           status: t.status || "Upcoming",
           isHidden: t.isHidden || false,
           participants: 0,
@@ -128,6 +130,11 @@ function Tournaments() {
         }));
         
         setTournaments(mapped);
+        if (res.data?.totalPrize !== undefined) {
+          setBackendTotalPrize(res.data.totalPrize);
+        } else if (res.totalPrize !== undefined) {
+          setBackendTotalPrize(res.totalPrize);
+        }
       } catch (err) {
         console.error("Failed to fetch tournaments", err);
       } finally {
@@ -158,12 +165,16 @@ function Tournaments() {
   const totalUpcoming = useMemo(() => tournaments.filter((i) => i.status === "Upcoming").length, [tournaments]);
   const totalCompleted = useMemo(() => tournaments.filter((i) => i.status === "Completed").length, [tournaments]);
   const totalPrize = useMemo(() => {
+    // FE calculation handles reactive updates (e.g. when toggling hidden status)
     const sum = tournaments.reduce((acc, t) => {
-      const val = parseFloat(t.prize.replace(/[$,]/g, ""));
-      return acc + (isNaN(val) ? 0 : val);
+      if (t.isHidden) return acc;
+      return acc + (t.rawPrize || 0);
     }, 0);
-    return `$${(sum / 1000).toFixed(0)}K`;
-  }, [tournaments]);
+    
+    // Fallback to backendTotalPrize if the local sum is 0 (e.g. pagination doesn't load all)
+    const finalPrize = sum > 0 ? sum : (backendTotalPrize > 0 ? backendTotalPrize : 0);
+    return finalPrize >= 1000 ? `$${(finalPrize / 1000).toFixed(0)}K` : `$${finalPrize}`;
+  }, [tournaments, backendTotalPrize]);
   const featuredTournament = useMemo(() => tournaments.find((t) => t.featured && t.status === "Live") || tournaments.find((t) => t.status === "Live") || null, [tournaments]);
 
   const handleViewDetails = (tournament) => {
