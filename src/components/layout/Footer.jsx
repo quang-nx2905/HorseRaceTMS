@@ -1,14 +1,21 @@
 import React from 'react';
-
+import { Trophy } from 'lucide-react';
 function Footer() {
     return (
-        <footer className="bg-white border-t border-zinc-200 text-zinc-500 py-4 px-8 mt-auto text-center text-sm flex flex-col gap-2 items-center justify-center">
+        <footer className="bg-white border-t border-zinc-200 text-zinc-500 py-6 px-8 mt-auto text-center text-sm flex flex-col gap-3 items-center justify-center">
+            <div className="flex items-center justify-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                    <Trophy className="w-4 h-4 text-white" />
+                </div>
+                <span className="font-black text-zinc-900 text-lg tracking-tight">HorseRace<span className="text-orange-500">TMS</span></span>
+            </div>
+
             <div className="flex gap-4 font-medium text-zinc-600">
                 <span>Email: <a href="mailto:contact_horserace@gmail.com" className="hover:text-blue-500 hover:underline transition-colors">contact_horserace@gmail.com</a></span>
                 <span className="text-zinc-300">|</span>
                 <span>Hotline: 090 123 4567</span>
             </div>
-            <div>
+            <div className="text-xs">
                 &copy; {new Date().getFullYear()} HorseRace TMS. All rights reserved.
             </div>
         </footer>

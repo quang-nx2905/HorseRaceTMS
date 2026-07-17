@@ -1,4 +1,6 @@
+import React from "react";
 import { Link } from "react-router-dom";
+import Footer from "../components/layout/Footer";
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight, Trophy, Zap, Shield, TrendingUp,
@@ -375,16 +377,7 @@ function Home() {
         </div>
       </section>
 
-      {/* ───────────── Footer ───────────── */}
-      <footer className="py-10 px-6 bg-zinc-900 text-center border-t border-zinc-800">
-        <div className="flex items-center justify-center gap-2 mb-3">
-          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-            <Trophy className="w-4 h-4 text-white" />
-          </div>
-          <span className="font-black text-white">HorseRace<span className="text-amber-400">TMS</span></span>
-        </div>
-        <p className="text-zinc-500 font-medium text-sm">&copy; {new Date().getFullYear()} HorseRaceTMS. All rights reserved.</p>
-      </footer>
+      <Footer />
     </div>
   );
 }
