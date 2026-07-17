@@ -18,7 +18,7 @@ import toast from "react-hot-toast";
  *   ownerId   {number}    – current owner's UserId (from JWT)
  *   onSuccess {function}  – called after successful invitation send (triggers list refresh)
  */
-function SendInvitationModal({ open, onClose, ownerId, onSuccess }) {
+function SendInvitationModal({ open, onClose, ownerId, onSuccess, initialTourId, initialHorseId, initialRaceId }) {
     const [jockeys, setJockeys] = useState([]);
     const [horses, setHorses] = useState([]);
     const [tournaments, setTournaments] = useState([]);
@@ -26,8 +26,8 @@ function SendInvitationModal({ open, onClose, ownerId, onSuccess }) {
 
     const [form, setForm] = useState({
         jockeyId: "",
-        horseId: "",
-        tourId: "",
+        horseId: initialHorseId ? initialHorseId.toString() : "",
+        tourId: initialTourId ? initialTourId.toString() : "",
         message: "",
     });
     const [submitting, setSubmitting] = useState(false);
@@ -35,6 +35,13 @@ function SendInvitationModal({ open, onClose, ownerId, onSuccess }) {
     // Load dropdown data when modal opens
     useEffect(() => {
         if (!open || !ownerId) return;
+
+        setForm({
+            jockeyId: "",
+            horseId: initialHorseId ? initialHorseId.toString() : "",
+            tourId: initialTourId ? initialTourId.toString() : "",
+            message: "",
+        });
 
         const load = async () => {
             setLoadingData(true);
@@ -84,6 +91,7 @@ function SendInvitationModal({ open, onClose, ownerId, onSuccess }) {
                 jockeyId: parseInt(form.jockeyId),
                 horseId: parseInt(form.horseId),
                 tourId: parseInt(form.tourId),
+                raceId: initialRaceId ? parseInt(initialRaceId) : undefined,
                 message: form.message || undefined,
             });
 
@@ -151,6 +159,7 @@ function SendInvitationModal({ open, onClose, ownerId, onSuccess }) {
                                 onChange={handleChange}
                                 className={selectClass}
                                 required
+                                disabled={!!initialHorseId}
                             >
                                 <option value="">Select a horse...</option>
                                 {horses.map((h) => (
@@ -181,6 +190,7 @@ function SendInvitationModal({ open, onClose, ownerId, onSuccess }) {
                                 onChange={handleChange}
                                 className={selectClass}
                                 required
+                                disabled={!!initialTourId}
                             >
                                 <option value="">Select a tournament...</option>
                                 {tournaments.map((t) => (

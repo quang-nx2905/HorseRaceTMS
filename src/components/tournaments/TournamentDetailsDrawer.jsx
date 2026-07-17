@@ -27,6 +27,11 @@ import RaceResultInputModal from "../modals/RaceResultInputModal";
 import RaceViewResultsModal from "../modals/RaceViewResultsModal";
 import RaceBetModal from "../modals/RaceBetModal";
 import predictionApi from "../../api/predictionApi";
+import RaceStatusBadge from "../races/RaceStatusBadge";
+import RegisterHorseModal from "../races/RegisterHorseModal";
+import RaceRegistrationManagement from "../races/RaceRegistrationManagement";
+import SendInvitationModal from "../invitations/SendInvitationModal";
+
 
 const STATUS_CONFIG = {
     Live: {
@@ -81,6 +86,33 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
     const [showBetModal, setShowBetModal] = useState(false);
     const [selectedRaceForModal, setSelectedRaceForModal] = useState(null);
     const [myBets, setMyBets] = useState([]);
+
+    const [showRegisterModal, setShowRegisterModal] = useState(false);
+    const [showInviteJockeyModal, setShowInviteJockeyModal] = useState(false);
+    const [prefilledRaceId, setPrefilledRaceId] = useState(null);
+    const [prefilledHorseId, setPrefilledHorseId] = useState(null);
+    const [prefilledTourId, setPrefilledTourId] = useState(null);
+
+    const handleOpenRegistration = async (raceId) => {
+        try {
+            await raceApi.openRegistration(raceId);
+            toast.success("Registration is now open!");
+            fetchDetail();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to open registration.");
+        }
+    };
+
+    const handleCloseRegistration = async (raceId) => {
+        try {
+            await raceApi.closeRegistration(raceId);
+            toast.success("Registration closed.");
+            fetchDetail();
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to close registration.");
+        }
+    };
+
 
     const handleMarkAsStarted = async (raceId) => {
         try {
@@ -345,30 +377,73 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                             <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
                                                 <Flag className="w-5 h-5" />
                                             </div>
-                                            <div>
-                                                <h4 className="font-bold text-zinc-800">{race.raceName} (Round {race.round})</h4>
+                                            <div className="flex flex-col gap-1">
+                                                <div className="flex items-center gap-2 flex-wrap">
+                                                    <h4 className="font-bold text-zinc-800">{race.raceName} (Round {race.round})</h4>
+                                                    <RaceStatusBadge status={race.status} />
+                                                </div>
                                                 <p className="text-xs text-zinc-500 font-medium">
-                                                    {new Date(race.raceDateTime).toLocaleString()} • {race.distance}m • Reward: x{race.rewardRatio || 2.0} • <span className="font-bold text-amber-600">{race.status}</span>
+                                                    {new Date(race.raceDateTime).toLocaleString()} • {race.distance}m • Reward: x{race.rewardRatio || 2.0}
                                                 </p>
+                                                {race.minParticipants && (
+                                                    <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">
+                                                        Participants: {race.participants?.length || 0} / {race.minParticipants}-{race.maxParticipants}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
                                             {(() => {
-                                                // Identify if the user is an assigned referee for this race or an admin
                                                 const isAssignedRef = user?.role === "Referee" && race.referees?.some(ref => String(ref.refereeId) === String(user?.id) || String(ref.refereeId) === String(user?.userId));
                                                 const canManageRace = user?.role === "Admin" || isAssignedRef;
+                                                const hasAlreadyRegistered = race.participants?.some(p => p.ownerId === user?.id || p.ownerId === user?.userId);
 
                                                 return (
                                                     <>
-                                                        {race.status === "Upcoming" && canManageRace && (
+                                                        {/* Admin registration controls */}
+                                                        {user?.role === "Admin" && (race.status === "Upcoming" || race.status === "Draft") && (
                                                             <button
-                                                                onClick={(e) => { e.stopPropagation(); handleMarkAsStarted(race.raceId); }}
-                                                                className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                                onClick={(e) => { e.stopPropagation(); handleOpenRegistration(race.raceId); }}
+                                                                className="px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
                                                             >
-                                                                Mark Started
+                                                                Open Reg
                                                             </button>
                                                         )}
-                                                        {(race.status === "Started" || race.status === "Live") && canManageRace && (
+                                                        {user?.role === "Admin" && race.status === "Open Registration" && (
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleCloseRegistration(race.raceId); }}
+                                                                className="px-3 py-1.5 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                            >
+                                                                Close Reg
+                                                            </button>
+                                                        )}
+
+                                                        {/* Horse owner registration control */}
+                                                        {user?.role === "HorseOwner" && race.status === "Open Registration" && !hasAlreadyRegistered && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    setPrefilledRaceId(race.raceId);
+                                                                    setShowRegisterModal(true);
+                                                                }}
+                                                                className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                            >
+                                                                Register Horse
+                                                            </button>
+                                                        )}
+
+                                                        {/* Start control for Ready To Start status */}
+                                                        {race.status === "Ready To Start" && canManageRace && (
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); handleMarkAsStarted(race.raceId); }}
+                                                                className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                            >
+                                                                Start Race
+                                                            </button>
+                                                        )}
+
+                                                        {/* Racing status controls */}
+                                                        {(race.status === "Racing" || race.status === "Started" || race.status === "Live") && canManageRace && (
                                                             <button
                                                                 onClick={(e) => { e.stopPropagation(); handleMarkAsCompleted(race.raceId); }}
                                                                 className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
@@ -395,6 +470,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                                     </>
                                                 );
                                             })()}
+
                                             {(race.status === "Completed" || race.status === "Awarded") && (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowViewModal(true); }}
@@ -432,6 +508,13 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
 
                                     {expandedRace === race.raceId && (
                                         <div className="p-4 pt-0 border-t border-zinc-100 mt-2">
+                                            {race.status === "Cancelled" && race.cancelReason && (
+                                                <div className="p-3 mb-4 bg-red-50 border border-red-205 text-red-750 text-xs font-semibold rounded-xl flex items-center gap-2">
+                                                    <AlertCircle size={16} className="text-red-500 flex-shrink-0" />
+                                                    <span>Reason: {race.cancelReason}</span>
+                                                </div>
+                                            )}
+
                                             <div className="mt-4">
                                                 <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-2">Referees ({race.referees?.length || 0})</p>
                                                 <div className="flex flex-wrap gap-2 mb-4">
@@ -449,32 +532,63 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                             <div>
                                                 <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-2">Participants ({race.participants?.length || 0})</p>
                                                 <div className="space-y-2">
-                                                    {race.participants?.map(p => (
-                                                        <div key={p.participantId} className="flex items-center justify-between bg-white p-3 rounded-xl border border-zinc-200">
-                                                            <div className="flex items-center gap-4">
-                                                                <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-500 flex items-center justify-center text-sm font-black shadow-inner flex-shrink-0">
-                                                                    {p.laneNumber}
-                                                                </div>
-                                                                <div className="w-10 h-10 rounded-full bg-amber-100 overflow-hidden flex-shrink-0 border border-amber-200 shadow-sm">
-                                                                    <img src={p.horseAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${p.horseName || p.horseId}&backgroundColor=fef3c7`} alt={p.horseName} className={`w-full h-full object-cover ${p.horseAvatar ? '' : 'p-1'}`} />
-                                                                </div>
-                                                                <div>
-                                                                    <p className="text-sm font-bold text-zinc-800">{p.horseName || `Horse #${p.horseId}`}</p>
-                                                                    <div className="flex items-center gap-1.5 mt-1">
-                                                                        <div className="w-4 h-4 rounded-full bg-zinc-200 overflow-hidden flex-shrink-0">
-                                                                            <img src={p.jockeyAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.jockeyName || p.jockeyId}&backgroundColor=f3f4f6`} alt={p.jockeyName} className="w-full h-full object-cover" />
+                                                    {race.participants?.map(p => {
+                                                        const isMyHorse = Number(p.ownerId) === Number(user?.id);
+                                                        const canInvite = user?.role === "HorseOwner" && isMyHorse && !p.jockeyId && race.status !== "Cancelled";
+
+                                                        return (
+                                                            <div key={p.participantId} className="flex items-center justify-between bg-white p-3 rounded-xl border border-zinc-200">
+                                                                <div className="flex items-center gap-4">
+                                                                    <div className="w-8 h-8 rounded-lg bg-zinc-100 text-zinc-500 flex items-center justify-center text-sm font-black shadow-inner flex-shrink-0">
+                                                                        {p.laneNumber || "-"}
+                                                                    </div>
+                                                                    <div className="w-10 h-10 rounded-full bg-amber-100 overflow-hidden flex-shrink-0 border border-amber-200 shadow-sm">
+                                                                        <img src={p.horseAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${p.horseName || p.horseId}&backgroundColor=fef3c7`} alt={p.horseName} className={`w-full h-full object-cover ${p.horseAvatar ? '' : 'p-1'}`} />
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="text-sm font-bold text-zinc-800">{p.horseName || `Horse #${p.horseId}`}</p>
+                                                                        <div className="flex items-center gap-1.5 mt-1">
+                                                                            <div className="w-4 h-4 rounded-full bg-zinc-200 overflow-hidden flex-shrink-0">
+                                                                                <img src={p.jockeyAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.jockeyName || p.jockeyId || "NoJockey"}&backgroundColor=f3f4f6`} alt={p.jockeyName || "No Jockey"} className="w-full h-full object-cover" />
+                                                                            </div>
+                                                                            <p className="text-[10px] text-zinc-500 font-semibold">{p.jockeyName || "No Jockey Assigned"}</p>
                                                                         </div>
-                                                                        <p className="text-[10px] text-zinc-500 font-semibold">{p.jockeyName || `Jockey #${p.jockeyId}`}</p>
                                                                     </div>
                                                                 </div>
+
+                                                                <div className="flex items-center gap-2">
+                                                                    {canInvite && (
+                                                                        <button
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
+                                                                                setPrefilledTourId(detail.tourId);
+                                                                                setPrefilledHorseId(p.horseId);
+                                                                                setPrefilledRaceId(race.raceId);
+                                                                                setShowInviteJockeyModal(true);
+                                                                            }}
+                                                                            className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-[10px] font-bold transition-all shadow-sm"
+                                                                        >
+                                                                            Invite Jockey
+                                                                        </button>
+                                                                    )}
+                                                                    <span className="text-[10px] font-bold uppercase px-2 py-1 bg-zinc-100 text-zinc-500 rounded-md">
+                                                                        {p.participationStatus}
+                                                                    </span>
+                                                                </div>
                                                             </div>
-                                                            <span className="text-[10px] font-bold uppercase px-2 py-1 bg-zinc-100 text-zinc-500 rounded-md">
-                                                                {p.participationStatus}
-                                                            </span>
-                                                        </div>
-                                                    ))}
+                                                        );
+                                                    })}
                                                 </div>
                                             </div>
+
+                                            {user?.role === "Admin" && (
+                                                <div className="mt-4 border-t border-zinc-100 pt-4">
+                                                    <RaceRegistrationManagement 
+                                                        raceId={race.raceId} 
+                                                        onStatusChange={() => fetchDetail()} 
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
@@ -522,8 +636,36 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                     fetchMyBets();
                 }}
             />
+
+            <RegisterHorseModal
+                open={showRegisterModal}
+                onClose={() => {
+                    setShowRegisterModal(false);
+                    setPrefilledRaceId(null);
+                }}
+                raceId={prefilledRaceId}
+                ownerId={user?.id}
+                onSuccess={() => fetchDetail()}
+            />
+
+            <SendInvitationModal
+                open={showInviteJockeyModal}
+                onClose={() => {
+                    setShowInviteJockeyModal(false);
+                    setPrefilledTourId(null);
+                    setPrefilledHorseId(null);
+                    setPrefilledRaceId(null);
+                }}
+                ownerId={user?.id}
+                initialTourId={prefilledTourId}
+                initialHorseId={prefilledHorseId}
+                initialRaceId={prefilledRaceId}
+                onSuccess={() => {
+                    fetchDetail();
+                }}
+            />
         </>
     );
 }
 
-export default TournamentDetailsDrawer;
+export default TournamentDetailsDrawer;

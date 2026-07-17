@@ -71,11 +71,9 @@ function CreateTournamentModal({ open, onClose }) {
             distance: "",
             rewardRatio: "2",
             refereeIds: [],
-            participants: Array.from({ length: basicInfo.lanesPerRace }, (_, j) => ({
-                lane: j + 1,
-                horseId: "",
-                jockeyId: "",
-            }))
+            minParticipants: 4,
+            maxParticipants: basicInfo.lanesPerRace,
+            participants: []
         }));
         setRaces(newRaces);
     };
@@ -122,17 +120,10 @@ function CreateTournamentModal({ open, onClose }) {
                 return;
             }
             lastRaceTime = currentRaceTime;
-
-            for (const p of race.participants) {
-                if (!p.horseId || !p.jockeyId) {
-                    isValid = false;
-                    break;
-                }
-            }
         }
 
         if (!isValid) {
-            toast.error("Please fill all details and assign all lanes for all races.");
+            toast.error("Please fill all details and assign referees for all races.");
             return;
         }
 
@@ -151,13 +142,12 @@ function CreateTournamentModal({ open, onClose }) {
                 RaceDateTime: r.dateTime,
                 Distance: parseFloat(r.distance || 0),
                 RewardRatio: parseFloat(r.rewardRatio || 2),
+                MinParticipants: r.minParticipants ?? 4,
+                MaxParticipants: r.maxParticipants ?? 12,
                 RefereeIds: r.refereeIds.map(id => parseInt(id)),
-                Participants: r.participants.map(p => ({
-                    LaneNumber: parseInt(p.lane),
-                    HorseId: parseInt(p.horseId),
-                    JockeyId: parseInt(p.jockeyId)
-                }))
+                Participants: []
             }))
+
         };
 
         try {
@@ -330,9 +320,6 @@ function CreateTournamentModal({ open, onClose }) {
 
     const renderStep2 = () => {
         const activeRace = races[activeRaceIndex];
-        
-        const selectedHorseIds = activeRace.participants.map(p => p.horseId).filter(Boolean);
-        const selectedJockeyIds = activeRace.participants.map(p => p.jockeyId).filter(Boolean);
 
         const minDateTime = activeRaceIndex > 0 && races[activeRaceIndex - 1].dateTime 
             ? races[activeRaceIndex - 1].dateTime 
@@ -354,9 +341,10 @@ function CreateTournamentModal({ open, onClose }) {
                                 className={`px-4 py-3 rounded-2xl text-left font-semibold transition-all flex items-center justify-between ${activeRaceIndex === i ? 'bg-amber-100 text-amber-700' : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-600'}`}
                             >
                                 <span>Race {i + 1}</span>
-                                {r.name && r.dateTime && r.distance && r.participants.every(p => p.horseId && p.jockeyId) && (
+                                {r.name && r.dateTime && r.distance && r.refereeIds && r.refereeIds.length > 0 && (
                                     <CheckCircle2 size={16} className="text-emerald-500" />
                                 )}
+
                             </button>
                         ))}
                     </div>
@@ -460,63 +448,56 @@ function CreateTournamentModal({ open, onClose }) {
                                         </div>
                                     )}
                                 </div>
-                                <h4 className="font-bold text-zinc-800 mb-4 flex items-center gap-2">
-                                    <Users size={18} className="text-zinc-500" /> Lane Assignments (Pairs)
-                                </h4>
-                                <div className="space-y-3">
-                                    {activeRace.participants.map((p, pIndex) => (
-                                        <div key={pIndex} className="flex items-center gap-4 bg-zinc-50 p-3 rounded-2xl border border-zinc-100">
-                                            <div className="w-12 h-12 bg-zinc-200 rounded-xl flex items-center justify-center font-black text-zinc-500">
-                                                L{p.lane}
-                                            </div>
-                                            <div className="flex-1 grid grid-cols-2 gap-4">
-                                                <div>
-                                                    <select
-                                                        value={p.horseId}
-                                                        onChange={e => updateParticipant(activeRaceIndex, pIndex, 'horseId', e.target.value)}
-                                                        className={`w-full border rounded-xl px-4 py-3 outline-none font-medium bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all ${p.horseId ? 'border-zinc-300 text-zinc-900' : 'border-zinc-300 text-zinc-500'}`}
-                                                    >
-                                                        <option value="">-- Select Horse --</option>
-                                                        {availableHorses.map(h => {
-                                                            const hid = h.id || h.horseId;
-                                                            const hname = h.name || h.horseName || `Horse #${hid}`;
-                                                            return (
-                                                                <option 
-                                                                    key={hid} 
-                                                                    value={hid}
-                                                                    disabled={hid && selectedHorseIds.includes(hid.toString()) && p.horseId !== hid.toString()}
-                                                                >
-                                                                    {hname}
-                                                                </option>
-                                                            );
-                                                        })}
-                                                    </select>
-                                                </div>
-                                                <div>
-                                                    <select
-                                                        value={p.jockeyId}
-                                                        onChange={e => updateParticipant(activeRaceIndex, pIndex, 'jockeyId', e.target.value)}
-                                                        className={`w-full border rounded-xl px-4 py-3 outline-none font-medium bg-white focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all ${p.jockeyId ? 'border-zinc-300 text-zinc-900' : 'border-zinc-300 text-zinc-500'}`}
-                                                    >
-                                                        <option value="">-- Select Jockey --</option>
-                                                        {availableJockeys.map(j => {
-                                                            const jid = j.id || j.userId;
-                                                            const jname = j.name || j.fullName || `Jockey #${jid}`;
-                                                            return (
-                                                                <option 
-                                                                    key={jid} 
-                                                                    value={jid}
-                                                                    disabled={jid && selectedJockeyIds.includes(jid.toString()) && p.jockeyId !== jid.toString()}
-                                                                >
-                                                                    {jname}
-                                                                </option>
-                                                            );
-                                                        })}
-                                                    </select>
-                                                </div>
-                                            </div>
+                                {/* Registration Limits */}
+                                <div className="mt-2">
+                                    <h4 className="font-bold text-zinc-800 mb-4 flex items-center gap-2">
+                                        <Users size={18} className="text-zinc-500" /> Registration Limits
+                                    </h4>
+                                    <div className="grid grid-cols-2 gap-4 mb-6">
+                                        <div>
+                                            <label className="block mb-2 font-semibold text-zinc-600 text-sm">Min Participants</label>
+                                            <input
+                                                type="number"
+                                                min="2"
+                                                max={activeRace.maxParticipants}
+                                                value={activeRace.minParticipants ?? 4}
+                                                onChange={e => updateRace(activeRaceIndex, 'minParticipants', parseInt(e.target.value) || 2)}
+                                                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:border-amber-400 font-medium"
+                                            />
                                         </div>
-                                    ))}
+                                        <div>
+                                            <label className="block mb-2 font-semibold text-zinc-600 text-sm">Max Participants</label>
+                                            <input
+                                                type="number"
+                                                min={activeRace.minParticipants ?? 2}
+                                                max="20"
+                                                value={activeRace.maxParticipants ?? 12}
+                                                onChange={e => updateRace(activeRaceIndex, 'maxParticipants', parseInt(e.target.value) || 12)}
+                                                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-3 outline-none focus:border-amber-400 font-medium"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Info Box */}
+                                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 flex gap-4 items-start">
+                                    <div className="mt-0.5 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                                        <Users size={16} className="text-amber-600" />
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-amber-900 mb-1">Horse Owners will self-register</p>
+                                        <p className="text-sm text-amber-800 leading-relaxed">
+                                            After the tournament is created, <strong>Horse Owners</strong> will register their horses for each race.
+                                            They will also send <strong>invitations to Jockeys</strong>. Jockeys can accept or decline.
+                                            Once a Jockey accepts, <strong>Admin reviews and approves</strong> the final participant assignment.
+                                        </p>
+                                        <div className="mt-3 flex flex-wrap gap-2">
+                                            <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">1. HorseOwner registers horse</span>
+                                            <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">2. HorseOwner invites Jockey</span>
+                                            <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">3. Jockey accepts / declines</span>
+                                            <span className="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">4. Admin approves Jockey</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

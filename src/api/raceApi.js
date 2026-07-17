@@ -23,6 +23,44 @@ const raceApi = {
   awardPrizes: (id) => {
     return axiosClient.post(`/Races/${id}/award`);
   },
+
+  // --- NEW REGISTRATION FLOW ENDPOINTS ---
+  registerHorse: (raceId, horseId) => {
+    return axiosClient.post(`/races/${raceId}/register`, { horseId });
+  },
+
+  getRegistrations: (raceId) => {
+    return axiosClient.get(`/races/${raceId}/registrations`);
+  },
+
+  approveRegistration: (raceId, registrationId) => {
+    return axiosClient.put(`/races/${raceId}/registrations/${registrationId}/approve`);
+  },
+
+  rejectRegistration: (raceId, registrationId, note) => {
+    return axiosClient.put(`/races/${raceId}/registrations/${registrationId}/reject`, { note });
+  },
+
+  openRegistration: (raceId) => {
+    return axiosClient.put(`/races/${raceId}/open-registration`);
+  },
+
+  closeRegistration: (raceId) => {
+    return axiosClient.put(`/races/${raceId}/close-registration`);
+  },
+
+  getRaceStatus: (raceId) => {
+    return axiosClient.get(`/races/${raceId}/status`);
+  },
+
+  getParticipants: (raceId) => {
+    return axiosClient.get(`/races/${raceId}/participants`);
+  },
+  // Admin approves jockey after jockey accepted invitation
+  approveJockey: (participantId) => {
+    return axiosClient.put(`/races/participants/${participantId}/approve-jockey`);
+  },
 };
 
 export default raceApi;
+
