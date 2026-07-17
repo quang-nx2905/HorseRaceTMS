@@ -78,7 +78,7 @@ function HorseCard({ horse, onView, onEdit, onDelete, onSuspend, onReinstate, is
                         <h3 className="font-black text-zinc-900 text-lg leading-tight">
                             {horse.name}
                         </h3>
-                        <p className="text-zinc-400 text-sm mt-0.5">{horse.breed}</p>
+                        <p className="text-zinc-400 text-sm mt-0.5">{horse.breed} • {horse.ownerName || "Unknown Owner"}</p>
                     </div>
                     <div className="flex flex-col gap-1.5 items-end">
                         {isAdmin && (
@@ -96,6 +96,11 @@ function HorseCard({ horse, onView, onEdit, onDelete, onSuspend, onReinstate, is
                 {/* Stats row */}
                 <div className="flex gap-4 my-4 py-4 border-t border-b border-zinc-100">
                     <div className="flex-1 text-center">
+                        <p className="text-2xl font-black text-zinc-900">#{horse.id}</p>
+                        <p className="text-xs text-zinc-400 mt-0.5">ID</p>
+                    </div>
+                    <div className="w-px bg-zinc-100" />
+                    <div className="flex-1 text-center">
                         <p className="text-2xl font-black text-zinc-900">{horse.age}</p>
                         <p className="text-xs text-zinc-400 mt-0.5">Age (yrs)</p>
                     </div>
@@ -103,11 +108,6 @@ function HorseCard({ horse, onView, onEdit, onDelete, onSuspend, onReinstate, is
                     <div className="flex-1 text-center">
                         <p className="text-2xl font-black text-yellow-500">{horse.wins}</p>
                         <p className="text-xs text-zinc-400 mt-0.5">Total Wins</p>
-                    </div>
-                    <div className="w-px bg-zinc-100" />
-                    <div className="flex-1 text-center">
-                        <p className="text-2xl font-black text-zinc-900">#{horse.id}</p>
-                        <p className="text-xs text-zinc-400 mt-0.5">ID</p>
                     </div>
                 </div>
 
@@ -215,6 +215,7 @@ function Horses() {
                         id: h.horseId,
                         name: h.horseName,
                         breed: h.breed || "Unknown",
+                        ownerName: h.ownerName,
                         age: h.age || 0,
                         weight: h.weight,
                         gender: h.gender,

@@ -1,117 +1,122 @@
+import Footer from "../components/layout/Footer";
+
 function AuthLayout({
     children,
 }) {
 
     return (
-        <div
-            className="
-        min-h-screen
-        grid
-        grid-cols-2
-        bg-[#f5f5f4]
-      "
-        >
-
-            {/* LEFT */}
+        <div className="min-h-screen flex flex-col">
             <div
                 className="
-          hidden
-          lg:flex
-          relative
-          overflow-hidden
-        "
+            flex-1
+            grid
+            grid-cols-2
+            bg-[#f5f5f4]
+          "
             >
 
-                {/* Background */}
-                <img
-                    src="https://images.unsplash.com/photo-1543357480-c60d40007a3f?q=80&w=2070"
-                    alt="horse"
-                    className="
-            absolute
-            inset-0
-            w-full
-            h-full
-            object-cover
-          "
-                />
-
-                {/* Overlay */}
+                {/* LEFT */}
                 <div
                     className="
-            absolute
-            inset-0
-            bg-black/50
-          "
-                ></div>
-
-                {/* Content */}
-                <div
-                    className="
-            relative
-            z-10
-            p-16
-            text-white
-            flex
-            flex-col
-            justify-end
-          "
+              hidden
+              lg:flex
+              relative
+              overflow-hidden
+            "
                 >
 
-                    <p
+                    {/* Background */}
+                    <img
+                        src="https://images.unsplash.com/photo-1543357480-c60d40007a3f?q=80&w=2070"
+                        alt="horse"
                         className="
-              uppercase
-              tracking-[5px]
-              text-yellow-400
-              mb-6
-            "
-                    >
-                        Horse Race Tournament
-                    </p>
+                absolute
+                inset-0
+                w-full
+                h-full
+                object-cover
+              "
+                    />
 
-                    <h1
+                    {/* Overlay */}
+                    <div
                         className="
-              text-6xl
-              font-bold
-              leading-tight
-              mb-6
-            "
-                    >
-                        Elite Racing
-                        Management
-                        Platform
-                    </h1>
+                absolute
+                inset-0
+                bg-black/50
+              "
+                    ></div>
 
-                    <p
+                    {/* Content */}
+                    <div
                         className="
-              text-zinc-300
-              text-lg
-              leading-relaxed
-              max-w-[500px]
-            "
+                relative
+                z-10
+                p-16
+                text-white
+                flex
+                flex-col
+                justify-end
+              "
                     >
-                        Manage tournaments, track live races,
-                        monitor analytics, and build
-                        championship experiences.
-                    </p>
+
+                        <p
+                            className="
+                  uppercase
+                  tracking-[5px]
+                  text-yellow-400
+                  mb-6
+                "
+                        >
+                            Horse Race Tournament
+                        </p>
+
+                        <h1
+                            className="
+                  text-6xl
+                  font-bold
+                  leading-tight
+                  mb-6
+                "
+                        >
+                            Elite Racing
+                            Management
+                            Platform
+                        </h1>
+
+                        <p
+                            className="
+                  text-zinc-300
+                  text-lg
+                  leading-relaxed
+                  max-w-[500px]
+                "
+                        >
+                            Manage tournaments, track live races,
+                            monitor analytics, and build
+                            championship experiences.
+                        </p>
+
+                    </div>
+
+                </div>
+
+                {/* RIGHT */}
+                <div
+                    className="
+              flex
+              items-center
+              justify-center
+              p-8
+            "
+                >
+
+                    {children}
 
                 </div>
 
             </div>
-
-            {/* RIGHT */}
-            <div
-                className="
-          flex
-          items-center
-          justify-center
-          p-8
-        "
-            >
-
-                {children}
-
-            </div>
-
+            <Footer />
         </div>
     );
 }
