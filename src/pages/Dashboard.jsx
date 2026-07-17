@@ -1,6 +1,8 @@
+import React, { useEffect, useState } from "react";
 import StatCard from "../components/ui/StatCard";
 import AnalyticsChart from "../components/charts/AnalyticsChart";
 import RecentRaces from "../components/dashboard/RecentRaces";
+import api from "../api/axiosClient";
 import {
     GanttChartSquare,
     Zap,
@@ -8,52 +10,108 @@ import {
     Target,
     ArrowUpRight,
     CalendarDays,
+    Users,
 } from "lucide-react";
 
-const stats = [
-    {
-        title: "Total Horses",
-        value: "2,450",
-        subtitle: "+12% this month",
-        icon: GanttChartSquare,
-        accent: "bg-yellow-400",
-        iconColor: "text-yellow-900",
-        trend: "+12%",
-        trendUp: true,
-    },
-    {
-        title: "Active Races",
-        value: "18",
-        subtitle: "Currently ongoing",
-        icon: Zap,
-        accent: "bg-emerald-400",
-        iconColor: "text-emerald-900",
-        trend: "+3",
-        trendUp: true,
-    },
-    {
-        title: "Predictions",
-        value: "12.4k",
-        subtitle: "AI generated insights",
-        icon: TrendingUp,
-        accent: "bg-blue-400",
-        iconColor: "text-blue-900",
-        trend: "+8.2%",
-        trendUp: true,
-    },
-    {
-        title: "Win Accuracy",
-        value: "86%",
-        subtitle: "Prediction engine",
-        icon: Target,
-        accent: "bg-violet-400",
-        iconColor: "text-violet-900",
-        trend: "+1.4%",
-        trendUp: true,
-    },
-];
-
 function Dashboard() {
+    const [stats, setStats] = useState([
+        {
+            title: "Total Horses",
+            value: "...",
+            subtitle: "Registered horses",
+            icon: GanttChartSquare,
+            accent: "bg-yellow-400",
+            iconColor: "text-yellow-900",
+            trend: "+0",
+            trendUp: true,
+        },
+        {
+            title: "Active Tournaments",
+            value: "...",
+            subtitle: "Currently ongoing",
+            icon: Zap,
+            accent: "bg-emerald-400",
+            iconColor: "text-emerald-900",
+            trend: "+0",
+            trendUp: true,
+        },
+        {
+            title: "Total Jockeys",
+            value: "...",
+            subtitle: "Professional riders",
+            icon: Users,
+            accent: "bg-blue-400",
+            iconColor: "text-blue-900",
+            trend: "+0",
+            trendUp: true,
+        },
+        {
+            title: "Completed Tournaments",
+            value: "...",
+            subtitle: "Successful events",
+            icon: Target,
+            accent: "bg-violet-400",
+            iconColor: "text-violet-900",
+            trend: "+0",
+            trendUp: true,
+        },
+    ]);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const response = await api.get('/dashboard/stats');
+                const data = response.data;
+                
+                setStats([
+                    {
+                        title: "Total Horses",
+                        value: data.totalHorses.toLocaleString(),
+                        subtitle: "Registered horses",
+                        icon: GanttChartSquare,
+                        accent: "bg-yellow-400",
+                        iconColor: "text-yellow-900",
+                        trend: "Live",
+                        trendUp: true,
+                    },
+                    {
+                        title: "Active Tournaments",
+                        value: data.activeTournaments.toLocaleString(),
+                        subtitle: "Currently ongoing",
+                        icon: Zap,
+                        accent: "bg-emerald-400",
+                        iconColor: "text-emerald-900",
+                        trend: "Live",
+                        trendUp: true,
+                    },
+                    {
+                        title: "Total Jockeys",
+                        value: data.totalJockeys.toLocaleString(),
+                        subtitle: "Professional riders",
+                        icon: Users,
+                        accent: "bg-blue-400",
+                        iconColor: "text-blue-900",
+                        trend: "Live",
+                        trendUp: true,
+                    },
+                    {
+                        title: "Completed Tournaments",
+                        value: data.completedTournaments.toLocaleString(),
+                        subtitle: "Successful events",
+                        icon: Target,
+                        accent: "bg-violet-400",
+                        iconColor: "text-violet-900",
+                        trend: "Done",
+                        trendUp: true,
+                    },
+                ]);
+            } catch (error) {
+                console.error("Failed to fetch dashboard stats", error);
+            }
+        };
+
+        fetchStats();
+    }, []);
 
     const today = new Date().toLocaleDateString("en-US", {
         weekday: "long",

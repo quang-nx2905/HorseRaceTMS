@@ -34,6 +34,9 @@ import Spectator from "./pages/Spectator";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import UsersManagement from "./pages/UsersManagement";
+import MyInvites from "./pages/MyInvites";
+import SentInvites from "./pages/SentInvites";
+import VNPayReturnPage from "./pages/VNPayReturnPage";
 import Invitations from "./pages/Invitations";
 
 
@@ -197,6 +200,15 @@ function App() {
             }
           />
 
+
+          <Route
+            path="/topup/vnpay-return"
+            element={
+              <ProtectedRoute allowedRoles={["Spectator"]}>
+                <VNPayReturnPage />
+              </ProtectedRoute>
+            }
+          />
 
           <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>

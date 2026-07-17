@@ -16,8 +16,10 @@ import {
     Activity,
     ShieldCheck,
     CalendarDays,
-    Loader2
+    Loader2,
+    Wallet
 } from "lucide-react";
+import TopupModal from "../components/TopupModal";
 
 function Profile() {
     const { user, setUser } = useAuth();
@@ -30,8 +32,11 @@ function Profile() {
         avatarUrl: null,
         role: "User",
         joinedDate: null,
-        isActive: true
+        isActive: true,
+        totalPoints: 0
     });
+
+    const [isTopupModalOpen, setIsTopupModalOpen] = useState(false);
 
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -51,7 +56,8 @@ function Profile() {
                     avatarUrl: data.avatarUrl || null,
                     role: data.role || prev.role,
                     joinedDate: data.joinedDate,
-                    isActive: data.isActive
+                    isActive: data.isActive,
+                    totalPoints: data.totalPoints || 0
                 }));
                 setUser(prev => ({ ...prev, avatarUrl: data.avatarUrl, name: data.fullName || prev?.name }));
             } catch (error) {
@@ -191,6 +197,21 @@ function Profile() {
                             <ShieldCheck size={12} className="text-amber-500" />
                             {profile.role}
                         </div>
+
+                        {profile.role === "Spectator" && (
+                            <div className="mt-6 w-full p-4 bg-gradient-to-br from-zinc-50 to-zinc-100 border border-zinc-200 rounded-2xl flex flex-col items-center">
+                                <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1">Points Balance</span>
+                                <div className="text-3xl font-black text-amber-500 flex items-center gap-2">
+                                    {profile.totalPoints.toLocaleString()} <span className="text-sm font-bold text-zinc-400">PTS</span>
+                                </div>
+                                <button 
+                                    onClick={() => setIsTopupModalOpen(true)}
+                                    className="mt-3 w-full py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <Wallet size={16} /> Top Up Points
+                                </button>
+                            </div>
+                        )}
 
                         {/* Divider */}
                         <div className="w-full h-px bg-zinc-100 my-6" />
@@ -429,6 +450,8 @@ function Profile() {
                     </div>
                 </div>
             </div>
+
+            <TopupModal isOpen={isTopupModalOpen} onClose={() => setIsTopupModalOpen(false)} />
         </div>
     );
 }
