@@ -36,6 +36,7 @@ import Profile from "./pages/Profile";
 import UsersManagement from "./pages/UsersManagement";
 import MyInvites from "./pages/MyInvites";
 import SentInvites from "./pages/SentInvites";
+import VNPayReturnPage from "./pages/VNPayReturnPage";
 import Invitations from "./pages/Invitations";
 
 function App() {
@@ -213,6 +214,15 @@ function App() {
                 <DashboardLayout>
                   <SentInvites />
                 </DashboardLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/topup/vnpay-return"
+            element={
+              <ProtectedRoute allowedRoles={["Spectator"]}>
+                <VNPayReturnPage />
               </ProtectedRoute>
             }
           />
