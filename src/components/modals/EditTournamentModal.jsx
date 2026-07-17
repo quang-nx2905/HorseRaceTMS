@@ -33,7 +33,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
         if (open && tournament) {
             setStep(1);
             setActiveRaceIndex(0);
-            
+
             const fetchData = async () => {
                 setLoading(true);
                 try {
@@ -44,14 +44,14 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                         userApi.getUsers({ role: 'Referee', page: 1, pageSize: 100 }),
                         tournamentApi.getById(tournament.id) // Fetch full tournament details
                     ]);
-                    
+
                     const allHorses = horsesRes.data || [];
                     setAvailableHorses(allHorses.filter(h => h.status === 'Approved'));
                     setAvailableJockeys(jockeysRes.items || jockeysRes.data?.items || []);
                     setAvailableReferees(refereesRes.items || refereesRes.data?.items || []);
-                    
+
                     const tDetail = detailRes.data?.data || detailRes.data || detailRes;
-                    
+
                     setBasicInfo({
                         id: tDetail.tourId,
                         name: tDetail.tourName || "",
@@ -62,13 +62,14 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                         totalRaces: tDetail.races ? tDetail.races.length : 0,
                         lanesPerRace: tDetail.races && tDetail.races.length > 0 ? (tDetail.races[0].participants?.length || 0) : 0,
                     });
-                    
+
                     if (tDetail.races) {
                         const loadedRaces = tDetail.races.map(r => ({
                             id: r.raceId,
                             name: r.raceName,
                             dateTime: r.raceDateTime ? r.raceDateTime.substring(0, 16) : "", // datetime-local format
                             distance: r.distance?.toString() || "",
+                            rewardRatio: r.rewardRatio?.toString() || "2",
                             refereeIds: (r.referees || []).map(ref => ref.refereeId.toString()),
                             participants: (r.participants || []).map(p => ({
                                 lane: p.laneNumber,
@@ -95,19 +96,20 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
 
     const generateRaces = () => {
         if (races.length === basicInfo.totalRaces && (races.length === 0 || races[0]?.participants?.length === basicInfo.lanesPerRace)) {
-            return; 
+            return;
         }
-        
+
         const newRaces = Array.from({ length: basicInfo.totalRaces }, (_, i) => {
             if (i < races.length && races[i].participants?.length === basicInfo.lanesPerRace) {
                 return races[i];
             }
-            
+
             return {
                 id: `race-${i}`,
                 name: `Round ${i + 1}`,
                 dateTime: "",
                 distance: "",
+                rewardRatio: "2",
                 refereeIds: [],
                 participants: Array.from({ length: basicInfo.lanesPerRace }, (_, j) => ({
                     lane: j + 1,
@@ -146,7 +148,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                 isValid = false;
                 break;
             }
-            
+
             const currentRaceTime = new Date(race.dateTime);
             if (currentRaceTime < lastRaceTime || currentRaceTime > maxTime) {
                 toast.error(`Race ${i + 1} time must be after the previous race and within tournament dates.`);
@@ -181,6 +183,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                 RaceName: r.name,
                 RaceDateTime: r.dateTime,
                 Distance: parseFloat(r.distance || 0),
+                RewardRatio: parseFloat(r.rewardRatio || 2),
                 RefereeIds: r.refereeIds.map(id => parseInt(id)),
                 Participants: r.participants.map(p => ({
                     LaneNumber: p.lane,
@@ -193,7 +196,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
         try {
             await tournamentApi.update(basicInfo.id, payload);
             toast.success("Tournament updated successfully!");
-            
+
             if (onUpdate) {
                 onUpdate({
                     ...tournament,
@@ -205,7 +208,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                     participants: races.reduce((sum, r) => sum + r.participants.length, 0)
                 });
             }
-            
+
             onClose();
             window.location.reload();
         } catch (error) {
@@ -368,14 +371,14 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
 
     const renderStep2 = () => {
         const activeRace = races[activeRaceIndex];
-        
+
         const selectedHorseIds = activeRace.participants.map(p => p.horseId).filter(Boolean);
         const selectedJockeyIds = activeRace.participants.map(p => p.jockeyId).filter(Boolean);
 
-        const minDateTime = activeRaceIndex > 0 && races[activeRaceIndex - 1].dateTime 
-            ? races[activeRaceIndex - 1].dateTime 
+        const minDateTime = activeRaceIndex > 0 && races[activeRaceIndex - 1].dateTime
+            ? races[activeRaceIndex - 1].dateTime
             : (basicInfo.startDate ? `${basicInfo.startDate}T00:00` : undefined);
-            
+
         const maxDateTime = basicInfo.endDate ? `${basicInfo.endDate}T23:59` : undefined;
 
         return (
@@ -411,7 +414,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                     {activeRace && (
                         <div className="space-y-8">
                             {/* Race Details */}
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
                                 <div>
                                     <label className="block mb-2 font-semibold text-zinc-700 text-sm">Race Name *</label>
                                     <input
@@ -449,6 +452,21 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                                         />
                                     </div>
                                 </div>
+                                <div>
+                                    <label className="block mb-2 font-semibold text-zinc-700 text-sm">Reward Ratio (x) *</label>
+                                    <div className="relative">
+                                        <Trophy size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                        <input
+                                            type="number"
+                                            step="0.1"
+                                            min="1.1"
+                                            value={activeRace.rewardRatio}
+                                            onChange={e => updateRace(activeRaceIndex, 'rewardRatio', e.target.value)}
+                                            placeholder="2.0"
+                                            className="w-full bg-zinc-50 border border-zinc-200 rounded-xl pl-10 pr-4 py-3 outline-none focus:border-amber-400 font-medium"
+                                        />
+                                    </div>
+                                </div>
                             </div>
 
                             <hr className="border-zinc-100" />
@@ -469,8 +487,8 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                                                 const isSelected = (activeRace.refereeIds || []).includes(refId.toString());
                                                 return (
                                                     <label key={refId} className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all hover:bg-zinc-100/50 ${isSelected ? 'bg-amber-50/50' : 'bg-white'}`}>
-                                                        <input 
-                                                            type="checkbox" 
+                                                        <input
+                                                            type="checkbox"
                                                             className="accent-amber-500 w-4 h-4 rounded border-zinc-300 focus:ring-amber-400"
                                                             checked={isSelected}
                                                             onChange={() => toggleReferee(activeRaceIndex, refId.toString())}
@@ -503,8 +521,8 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                                                             const hid = h.id || h.horseId;
                                                             const hname = h.name || h.horseName || `Horse #${hid}`;
                                                             return (
-                                                                <option 
-                                                                    key={hid} 
+                                                                <option
+                                                                    key={hid}
                                                                     value={hid}
                                                                     disabled={hid && selectedHorseIds.includes(hid.toString()) && p.horseId !== hid.toString()}
                                                                 >
@@ -525,8 +543,8 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                                                             const jid = j.id || j.userId;
                                                             const jname = j.name || j.fullName || `Jockey #${jid}`;
                                                             return (
-                                                                <option 
-                                                                    key={jid} 
+                                                                <option
+                                                                    key={jid}
                                                                     value={jid}
                                                                     disabled={jid && selectedJockeyIds.includes(jid.toString()) && p.jockeyId !== jid.toString()}
                                                                 >
@@ -590,27 +608,27 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                     </h4>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
                         <div>
-                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><Trophy size={14}/> Name</p>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><Trophy size={14} /> Name</p>
                             <p className="font-black text-zinc-900 truncate" title={basicInfo.name}>{basicInfo.name}</p>
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><DollarSign size={14}/> Prize Pool</p>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><DollarSign size={14} /> Prize Pool</p>
                             <p className="font-black text-emerald-600">${basicInfo.prizePool || "0"}</p>
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><MapPin size={14}/> Location</p>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><MapPin size={14} /> Location</p>
                             <p className="font-bold text-zinc-800 truncate">{basicInfo.location || "N/A"}</p>
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><Calendar size={14}/> Start Date</p>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><Calendar size={14} /> Start Date</p>
                             <p className="font-bold text-zinc-800">{basicInfo.startDate || "N/A"}</p>
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><Calendar size={14}/> End Date</p>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><Calendar size={14} /> End Date</p>
                             <p className="font-bold text-zinc-800">{basicInfo.endDate || "N/A"}</p>
                         </div>
                         <div>
-                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><Flag size={14}/> Total Races</p>
+                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-1 flex items-center gap-1"><Flag size={14} /> Total Races</p>
                             <p className="font-bold text-zinc-800">{races.length}</p>
                         </div>
                     </div>

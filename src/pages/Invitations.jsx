@@ -302,7 +302,7 @@ function Invitations() {
     const handleRespond = async (inviteId, accept) => {
         setRespondingId(inviteId);
         try {
-            const res = await invitationApi.respondToInvitation(inviteId, { accept });
+            const res = await invitationApi.respondToInvitation(inviteId, accept);
             toast.success(res?.message || (accept ? "Invitation accepted!" : "Invitation rejected."));
             fetchInvitations();
         } catch (err) {
