@@ -3,7 +3,7 @@ import { UploadCloud, X, Loader2, Image as ImageIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import axiosClient from "../../api/axiosClient";
 
-export default function ImageUpload({ value, onChange, className = "" }) {
+export default function ImageUpload({ value, onChange, className = "", variant = "image" }) {
     const [isUploading, setIsUploading] = useState(false);
     const [preview, setPreview] = useState(value || null);
     const [isDragging, setIsDragging] = useState(false);
@@ -31,7 +31,8 @@ export default function ImageUpload({ value, onChange, className = "" }) {
         formData.append("file", file);
 
         try {
-            const response = await axiosClient.post("/Upload/Image", formData, {
+            const uploadUrl = variant === "banner" ? "/Upload/Image?banner=true" : "/Upload/Image";
+            const response = await axiosClient.post(uploadUrl, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                 },
@@ -99,7 +100,8 @@ export default function ImageUpload({ value, onChange, className = "" }) {
                 onDragLeave={onDragLeave}
                 onDrop={onDrop}
                 className={`
-                    w-full min-h-[160px] border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-6
+                    w-full border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-6
+                    ${variant === "banner" ? "aspect-[12/5] min-h-0" : "min-h-[160px]"}
                     cursor-pointer transition-all duration-200 overflow-hidden relative group
                     ${isDragging ? "border-yellow-400 bg-yellow-50" : "border-zinc-200 bg-zinc-50 hover:bg-zinc-100 hover:border-zinc-300"}
                     ${preview ? "border-transparent bg-transparent" : ""}
@@ -110,7 +112,7 @@ export default function ImageUpload({ value, onChange, className = "" }) {
                         <img 
                             src={preview} 
                             alt="Preview" 
-                            className={`w-full h-full object-cover absolute inset-0 transition-opacity ${isUploading ? "opacity-50" : "opacity-100"}`} 
+                            className={`w-full h-full absolute inset-0 transition-opacity ${variant === "banner" ? "object-contain bg-zinc-950" : "object-cover"} ${isUploading ? "opacity-50" : "opacity-100"}`} 
                         />
                         {/* Overlay on hover */}
                         {!isUploading && (
@@ -127,7 +129,9 @@ export default function ImageUpload({ value, onChange, className = "" }) {
                             <ImageIcon size={24} className="text-zinc-400" />
                         </div>
                         <p className="text-sm font-semibold text-zinc-700">Click to upload or drag & drop</p>
-                        <p className="text-xs text-zinc-400 mt-1">SVG, PNG, JPG or GIF (max. 5MB)</p>
+                        <p className="text-xs text-zinc-400 mt-1">
+                            {variant === "banner" ? "Recommended ratio 12:5 (e.g. 1920 × 800)" : "SVG, PNG, JPG or GIF (max. 5MB)"}
+                        </p>
                     </>
                 )}
 
