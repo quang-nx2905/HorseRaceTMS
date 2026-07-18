@@ -41,10 +41,14 @@ function Spectator() {
 
     const [editingLink, setEditingLink] = useState(false);
     const [tempLink, setTempLink] = useState("");
+    const [linkError, setLinkError] = useState("");
     const [chatMode, setChatMode] = useState("youtube");
+    const [standaloneYoutubeId, setStandaloneYoutubeId] = useState(() => localStorage.getItem("spectatorStandaloneYoutubeId") || "");
     
     // Use auth context if you have it to get userId, else mock it
     const { user } = useAuth ? useAuth() : { user: null };
+    const isAdmin = user?.role?.toLowerCase() === "admin";
+    const canManageYoutubeLink = isAdmin;
 
     const chatEndRef = useRef(null);
     const hubConnection = useRef(null);
@@ -62,14 +66,20 @@ function Spectator() {
             try {
                 const res = await axiosClient.get("/Races/streams/active");
                 const data = res.data;
-                const lives = data.filter(r => ["LIVE", "STARTED", "ONGOING"].includes(r.status?.toUpperCase()));
-                const upcomings = data.filter(r => r.status?.toUpperCase() === "UPCOMING");
+                const liveStatuses = ["LIVE", "STARTED", "ONGOING", "RACING"];
+                const upcomingStatuses = [
+                    "UPCOMING",
+                    "OPEN REGISTRATION",
+                    "REGISTRATION CLOSED",
+                    "READY TO START"
+                ];
+                const lives = data.filter(r => liveStatuses.includes(r.status?.toUpperCase()));
+                const upcomings = data.filter(r => upcomingStatuses.includes(r.status?.toUpperCase()));
                 
                 // Map properties to match UI expectations
                 const mapRace = r => ({
                     ...r,
                     race: r.raceName,
-                    laps: "N/A",
                     tournamentName: r.tournamentName || "Uncategorized"
                 });
 
@@ -79,9 +89,10 @@ function Spectator() {
                 if (lives.length > 0) setSelectedStream(mapRace(lives[0]));
                 else if (upcomings.length > 0) setSelectedStream(mapRace(upcomings[0]));
                 else if (data.length > 0) setSelectedStream(mapRace(data[0])); // Fallback to first race
-                else setSelectedStream(null); // Explicit null if empty
+                else setSelectedStream(null);
             } catch (err) {
                 console.error("Failed to fetch streams", err);
+                setSelectedStream(null);
             } finally {
                 setIsLoading(false);
             }
@@ -91,7 +102,7 @@ function Spectator() {
 
     // Load comments and connect SignalR when stream changes
     useEffect(() => {
-        if (!selectedStream) return;
+        if (!selectedStream?.raceId) return;
 
         const loadCommentsAndConnect = async () => {
             try {
@@ -137,13 +148,22 @@ function Spectator() {
     const handleUpdateLink = async () => {
         if (!tempLink.trim() || !selectedStream) return;
         const newId = extractYoutubeId(tempLink);
+
+        if (!/^[a-zA-Z0-9_-]{11}$/.test(newId)) {
+            setLinkError("Invalid YouTube link or video ID.");
+            return;
+        }
+
+        setLinkError("");
+
+        if (!selectedStream.raceId) return;
         
         try {
             await axiosClient.put(`/Races/${selectedStream.raceId}/youtube-id`, `"${newId}"`, {
                 headers: { "Content-Type": "application/json" }
             });
             
-            if (selectedStream.status === "LIVE" || selectedStream.status === "STARTED") {
+            if (["LIVE", "STARTED", "ONGOING", "RACING"].includes(selectedStream.status?.toUpperCase())) {
                 const updated = liveRaces.map(r => r.raceId === selectedStream.raceId ? { ...r, youtubeId: newId } : r);
                 setLiveRaces(updated);
             } else {
@@ -154,13 +174,31 @@ function Spectator() {
             setSelectedStream({ ...selectedStream, youtubeId: newId });
             setEditingLink(false);
             setTempLink("");
+            setChatMode("youtube");
         } catch (err) {
             console.error("Failed to update youtube link", err);
+            setLinkError(err.response?.data?.message || "Unable to save the YouTube link.");
         }
     };
 
+    const handleStandaloneLink = () => {
+        const newId = extractYoutubeId(tempLink.trim());
+        if (!/^[a-zA-Z0-9_-]{11}$/.test(newId)) {
+            setLinkError("Invalid YouTube link or video ID.");
+            return;
+        }
+
+        localStorage.setItem("spectatorStandaloneYoutubeId", newId);
+        setStandaloneYoutubeId(newId);
+        setTempLink("");
+        setLinkError("");
+        setEditingLink(false);
+    };
+
     const handleSend = async () => {
-        if (!chatMsg.trim() || !selectedStream || !hubConnection.current) return;
+        if (!chatMsg.trim() || !selectedStream) return;
+
+        if (!hubConnection.current) return;
         
         try {
             // Use real userId if available, else 1 for testing (requires a valid user in DB)
@@ -184,14 +222,64 @@ function Spectator() {
 
     if (!selectedStream) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[500px] text-zinc-400">
-                <div className="bg-zinc-900 p-8 rounded-full mb-6 border border-zinc-800">
-                    <MonitorOff className="w-12 h-12 text-zinc-500" />
+                <div className="pb-12">
+                    <div className="relative mb-6 overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-950 px-6 py-8 shadow-2xl md:px-10">
+                        <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-amber-500/10 blur-3xl" />
+                        <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+                            <div>
+                                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-xs font-black uppercase tracking-[0.18em] text-amber-400">
+                                    <Radio className="h-3.5 w-3.5" /> Race Broadcast Center
+                                </div>
+                                <h1 className="text-4xl font-black tracking-tight text-white">Live Stream <span className="text-amber-400">Preview</span></h1>
+                                <p className="mt-3 max-w-xl text-sm font-medium leading-6 text-zinc-400">Watch the current YouTube broadcast and join the live conversation.</p>
+                            </div>
+                            {isAdmin && !editingLink && (
+                                <button onClick={() => { setTempLink(standaloneYoutubeId); setLinkError(""); setEditingLink(true); }} className="inline-flex items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 py-3 text-sm font-black text-zinc-950 transition hover:bg-amber-500">
+                                    <LinkIcon className="h-4 w-4" /> {standaloneYoutubeId ? "Change YouTube Link" : "Set YouTube Link"}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {isAdmin && editingLink && (
+                        <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 shadow-sm">
+                            <div className="flex flex-col gap-3 md:flex-row">
+                                <input value={tempLink} onChange={event => { setTempLink(event.target.value); setLinkError(""); }} onKeyDown={event => event.key === "Enter" && handleStandaloneLink()} placeholder="Paste a YouTube link or video ID..." className="min-w-0 flex-1 rounded-xl border border-amber-200 bg-white px-4 py-3 text-sm outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20" />
+                                <button onClick={handleStandaloneLink} className="rounded-xl bg-zinc-950 px-5 py-3 text-sm font-black text-white hover:bg-zinc-800">Save Link</button>
+                                <button onClick={() => { setEditingLink(false); setLinkError(""); }} className="rounded-xl border border-zinc-200 bg-white px-5 py-3 text-sm font-black text-zinc-600 hover:bg-zinc-50">Cancel</button>
+                            </div>
+                            {linkError && <p className="mt-2 text-xs font-semibold text-red-500">{linkError}</p>}
+                        </div>
+                    )}
+
+                    <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
+                        <div className="overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm xl:col-span-2">
+                            <div className="relative aspect-video bg-zinc-950">
+                                {standaloneYoutubeId ? (
+                                    <iframe className="absolute inset-0 h-full w-full" src={`https://www.youtube.com/embed/${standaloneYoutubeId}?autoplay=1&mute=1`} title="YouTube broadcast preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen />
+                                ) : (
+                                    <div className="flex h-full flex-col items-center justify-center px-6 text-center">
+                                        <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-3xl border border-white/10 bg-white/5"><Play className="h-8 w-8 text-zinc-500" /></div>
+                                        <h2 className="text-xl font-black text-white">No YouTube Link Attached</h2>
+                                        <p className="mt-2 max-w-sm text-sm text-zinc-500">Set a YouTube link to preview the broadcast here.</p>
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex items-center justify-between gap-4 p-5">
+                                <div><p className="font-black text-zinc-900">Live Broadcast</p><p className="mt-1 text-xs font-medium text-zinc-500">YouTube stream provided by the race administrator.</p></div>
+                                {standaloneYoutubeId && <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-black text-emerald-600">Link Ready</span>}
+                            </div>
+                        </div>
+
+                        <div className="min-h-[480px] overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm">
+                            <div className="border-b border-zinc-100 p-5"><h2 className="flex items-center gap-2 font-black text-zinc-900"><MessageSquare className="h-5 w-5 text-red-500" /> YouTube Live Chat</h2><p className="mt-1 text-xs text-zinc-500">Available only when Live Chat is enabled on YouTube.</p></div>
+                            <div className="relative h-[410px] bg-zinc-50">
+                                {standaloneYoutubeId ? <iframe src={`https://www.youtube.com/live_chat?v=${standaloneYoutubeId}&embed_domain=${window.location.hostname}`} title="YouTube live chat" className="absolute inset-0 h-full w-full border-0" /> : <div className="flex h-full flex-col items-center justify-center p-6 text-center text-zinc-400"><MessageSquare className="mb-3 h-10 w-10 opacity-20" /><p className="text-sm font-medium">Live Chat will appear after a link is attached.</p></div>}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h3 className="text-2xl font-black text-white mb-2">No Active Broadcasts</h3>
-                <p className="text-center max-w-sm">There are currently no live or upcoming races. Please check back later.</p>
-            </div>
-        );
+            );
     }
 
     // Helper to group races by tournament
@@ -212,14 +300,14 @@ function Spectator() {
                     <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/8 rounded-full blur-3xl" />
                     <div className="absolute bottom-0 left-0 w-48 h-64 bg-blue-500/5 rounded-full blur-3xl" />
                 </div>
-                <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="relative z-10">
                     <div>
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-500/15 border border-red-500/30 text-red-400 rounded-full text-xs font-bold uppercase tracking-widest mb-4">
                             <span className="relative flex h-2 w-2">
                                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
                                 <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
                             </span>
-                            Broadcasting Live
+                            Race Broadcast Center
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-3">
                             Spectator <span className="text-amber-400">Arena</span>
@@ -229,23 +317,6 @@ function Spectator() {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-3 min-w-[270px]">
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-                            <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider mb-1">Live Viewers</p>
-                            <p className="text-2xl font-black text-white">42K</p>
-                            <p className="text-[9px] text-emerald-400 font-bold mt-0.5">+12%</p>
-                        </div>
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-                            <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider mb-1">Streams</p>
-                            <p className="text-2xl font-black text-white">8</p>
-                            <p className="text-[9px] text-zinc-500 font-bold mt-0.5">Active</p>
-                        </div>
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-                            <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-wider mb-1">Rating</p>
-                            <p className="text-2xl font-black text-amber-400">4.9</p>
-                            <p className="text-[9px] text-zinc-500 font-bold mt-0.5">★★★★★</p>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -305,7 +376,7 @@ function Spectator() {
                             )}
 
                             {/* LIVE badge overlay */}
-                            {["LIVE", "STARTED", "ONGOING"].includes(selectedStream.status?.toUpperCase()) && (
+                            {["LIVE", "STARTED", "ONGOING", "RACING"].includes(selectedStream.status?.toUpperCase()) && (
                                 <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-red-600/90 backdrop-blur-sm rounded-full pointer-events-none z-20">
                                     <span className="relative flex h-2 w-2">
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-200 opacity-75" />
@@ -315,13 +386,6 @@ function Spectator() {
                                 </div>
                             )}
 
-                            {/* Viewer count overlay */}
-                            {selectedStream.viewers && selectedStream.viewers !== "Waiting" && selectedStream.viewers !== "Live" && (
-                                <div className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 bg-black/50 backdrop-blur-sm border border-white/10 rounded-full pointer-events-none z-20">
-                                    <Users className="w-3.5 h-3.5 text-zinc-300" />
-                                    <span className="text-xs text-white font-bold">{selectedStream.viewers}</span>
-                                </div>
-                            )}
                         </div>
 
                         {/* Stream info bar */}
@@ -329,28 +393,31 @@ function Spectator() {
                             <div>
                                 <h3 className="font-black text-zinc-900 text-lg">{selectedStream.race}</h3>
                                 <p className="text-zinc-500 text-sm mt-0.5">
-                                    {selectedStream.track} · {["LIVE", "STARTED", "ONGOING"].includes(selectedStream.status?.toUpperCase()) ? `Lap ${selectedStream.laps}` : `Starts: ${selectedStream.time}`} · {["LIVE", "STARTED", "ONGOING"].includes(selectedStream.status?.toUpperCase()) ? "Leader:" : "Status:"} <strong className="text-zinc-700">{["LIVE", "STARTED", "ONGOING"].includes(selectedStream.status?.toUpperCase()) ? selectedStream.leader : "Waiting"}</strong>
+                                    {selectedStream.track}{selectedStream.time ? ` · ${selectedStream.time}` : ""} · <strong className="text-zinc-700">{selectedStream.status}</strong>
                                 </p>
                             </div>
                             <div className="flex flex-wrap items-center gap-3">
-                                {user?.role === "Admin" && (
+                                {canManageYoutubeLink && (
                                     editingLink ? (
-                                        <div className="flex items-center gap-2">
-                                            <input 
-                                                type="text" 
-                                                placeholder="Paste YouTube link..." 
-                                                value={tempLink}
-                                                onChange={(e) => setTempLink(e.target.value)}
-                                                onKeyDown={(e) => e.key === "Enter" && handleUpdateLink()}
-                                                className="px-3 py-1.5 text-sm bg-zinc-50 border border-zinc-200 rounded-xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all w-48"
-                                            />
-                                            <button onClick={handleUpdateLink} className="px-3 py-1.5 bg-amber-400 text-zinc-950 text-xs font-bold rounded-xl hover:bg-amber-500 transition-colors">Save</button>
-                                            <button onClick={() => setEditingLink(false)} className="px-3 py-1.5 bg-zinc-100 text-zinc-600 text-xs font-bold rounded-xl hover:bg-zinc-200 transition-colors">Cancel</button>
+                                        <div>
+                                            <div className="flex items-center gap-2">
+                                                <input 
+                                                    type="text" 
+                                                    placeholder="Paste a YouTube link or video ID..." 
+                                                    value={tempLink}
+                                                    onChange={(e) => { setTempLink(e.target.value); setLinkError(""); }}
+                                                    onKeyDown={(e) => e.key === "Enter" && handleUpdateLink()}
+                                                    className="px-3 py-1.5 text-sm bg-zinc-50 border border-zinc-200 rounded-xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 transition-all w-64"
+                                                />
+                                                <button onClick={handleUpdateLink} className="px-3 py-1.5 bg-amber-400 text-zinc-950 text-xs font-bold rounded-xl hover:bg-amber-500 transition-colors">Save</button>
+                                                <button onClick={() => { setEditingLink(false); setLinkError(""); }} className="px-3 py-1.5 bg-zinc-100 text-zinc-600 text-xs font-bold rounded-xl hover:bg-zinc-200 transition-colors">Cancel</button>
+                                            </div>
+                                            {linkError && <p className="mt-1.5 text-xs font-semibold text-red-500">{linkError}</p>}
                                         </div>
                                     ) : (
-                                        <button onClick={() => { setTempLink(""); setEditingLink(true); }} className="px-3 py-1.5 bg-zinc-50 border border-zinc-200 text-zinc-600 rounded-xl text-xs font-bold hover:bg-zinc-100 hover:text-zinc-900 flex items-center gap-1.5 transition-colors">
+                                        <button onClick={() => { setTempLink(selectedStream.youtubeId || ""); setLinkError(""); setEditingLink(true); }} className="px-3 py-1.5 bg-zinc-50 border border-zinc-200 text-zinc-600 rounded-xl text-xs font-bold hover:bg-zinc-100 hover:text-zinc-900 flex items-center gap-1.5 transition-colors">
                                             <LinkIcon className="w-3.5 h-3.5" />
-                                            Change Link
+                                            Set Link ({user?.role})
                                         </button>
                                     )
                                 )}
@@ -398,10 +465,7 @@ function Spectator() {
                                                         </span>
                                                     </div>
                                                     <p className={`text-xs mb-2 truncate ${selectedStream.race === r.race ? "text-zinc-400" : "text-zinc-500"}`}><MapPin className="w-3 h-3 inline mr-1" />{r.track}</p>
-                                                    <div className="flex items-center justify-between text-xs font-bold mt-3 pt-3 border-t border-white/5">
-                                                        <span className={`flex items-center gap-1 ${selectedStream.race === r.race ? "text-zinc-300" : "text-zinc-500"}`}>
-                                                            <Users className="w-3 h-3" /> {r.viewers}
-                                                        </span>
+                                                    <div className="flex items-center justify-end text-xs font-bold mt-3 pt-3 border-t border-white/5">
                                                         <span className={`flex items-center gap-1 ${selectedStream.race === r.race ? "text-amber-400" : "text-amber-600"}`}>
                                                             <Trophy className="w-3 h-3" /> {r.prize}
                                                         </span>
@@ -496,21 +560,28 @@ function Spectator() {
 
                     {chatMode === "youtube" ? (
                         <div className="flex-1 bg-zinc-50 relative">
-                            {selectedStream.youtubeId && ["LIVE", "STARTED", "ONGOING", "UPCOMING", "WAITING"].includes(selectedStream.status?.toUpperCase()) ? (
+                            {selectedStream.youtubeId ? (
                                 <iframe
                                     src={`https://www.youtube.com/live_chat?v=${selectedStream.youtubeId}&embed_domain=${window.location.hostname}`}
                                     className="absolute inset-0 w-full h-full border-0"
+                                    title="YouTube live chat"
                                 ></iframe>
                             ) : (
                                 <div className="flex flex-col items-center justify-center h-full text-zinc-400 p-6 text-center">
                                     <MessageSquare className="w-12 h-12 mb-3 opacity-20" />
-                                    <p className="text-sm font-medium">YouTube live chat is only available for active or upcoming events.</p>
+                                    <p className="text-sm font-medium">Add a YouTube link to open Live Chat. If Live Chat is disabled for the video, use the App tab.</p>
                                 </div>
                             )}
                         </div>
                     ) : (
                         <>
                             <div className="flex-1 overflow-y-auto p-5 space-y-3">
+                                {reactions.length === 0 && (
+                                    <div className="flex h-full min-h-48 flex-col items-center justify-center text-center text-zinc-400">
+                                        <MessageSquare className="mb-3 h-10 w-10 opacity-20" />
+                                        <p className="text-sm font-medium">No comments yet.</p>
+                                    </div>
+                                )}
                                 {reactions.map((r, i) => (
                                     <div key={i} className="flex gap-3">
                                         {/* Avatar */}
