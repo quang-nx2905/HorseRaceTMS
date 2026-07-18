@@ -271,6 +271,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                         <ImageUpload 
                             value={basicInfo.bannerUrl}
                             onChange={(url) => setBasicInfo({ ...basicInfo, bannerUrl: url })}
+                            variant="banner"
                         />
                     </div>
 

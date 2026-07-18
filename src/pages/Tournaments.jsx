@@ -430,11 +430,11 @@ function Tournaments() {
 
                 {/* Banner Image */}
                 {tournament.bannerUrl && (
-                  <div className="w-full h-32 bg-zinc-100 overflow-hidden relative">
+                  <div className="w-full aspect-[12/5] bg-zinc-950 overflow-hidden relative">
                     <img 
                       src={tournament.bannerUrl} 
                       alt={tournament.name} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-500" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/50 to-transparent"></div>
                   </div>
