@@ -186,9 +186,14 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                 `}</style>
 
                 {/* ── HEADER HERO BANNER ── */}
-                <div className={`relative overflow-hidden bg-gradient-to-br ${cfg.glow} bg-zinc-900 p-8 pb-10 border-b border-zinc-200`}>
-                    <div className="absolute inset-0 bg-zinc-950/85 pointer-events-none" />
-                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none" />
+                <div className={`relative overflow-hidden ${detail?.bannerUrl ? 'bg-zinc-950' : `bg-gradient-to-br ${cfg.glow} bg-zinc-900`} p-8 pb-10 border-b border-zinc-200`}>
+                    {detail?.bannerUrl && (
+                        <div className="absolute inset-0 z-0">
+                            <img src={detail.bannerUrl} alt="Tournament Banner" className="w-full h-full object-cover opacity-75" />
+                        </div>
+                    )}
+                    <div className={`absolute inset-0 ${detail?.bannerUrl ? 'bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-zinc-950/20' : 'bg-zinc-950/85'} pointer-events-none z-0`} />
+                    <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none z-0" />
 
                     <div className="relative z-10">
                         <div className="flex items-center justify-between mb-6">
