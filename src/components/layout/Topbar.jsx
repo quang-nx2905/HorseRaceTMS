@@ -21,7 +21,7 @@ const PAGE_TITLES = {
     "/predictions": "Predictions",
     "/leaderboard": "Leaderboard",
     "/referee": "Referee",
-    "/spectator": "Spectator",
+    "/spectator": "Race Broadcasts",
     "/settings": "Settings",
     "/profile": "Profile",
 };

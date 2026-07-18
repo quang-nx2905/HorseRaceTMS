@@ -44,7 +44,7 @@ const getNavGroups = (userRole) => {
       label: "Management",
       items: [
         { name: "Referee", path: "/referee", icon: Shield, roles: ["Admin", "Referee"] },
-        { name: "Spectator", path: "/spectator", icon: Eye, roles: ["Admin", "Spectator"] },
+        { name: "Race Broadcasts", path: "/spectator", icon: Eye, roles: ["Admin", "HorseOwner", "Spectator"] },
       ],
     },
     {

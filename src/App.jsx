@@ -144,7 +144,7 @@ function App() {
           <Route
             path="/spectator"
             element={
-              <ProtectedRoute allowedRoles={["Admin", "Spectator"]}>
+              <ProtectedRoute allowedRoles={["Admin", "HorseOwner", "Spectator"]}>
                 <DashboardLayout>
                   <Spectator />
                 </DashboardLayout>
