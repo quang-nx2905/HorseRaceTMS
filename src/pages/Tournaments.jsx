@@ -33,6 +33,7 @@ import usePagination from "../hooks/usePagination";
 import EmptyState from "../components/common/EmptyState";
 import ConfirmModal from "../components/common/ConfirmModal";
 import EditTournamentModal from "../components/modals/EditTournamentModal";
+import fallbackTournamentBanner from "../assets/hero.png";
 
 const STATUS_CONFIG = {
   Live: {
@@ -123,8 +124,8 @@ function Tournaments() {
           rawPrize: t.prizePool || 0,
           status: t.status || "Upcoming",
           isHidden: t.isHidden || false,
-          bannerUrl: t.bannerUrl || null,
-          participants: 0,
+          bannerUrl: t.bannerUrl || fallbackTournamentBanner,
+          participants: t.participantCount || 0,
           featured: false,
         }));
         
@@ -434,6 +435,9 @@ function Tournaments() {
                     <img 
                       src={tournament.bannerUrl} 
                       alt={tournament.name} 
+                      onError={(event) => {
+                        if (event.currentTarget.src !== fallbackTournamentBanner) event.currentTarget.src = fallbackTournamentBanner;
+                      }}
                       className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-500" 
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/50 to-transparent"></div>

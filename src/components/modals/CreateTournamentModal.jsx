@@ -74,11 +74,7 @@ function CreateTournamentModal({ open, onClose }) {
             distance: "",
             rewardRatio: "2",
             refereeIds: [],
-            participants: Array.from({ length: basicInfo.lanesPerRace }, (_, j) => ({
-                lane: j + 1,
-                horseId: "",
-                jockeyId: "",
-            }))
+            participants: []
         }));
         setRaces(newRaces);
     };
@@ -101,7 +97,7 @@ function CreateTournamentModal({ open, onClose }) {
             return;
         }
 
-        if (races.length !== basicInfo.totalRaces || races[0]?.participants?.length !== basicInfo.lanesPerRace) {
+        if (races.length !== basicInfo.totalRaces) {
             generateRaces();
         }
         setStep(2);
@@ -126,16 +122,10 @@ function CreateTournamentModal({ open, onClose }) {
             }
             lastRaceTime = currentRaceTime;
 
-            for (const p of race.participants) {
-                if (!p.horseId || !p.jockeyId) {
-                    isValid = false;
-                    break;
-                }
-            }
         }
 
         if (!isValid) {
-            toast.error("Please fill all details and assign all lanes for all races.");
+            toast.error("Please fill all required race details and assign at least one referee.");
             return;
         }
 
@@ -155,12 +145,10 @@ function CreateTournamentModal({ open, onClose }) {
                 RaceDateTime: r.dateTime,
                 Distance: parseFloat(r.distance || 0),
                 RewardRatio: parseFloat(r.rewardRatio || 2),
+                MinParticipants: Math.min(2, basicInfo.lanesPerRace),
+                MaxParticipants: basicInfo.lanesPerRace,
                 RefereeIds: r.refereeIds.map(id => parseInt(id)),
-                Participants: r.participants.map(p => ({
-                    LaneNumber: parseInt(p.lane),
-                    HorseId: parseInt(p.horseId),
-                    JockeyId: parseInt(p.jockeyId)
-                }))
+                Participants: []
             }))
         };
 
@@ -366,7 +354,7 @@ function CreateTournamentModal({ open, onClose }) {
                                 className={`px-4 py-3 rounded-2xl text-left font-semibold transition-all flex items-center justify-between ${activeRaceIndex === i ? 'bg-amber-100 text-amber-700' : 'bg-zinc-50 hover:bg-zinc-100 text-zinc-600'}`}
                             >
                                 <span>Race {i + 1}</span>
-                                {r.name && r.dateTime && r.distance && r.participants.every(p => p.horseId && p.jockeyId) && (
+                                {r.name && r.dateTime && r.distance && r.refereeIds?.length > 0 && (
                                     <CheckCircle2 size={16} className="text-emerald-500" />
                                 )}
                             </button>
@@ -473,9 +461,12 @@ function CreateTournamentModal({ open, onClose }) {
                                     )}
                                 </div>
                                 <h4 className="font-bold text-zinc-800 mb-4 flex items-center gap-2">
-                                    <Users size={18} className="text-zinc-500" /> Lane Assignments (Pairs)
+                                    <Users size={18} className="text-zinc-500" /> Lane Capacity
                                 </h4>
-                                <div className="space-y-3">
+                                <p className="rounded-2xl border border-amber-100 bg-amber-50 p-4 text-sm font-medium text-amber-800">
+                                    This race has {basicInfo.lanesPerRace} lanes. Horse–jockey pairs will be assigned automatically from L1 after the owner, jockey and admin approval flow is completed.
+                                </p>
+                                <div className="hidden space-y-3">
                                     {activeRace.participants.map((p, pIndex) => (
                                         <div key={pIndex} className="flex items-center gap-4 bg-zinc-50 p-3 rounded-2xl border border-zinc-100">
                                             <div className="w-12 h-12 bg-zinc-200 rounded-xl flex items-center justify-center font-black text-zinc-500">

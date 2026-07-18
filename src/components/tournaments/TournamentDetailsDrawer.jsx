@@ -27,6 +27,8 @@ import RaceResultInputModal from "../modals/RaceResultInputModal";
 import RaceViewResultsModal from "../modals/RaceViewResultsModal";
 import RaceBetModal from "../modals/RaceBetModal";
 import predictionApi from "../../api/predictionApi";
+import RaceRegistrationPanel from "../races/RaceRegistrationPanel";
+import fallbackTournamentBanner from "../../assets/hero.png";
 
 const STATUS_CONFIG = {
     Live: {
@@ -81,6 +83,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
     const [showBetModal, setShowBetModal] = useState(false);
     const [selectedRaceForModal, setSelectedRaceForModal] = useState(null);
     const [myBets, setMyBets] = useState([]);
+    const isSpectator = user?.role?.toLowerCase() === "spectator";
 
     const handleMarkAsStarted = async (raceId) => {
         try {
@@ -118,7 +121,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
     useEffect(() => {
         if (open && tournament) {
             fetchDetail();
-            if (user?.role === "Spectator") {
+            if (isSpectator) {
                 fetchMyBets();
             }
         } else {
@@ -155,8 +158,13 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
 
     const cfg = STATUS_CONFIG[tournament.status] || STATUS_CONFIG.Upcoming;
     const Icon = cfg.icon;
+    const displayedBannerUrl = detail?.bannerUrl || tournament.bannerUrl || fallbackTournamentBanner;
 
-    const bettorsCount = 0; // Currently no data for bettors
+    // A RaceParticipant is only created after the horse and jockey have both
+    // completed the approval flow, so this is the confirmed pair count.
+    const participantCount = detail?.participantCount
+        ?? detail?.races?.reduce((total, race) => total + (race.participants?.length || 0), 0)
+        ?? 0;
     
     const uniqueHorses = new Set();
     detail?.races?.forEach(r => r.participants?.forEach(p => uniqueHorses.add(p.horseId)));
@@ -186,13 +194,11 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                 `}</style>
 
                 {/* ── HEADER HERO BANNER ── */}
-                <div className={`relative overflow-hidden ${detail?.bannerUrl ? 'bg-zinc-950' : `bg-gradient-to-br ${cfg.glow} bg-zinc-900`} p-8 pb-10 border-b border-zinc-200`}>
-                    {detail?.bannerUrl && (
-                        <div className="absolute inset-0 z-0">
-                            <img src={detail.bannerUrl} alt="Tournament Banner" className="w-full h-full object-cover opacity-75" />
-                        </div>
-                    )}
-                    <div className={`absolute inset-0 ${detail?.bannerUrl ? 'bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-zinc-950/20' : 'bg-zinc-950/85'} pointer-events-none z-0`} />
+                <div className="relative overflow-hidden bg-zinc-950 p-8 pb-10 border-b border-zinc-200">
+                    <div className="absolute inset-0 z-0">
+                        <img src={displayedBannerUrl} alt="Tournament Banner" onError={(event) => { if (event.currentTarget.src !== fallbackTournamentBanner) event.currentTarget.src = fallbackTournamentBanner; }} className="w-full h-full object-cover opacity-75" />
+                    </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-zinc-950/20 pointer-events-none z-0" />
                     <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-2xl pointer-events-none z-0" />
 
                     <div className="relative z-10">
@@ -256,8 +262,8 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                 <Users className="w-5 h-5" />
                             </div>
                             <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider mb-1">Participants</p>
-                            <p className="text-3xl font-black text-zinc-900">{bettorsCount}</p>
-                            <p className="text-[10px] text-zinc-400 mt-0.5 font-medium">Active bettors</p>
+                            <p className="text-3xl font-black text-zinc-900">{participantCount}</p>
+                            <p className="text-[10px] text-zinc-400 mt-0.5 font-medium">Approved horse-jockey pairs</p>
                         </div>
 
                         <div className="bg-zinc-50 border border-zinc-100 rounded-2xl p-5 text-center hover:bg-zinc-100/70 transition-colors">
@@ -408,7 +414,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                                     View Results
                                                 </button>
                                             )}
-                                            {(race.status === "Upcoming" || race.status === "Started" || race.status === "Live") && user?.role === "Spectator" && (() => {
+                                            {isSpectator && (() => {
                                                 const activeBetsCount = myBets.filter(b => b.raceId === race.raceId && b.status === "Active").length;
                                                 return (
                                                     <div className="flex items-center gap-2">
@@ -420,14 +426,6 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                                                 My Bets ({activeBetsCount})
                                                             </button>
                                                         )}
-                                                        {race.status === "Upcoming" && (
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowBetModal(true); }}
-                                                                className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-xs font-bold transition-colors shadow-sm whitespace-nowrap"
-                                                            >
-                                                                Place Bet
-                                                            </button>
-                                                        )}
                                                     </div>
                                                 );
                                             })()}
@@ -437,6 +435,18 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
 
                                     {expandedRace === race.raceId && (
                                         <div className="p-4 pt-0 border-t border-zinc-100 mt-2">
+                                            {isSpectator && race.status === "Open Registration" && (
+                                                <div className="mt-4 flex items-center justify-between gap-4 rounded-2xl border border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 p-4">
+                                                    <div>
+                                                        <p className="text-sm font-black text-amber-900">BET is Open</p>
+                                                        <p className="text-xs font-medium text-amber-700">Choose one of the confirmed horse–jockey participants before registration closes.</p>
+                                                    </div>
+                                                    <button disabled={!race.participants?.length} onClick={() => { setSelectedRaceForModal(race); setShowBetModal(true); }} className="shrink-0 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-black text-white shadow-sm hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50">
+                                                        Place Bet
+                                                    </button>
+                                                </div>
+                                            )}
+                                            <RaceRegistrationPanel race={race} user={user} onUpdated={fetchDetail} />
                                             <div className="mt-4">
                                                 <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest mb-2">Referees ({race.referees?.length || 0})</p>
                                                 <div className="flex flex-wrap gap-2 mb-4">

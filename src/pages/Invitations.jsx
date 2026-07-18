@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import {
     Mail,
-    Plus,
     Search,
     Filter,
     ChevronLeft,
@@ -21,7 +20,6 @@ import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import { invitationApi } from "../api/invitationApi";
 import InvitationStatusBadge from "../components/invitations/InvitationStatusBadge";
-import SendInvitationModal from "../components/invitations/SendInvitationModal";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -40,7 +38,13 @@ const STATUS_FILTERS = [
 
 const formatDate = (dateStr) => {
     if (!dateStr) return "—";
-    return new Date(dateStr).toLocaleDateString("en-US", {
+
+    // SQL `datetime` responses created before the API UTC fix may not include
+    // a timezone suffix. Invitation timestamps are stored in UTC.
+    const hasTimeZone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(dateStr);
+    const utcDateStr = hasTimeZone ? dateStr : `${dateStr}Z`;
+
+    return new Date(utcDateStr).toLocaleString("en-US", {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -261,11 +265,8 @@ function Invitations() {
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [sendModalOpen, setSendModalOpen] = useState(false);
     const [respondingId, setRespondingId] = useState(null);
     const [cancellingId, setCancellingId] = useState(null);
-
-    const ownerId = parseInt(user?.id);
 
     // ── Load invitations ─────────────────────────────────────────────────────
     const fetchInvitations = useCallback(async () => {
@@ -372,15 +373,6 @@ function Invitations() {
                     </p>
                 </div>
 
-                {isOwner && (
-                    <button
-                        onClick={() => setSendModalOpen(true)}
-                        className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-lg shadow-amber-500/25 transition-all hover:-translate-y-0.5 active:translate-y-0"
-                    >
-                        <Plus size={16} strokeWidth={2.5} />
-                        Send Invitation
-                    </button>
-                )}
             </div>
 
             {/* ── STATS CARDS ── */}
@@ -545,15 +537,6 @@ function Invitations() {
                 )}
             </div>
 
-            {/* ── SEND INVITATION MODAL ── */}
-            {isOwner && (
-                <SendInvitationModal
-                    open={sendModalOpen}
-                    onClose={() => setSendModalOpen(false)}
-                    ownerId={ownerId}
-                    onSuccess={fetchInvitations}
-                />
-            )}
         </div>
     );
 }

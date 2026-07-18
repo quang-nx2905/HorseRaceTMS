@@ -15,5 +15,6 @@ export const invitationApi = {
     },
     respondToInvitation: (id, isAccepted) => {
         return axiosClient.put(`/invitations/${id}/respond`, { isAccepted });
-    }
+    },
+    adminReview: (id, isAccepted) => axiosClient.put(`/invitations/${id}/admin-review`, { isAccepted })
 };
