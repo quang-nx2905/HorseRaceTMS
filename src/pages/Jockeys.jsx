@@ -27,7 +27,6 @@ import SendInviteModal from "../components/jockeys/SendInviteModal";
 import ConfirmModal from "../components/common/ConfirmModal";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
-import { useNotifications } from "../context/NotificationContext";
 import { jockeyApi } from "../api/jockeyApi";
 import { userApi } from "../api/userApi";
 import { invitationApi } from "../api/invitationApi";
@@ -227,7 +226,6 @@ function JockeyCard({ jockey, index, onView, onEdit, onAdminEdit, onDelete, onRe
 // ── Main Page ────────────────────────────────────────────
 function Jockeys() {
     const { user } = useAuth();
-    const { addNotification } = useNotifications();
     const [jockeys, setJockeys] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -319,12 +317,6 @@ function Jockeys() {
         try {
             await jockeyApi.requestUpdateJockey(selectedJockey.userId, formData);
             toast.success("Profile update requested successfully! Pending Admin review.");
-            // Notify the jockey that their request was submitted
-            addNotification({
-                title: "Update Request Submitted",
-                message: "Your profile update request has been submitted and is pending Admin review.",
-                type: "jockey_update",
-            });
             setOpenEdit(false);
             fetchJockeys();
         } catch (error) {
@@ -336,46 +328,12 @@ function Jockeys() {
     const handleReviewJockey = async (jockeyId, reviewData) => {
         try {
             const adminUserId = user?.id ? Number(user.id) : 0;
-            // Find jockey name for notification message
-            const reviewedJockey = jockeys.find((j) => j.userId === jockeyId);
-            const jockeyName = reviewedJockey?.user?.fullName || reviewedJockey?.name || "The jockey";
-
             await jockeyApi.reviewJockeyRequest(jockeyId, {
                 ...reviewData,
                 reviewedBy: adminUserId
             });
 
-            const actionLabel = reviewData.isApproved ? "Approved" : "Rejected";
             toast.success(reviewData.isApproved ? "Approved profile update!" : "Rejected profile update.");
-
-            // Notify admin of their own action (so they have a record)
-            addNotification({
-                title: `Profile Update ${actionLabel}`,
-                message: `You have ${actionLabel.toLowerCase()} the profile update request from ${jockeyName}.`,
-                type: "jockey_review",
-            });
-
-            // Store notification for the jockey in their storage slot
-            if (reviewedJockey?.userId) {
-                const jockeyStorageKey = `hrtms_notifications_${reviewedJockey.userId}`;
-                try {
-                    const existing = JSON.parse(localStorage.getItem(jockeyStorageKey) || "[]");
-                    const jockeyNotif = {
-                        id: Date.now() + Math.random(),
-                        unread: true,
-                        time: "Just now",
-                        createdAt: new Date().toISOString(),
-                        title: reviewData.isApproved ? "Profile Update Approved ✅" : "Profile Update Rejected ❌",
-                        message: reviewData.isApproved
-                            ? "Your profile update request has been approved by Admin. Changes are now live!"
-                            : `Your profile update request was rejected by Admin.${reviewData.notes ? ` Note: ${reviewData.notes}` : ""}`,
-                        type: "jockey_review",
-                    };
-                    localStorage.setItem(jockeyStorageKey, JSON.stringify([jockeyNotif, ...existing]));
-                } catch {
-                    // ignore storage errors
-                }
-            }
 
             setOpenReview(false);
             fetchJockeys();

@@ -5,16 +5,9 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import { AuthProvider, useAuth } from "./context/AuthContext";
-import { NotificationProvider } from "./context/NotificationContext";
+import { AuthProvider } from "./context/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-
-// Wraps NotificationProvider inside AuthProvider so it can access the logged-in user
-function NotificationWrapper({ children }) {
-  const { user } = useAuth();
-  return <NotificationProvider user={user}>{children}</NotificationProvider>;
-}
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -43,7 +36,6 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <NotificationWrapper>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -229,7 +221,6 @@ function App() {
 
           <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
-        </NotificationWrapper>
       </BrowserRouter>
     </AuthProvider>
   );
