@@ -5,6 +5,7 @@ import { toast } from "react-hot-toast";
 import { getAllHorses } from "../../api/horseApi";
 import { userApi } from "../../api/userApi";
 import tournamentApi from "../../api/tournamentApi";
+import ImageUpload from "../common/ImageUpload";
 
 function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
     const [step, setStep] = useState(1);
@@ -18,6 +19,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
         startDate: "",
         endDate: "",
         prizePool: "",
+        bannerUrl: "",
         totalRaces: 3,
         lanesPerRace: 5,
     });
@@ -59,6 +61,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                         startDate: tDetail.startDate ? tDetail.startDate.split('T')[0] : "",
                         endDate: tDetail.endDate ? tDetail.endDate.split('T')[0] : "",
                         prizePool: tDetail.prizePool ? tDetail.prizePool.toString() : "",
+                        bannerUrl: tDetail.bannerUrl || "",
                         totalRaces: tDetail.races ? tDetail.races.length : 0,
                         lanesPerRace: tDetail.races && tDetail.races.length > 0 ? (tDetail.races[0].participants?.length || 0) : 0,
                     });
@@ -178,6 +181,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
             Location: basicInfo.location,
             StartDate: basicInfo.startDate,
             EndDate: basicInfo.endDate,
+            BannerUrl: basicInfo.bannerUrl,
             PrizePool: parseFloat(basicInfo.prizePool.toString().replace(/[,.]/g, '') || 0),
             Races: races.map(r => ({
                 RaceName: r.name,
@@ -205,6 +209,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                     date: basicInfo.startDate ? new Date(basicInfo.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "TBA",
                     endDate: basicInfo.endDate ? new Date(basicInfo.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "TBA",
                     prize: `$${parseFloat(basicInfo.prizePool.toString().replace(/[,.]/g, '') || 0).toLocaleString()}`,
+                    bannerUrl: basicInfo.bannerUrl,
                     participants: races.reduce((sum, r) => sum + r.participants.length, 0)
                 });
             }
@@ -260,6 +265,13 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                                 className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-4 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium text-lg"
                             />
                         </div>
+                    </div>
+                    <div className="md:col-span-2">
+                        <label className="block mb-2 font-semibold text-zinc-700">Tournament Banner</label>
+                        <ImageUpload 
+                            value={basicInfo.bannerUrl}
+                            onChange={(url) => setBasicInfo({ ...basicInfo, bannerUrl: url })}
+                        />
                     </div>
 
                     <div>

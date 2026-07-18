@@ -101,9 +101,7 @@ function Tournaments() {
   const [openEdit, setOpenEdit] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [search, filter]);
+
 
   const [tournaments, setTournaments] = useState([]);
   const [backendTotalPrize, setBackendTotalPrize] = useState(0);
@@ -125,6 +123,7 @@ function Tournaments() {
           rawPrize: t.prizePool || 0,
           status: t.status || "Upcoming",
           isHidden: t.isHidden || false,
+          bannerUrl: t.bannerUrl || null,
           participants: 0,
           featured: false,
         }));
@@ -160,6 +159,10 @@ function Tournaments() {
     totalPages,
     paginatedData,
   } = usePagination(filteredTournaments, 4);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, filter, setCurrentPage]);
 
   const totalLive = useMemo(() => tournaments.filter((i) => i.status === "Live").length, [tournaments]);
   const totalUpcoming = useMemo(() => tournaments.filter((i) => i.status === "Upcoming").length, [tournaments]);
@@ -414,7 +417,6 @@ function Tournaments() {
           </div>
         ) : (
           paginatedData.map((tournament, index) => {
-            const cfg = STATUS_CONFIG[tournament.status] || STATUS_CONFIG.Upcoming;
             const accentGradient = CARD_ACCENTS[index % CARD_ACCENTS.length];
 
             return (
@@ -425,6 +427,18 @@ function Tournaments() {
               >
                 {/* Top accent stripe */}
                 <div className={`h-1.5 w-full bg-gradient-to-r ${accentGradient}`} />
+
+                {/* Banner Image */}
+                {tournament.bannerUrl && (
+                  <div className="w-full h-32 bg-zinc-100 overflow-hidden relative">
+                    <img 
+                      src={tournament.bannerUrl} 
+                      alt={tournament.name} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/50 to-transparent"></div>
+                  </div>
+                )}
 
                 <div className="p-7">
                   {/* Header row */}
