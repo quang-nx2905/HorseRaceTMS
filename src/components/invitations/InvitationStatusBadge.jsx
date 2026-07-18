@@ -22,6 +22,16 @@ const STATUS_CONFIG = {
         style: "bg-emerald-100 text-emerald-700 ring-1 ring-emerald-300",
         dot: "bg-emerald-500",
     },
+    AcceptedPendingAdmin: {
+        label: "Waiting for Admin",
+        style: "bg-blue-100 text-blue-700 ring-1 ring-blue-300",
+        dot: "bg-blue-500",
+    },
+    AdminRejected: {
+        label: "Admin Rejected",
+        style: "bg-red-100 text-red-700 ring-1 ring-red-300",
+        dot: "bg-red-500",
+    },
     Rejected: {
         label: "Rejected",
         style: "bg-red-100 text-red-600 ring-1 ring-red-300",
