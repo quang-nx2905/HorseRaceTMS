@@ -16,19 +16,21 @@ import {
     Zap,
     Flag,
     ChevronDown,
-    ChevronUp
+    ChevronUp,
+    FileWarning
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import tournamentApi from "../../api/tournamentApi";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
 import raceApi from "../../api/raceApi";
-import RaceResultInputModal from "../modals/RaceResultInputModal";
 import RaceViewResultsModal from "../modals/RaceViewResultsModal";
 import RaceBetModal from "../modals/RaceBetModal";
 import predictionApi from "../../api/predictionApi";
 import RaceRegistrationPanel from "../races/RaceRegistrationPanel";
 import fallbackTournamentBanner from "../../assets/hero.png";
+import ConfirmModal from "../common/ConfirmModal";
+import RaceIncidentsModal from "../modals/RaceIncidentsModal";
 
 const STATUS_CONFIG = {
     Live: {
@@ -78,39 +80,19 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
     const [expandedRace, setExpandedRace] = useState(null);
 
     // Modals state
-    const [showInputModal, setShowInputModal] = useState(false);
     const [showViewModal, setShowViewModal] = useState(false);
     const [showBetModal, setShowBetModal] = useState(false);
     const [selectedRaceForModal, setSelectedRaceForModal] = useState(null);
+    const [raceToAward, setRaceToAward] = useState(null);
+    const [showIncidentsModal, setShowIncidentsModal] = useState(false);
     const [myBets, setMyBets] = useState([]);
     const isSpectator = user?.role?.toLowerCase() === "spectator";
-
-    const handleMarkAsStarted = async (raceId) => {
-        try {
-            await raceApi.updateStatus(raceId, "Started");
-            toast.success("Race marked as started!");
-            fetchDetail(); // Refresh data
-        } catch (error) {
-            console.error("Failed to update race status", error);
-            toast.error("Failed to mark race as started.");
-        }
-    };
-
-    const handleMarkAsCompleted = async (raceId) => {
-        try {
-            await raceApi.updateStatus(raceId, "Completed");
-            toast.success("Race marked as completed!");
-            fetchDetail(); // Refresh data
-        } catch (error) {
-            console.error("Failed to update race status", error);
-            toast.error("Failed to mark race as completed.");
-        }
-    };
 
     const handleAwardPrizes = async (raceId) => {
         try {
             await raceApi.awardPrizes(raceId);
             toast.success("Prizes awarded successfully!");
+            setRaceToAward(null);
             fetchDetail(); // Refresh data
         } catch (error) {
             console.error("Failed to award prizes", error);
@@ -353,6 +335,15 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                         onClick={() => setExpandedRace(expandedRace === race.raceId ? null : race.raceId)}
                                     >
                                         <div className="flex items-center gap-3">
+                                            {user?.role === "Admin" && race.incidentsCount > 0 && (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowIncidentsModal(true); }}
+                                                    className="flex items-center gap-1.5 rounded-lg border border-orange-200 bg-orange-50 px-3 py-1.5 text-xs font-bold text-orange-700 transition-colors hover:bg-orange-100"
+                                                >
+                                                    <FileWarning className="h-3.5 w-3.5" />
+                                                    View Incidents ({race.incidentsCount})
+                                                </button>
+                                            )}
                                             <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center">
                                                 <Flag className="w-5 h-5" />
                                             </div>
@@ -364,55 +355,26 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            {(() => {
-                                                // Identify if the user is an assigned referee for this race or an admin
-                                                const isAssignedRef = user?.role === "Referee" && race.referees?.some(ref => String(ref.refereeId) === String(user?.id) || String(ref.refereeId) === String(user?.userId));
-                                                const canManageRace = user?.role === "Admin" || isAssignedRef;
-
-                                                return (
-                                                    <>
-                                                        {race.status === "Upcoming" && canManageRace && (
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleMarkAsStarted(race.raceId); }}
-                                                                className="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
-                                                            >
-                                                                Mark Started
-                                                            </button>
-                                                        )}
-                                                        {(race.status === "Started" || race.status === "Live") && canManageRace && (
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleMarkAsCompleted(race.raceId); }}
-                                                                className="px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg text-xs font-bold transition-colors shadow-sm"
-                                                            >
-                                                                Mark Completed
-                                                            </button>
-                                                        )}
-                                                        {race.status === "Completed" && canManageRace && (
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowInputModal(true); }}
-                                                                className="px-3 py-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
-                                                            >
-                                                                Input Results
-                                                            </button>
-                                                        )}
-                                                        {race.status === "Completed" && user?.role === "Admin" && (
-                                                            <button
-                                                                onClick={(e) => { e.stopPropagation(); handleAwardPrizes(race.raceId); }}
-                                                                className="px-3 py-1.5 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
-                                                            >
-                                                                Award Prizes
-                                                            </button>
-                                                        )}
-                                                    </>
-                                                );
-                                            })()}
-                                            {(race.status === "Completed" || race.status === "Awarded") && (
+                                            {(race.status === "Completed" || race.status === "Awarded") && race.hasResults && (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowViewModal(true); }}
                                                     className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 text-amber-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
                                                 >
                                                     View Results
                                                 </button>
+                                            )}
+                                            {race.status === "Completed" && user?.role === "Admin" && race.hasResults && (
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setRaceToAward(race); }}
+                                                    className="px-3 py-1.5 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                                >
+                                                    Award Prizes
+                                                </button>
+                                            )}
+                                            {race.status === "Completed" && user?.role === "Admin" && !race.hasResults && (
+                                                <span className="px-3 py-1.5 bg-zinc-100 text-zinc-500 rounded-lg text-xs font-bold border border-zinc-200">
+                                                    Awaiting Referee Results
+                                                </span>
                                             )}
                                             {isSpectator && (() => {
                                                 const activeBetsCount = myBets.filter(b => b.raceId === race.raceId && b.status === "Active").length;
@@ -516,12 +478,6 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
             </div>
         </div>
         {/* Modals */}
-            <RaceResultInputModal
-                open={showInputModal}
-                onClose={() => setShowInputModal(false)}
-                race={selectedRaceForModal}
-            />
-
             <RaceViewResultsModal
                 open={showViewModal}
                 onClose={() => setShowViewModal(false)}
@@ -536,6 +492,20 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                 onSuccess={() => {
                     fetchMyBets();
                 }}
+            />
+            <RaceIncidentsModal
+                open={showIncidentsModal}
+                onClose={() => setShowIncidentsModal(false)}
+                race={selectedRaceForModal}
+            />
+            <ConfirmModal
+                open={Boolean(raceToAward)}
+                onClose={() => setRaceToAward(null)}
+                onConfirm={() => handleAwardPrizes(raceToAward.raceId)}
+                title="Confirm Prize Distribution"
+                message={`Confirm that you have reviewed the final results for ${raceToAward?.raceName || "this race"}. This action will settle every active bet and cannot be repeated.`}
+                confirmLabel="Confirm & Award Prizes"
+                confirmVariant="success"
             />
         </>
     );

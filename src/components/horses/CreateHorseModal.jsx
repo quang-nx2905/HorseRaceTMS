@@ -104,6 +104,7 @@ function CreateHorseModal({
                             <ImageUpload 
                                 value={form.imageUrl} 
                                 onChange={(url) => setForm(prev => ({ ...prev, imageUrl: url }))} 
+                                imageFit="contain"
                             />
                         </div>
                         <div>

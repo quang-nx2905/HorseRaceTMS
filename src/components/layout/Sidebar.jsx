@@ -43,7 +43,7 @@ const getNavGroups = (userRole) => {
     {
       label: "Management",
       items: [
-        { name: "Referee", path: "/referee", icon: Shield, roles: ["Admin", "Referee"] },
+        { name: "Race Duties", path: "/race-duties", icon: Shield, roles: ["Referee"] },
         { name: "Race Broadcasts", path: "/spectator", icon: Eye, roles: ["Admin", "HorseOwner", "Spectator"] },
       ],
     },
@@ -72,15 +72,25 @@ function Sidebar() {
   const [spectatorPoints, setSpectatorPoints] = useState(0);
 
   useEffect(() => {
-    if (user?.role?.toLowerCase() === "spectator") {
+    if (user?.role?.toLowerCase() !== "spectator") return;
+
+    const fetchSpectatorPoints = () => {
       api.get("/Profile/Me")
         .then(res => {
-          console.log("Profile API Response:", res.data);
           const points = res.data?.totalPoints ?? res.data?.TotalPoints ?? 0;
           setSpectatorPoints(points);
         })
         .catch(err => console.error("Failed to fetch spectator points", err));
-    }
+    };
+
+    fetchSpectatorPoints();
+    const interval = window.setInterval(fetchSpectatorPoints, 15_000);
+    window.addEventListener("spectator-points-updated", fetchSpectatorPoints);
+
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener("spectator-points-updated", fetchSpectatorPoints);
+    };
   }, [user]);
 
   const navGroups = getNavGroups(user?.role);

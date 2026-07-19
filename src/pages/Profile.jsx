@@ -17,7 +17,10 @@ import {
     ShieldCheck,
     CalendarDays,
     Loader2,
-    Wallet
+    Wallet,
+    ArrowDownLeft,
+    ArrowUpRight,
+    ReceiptText
 } from "lucide-react";
 import TopupModal from "../components/TopupModal";
 
@@ -37,6 +40,8 @@ function Profile() {
     });
 
     const [isTopupModalOpen, setIsTopupModalOpen] = useState(false);
+    const [pointTransactions, setPointTransactions] = useState([]);
+    const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
 
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -60,6 +65,17 @@ function Profile() {
                     totalPoints: data.totalPoints || 0
                 }));
                 setUser(prev => ({ ...prev, avatarUrl: data.avatarUrl, name: data.fullName || prev?.name }));
+                if (data.role === "Spectator") {
+                    setIsLoadingTransactions(true);
+                    try {
+                        const historyResponse = await axiosClient.get("/points/history?limit=50");
+                        setPointTransactions(historyResponse.data?.data || []);
+                    } catch (historyError) {
+                        console.error("Failed to load point history:", historyError);
+                    } finally {
+                        setIsLoadingTransactions(false);
+                    }
+                }
             } catch (error) {
                 console.error("Failed to fetch profile:", error);
                 toast.error("Failed to load profile details.");
@@ -343,6 +359,55 @@ function Profile() {
                     </div>
                 </div>
             </div>
+
+            {profile.role === "Spectator" && (
+                <div className="overflow-hidden rounded-3xl border border-zinc-200/80 bg-white shadow-sm">
+                    <div className="flex flex-col gap-4 border-b border-zinc-100 p-6 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                            <h3 className="flex items-center gap-2 text-lg font-black text-zinc-900">
+                                <ReceiptText size={19} className="text-amber-500" /> Point Transaction History
+                            </h3>
+                            <p className="mt-1 text-sm font-medium text-zinc-500">Top-ups, bets, refunds, and winning rewards recorded by the system.</p>
+                        </div>
+                        <div className="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-3 text-right">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-amber-600">Current Balance</p>
+                            <p className="text-2xl font-black text-zinc-900">{profile.totalPoints.toLocaleString()} <span className="text-xs text-zinc-400">PTS</span></p>
+                        </div>
+                    </div>
+
+                    {isLoadingTransactions ? (
+                        <div className="flex min-h-48 items-center justify-center"><Loader2 className="animate-spin text-amber-500" /></div>
+                    ) : pointTransactions.length === 0 ? (
+                        <div className="flex min-h-48 flex-col items-center justify-center px-6 text-center">
+                            <ReceiptText className="mb-3 text-zinc-300" size={36} />
+                            <p className="font-bold text-zinc-700">No point transactions yet</p>
+                            <p className="mt-1 text-sm text-zinc-400">New bets, rewards, refunds, and top-ups will appear here.</p>
+                        </div>
+                    ) : (
+                        <div className="divide-y divide-zinc-100">
+                            {pointTransactions.map(transaction => {
+                                const isCredit = transaction.amount > 0;
+                                const labels = { BetPlaced: "Bet placed", BetWon: "Bet reward", BetRefund: "Bet refund", TopUp: "Points top-up" };
+                                return (
+                                    <div key={transaction.transactionId} className="flex items-center gap-4 px-6 py-4 transition-colors hover:bg-zinc-50/80">
+                                        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${isCredit ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-500"}`}>
+                                            {isCredit ? <ArrowDownLeft size={19} /> : <ArrowUpRight size={19} />}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <p className="font-bold text-zinc-900">{labels[transaction.transactionType] || transaction.transactionType}</p>
+                                            <p className="truncate text-xs font-medium text-zinc-400">{transaction.description || "Point balance update"}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className={`font-black ${isCredit ? "text-emerald-600" : "text-red-500"}`}>{isCredit ? "+" : ""}{transaction.amount.toLocaleString()} PTS</p>
+                                            <p className="mt-0.5 text-[11px] font-medium text-zinc-400">{new Date(transaction.createdAt).toLocaleString()}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* PERFORMANCE STATS */}
             <div className="space-y-4">
