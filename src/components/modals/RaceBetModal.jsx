@@ -36,6 +36,7 @@ function RaceBetModal({ open, onClose, race, onSuccess }) {
                 betPoints: Number(betPoints)
             });
             toast.success("Bet placed successfully!");
+            window.dispatchEvent(new Event("spectator-points-updated"));
             if (onSuccess) onSuccess();
             onClose();
         } catch (error) {

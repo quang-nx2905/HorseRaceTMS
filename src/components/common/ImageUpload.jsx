@@ -3,7 +3,7 @@ import { UploadCloud, X, Loader2, Image as ImageIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import axiosClient from "../../api/axiosClient";
 
-export default function ImageUpload({ value, onChange, className = "", variant = "image" }) {
+export default function ImageUpload({ value, onChange, className = "", variant = "image", imageFit = "cover" }) {
     const [isUploading, setIsUploading] = useState(false);
     const [preview, setPreview] = useState(value || null);
     const [isDragging, setIsDragging] = useState(false);
@@ -101,7 +101,7 @@ export default function ImageUpload({ value, onChange, className = "", variant =
                 onDrop={onDrop}
                 className={`
                     w-full border-2 border-dashed rounded-2xl flex flex-col items-center justify-center p-6
-                    ${variant === "banner" ? "aspect-[12/5] min-h-0" : "min-h-[160px]"}
+                    ${variant === "banner" ? "aspect-[12/5] min-h-0" : imageFit === "contain" ? "min-h-[220px]" : "min-h-[160px]"}
                     cursor-pointer transition-all duration-200 overflow-hidden relative group
                     ${isDragging ? "border-yellow-400 bg-yellow-50" : "border-zinc-200 bg-zinc-50 hover:bg-zinc-100 hover:border-zinc-300"}
                     ${preview ? "border-transparent bg-transparent" : ""}
@@ -109,11 +109,25 @@ export default function ImageUpload({ value, onChange, className = "", variant =
             >
                 {preview ? (
                     <>
-                        <img 
-                            src={preview} 
-                            alt="Preview" 
-                            className={`w-full h-full absolute inset-0 transition-opacity ${variant === "banner" ? "object-contain bg-zinc-950" : "object-cover"} ${isUploading ? "opacity-50" : "opacity-100"}`} 
+                        {imageFit === "contain" && variant !== "banner" && (
+                            <>
+                                <img
+                                    src={preview}
+                                    alt=""
+                                    aria-hidden="true"
+                                    className="absolute inset-0 h-full w-full scale-110 object-cover opacity-35 blur-2xl"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/80 via-zinc-900/35 to-zinc-950/80" />
+                            </>
+                        )}
+                        <img
+                            src={preview}
+                            alt="Preview"
+                            className={`absolute inset-0 h-full w-full transition-all duration-300 ${(variant === "banner" || imageFit === "contain") ? `object-contain ${variant === "banner" ? "bg-zinc-950" : "p-3 drop-shadow-2xl"}` : "object-cover"} ${isUploading ? "opacity-50 scale-[0.98]" : "opacity-100"}`}
                         />
+                        {imageFit === "contain" && variant !== "banner" && (
+                            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/35 to-transparent" />
+                        )}
                         {/* Overlay on hover */}
                         {!isUploading && (
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">

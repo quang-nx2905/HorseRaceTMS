@@ -83,6 +83,7 @@ function EditHorseModal({ open, onClose, horse, onSave, isAdmin }) {
                     <ImageUpload 
                         value={form.imageUrl} 
                         onChange={(url) => setForm({ ...form, imageUrl: url })} 
+                        imageFit="contain"
                     />
                 </div>
 

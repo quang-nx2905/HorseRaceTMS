@@ -123,9 +123,9 @@ function App() {
           />
 
           <Route
-            path="/referee"
+            path="/race-duties"
             element={
-              <ProtectedRoute allowedRoles={["Admin", "Referee"]}>
+              <ProtectedRoute allowedRoles={["Referee"]}>
                 <DashboardLayout>
                   <Referee />
                 </DashboardLayout>

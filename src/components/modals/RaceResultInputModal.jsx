@@ -6,11 +6,14 @@ import { toast } from "react-hot-toast";
 function RaceResultInputModal({ open, onClose, race }) {
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
     useEffect(() => {
         if (open && race && race.participants) {
             // Initialize form state with participants
-            const initialResults = race.participants.map(p => ({
+            const initialResults = race.participants
+                .filter(p => !p.participationStatus || p.participationStatus === "Approved")
+                .map(p => ({
                 participantId: p.participantId,
                 horseName: p.horseName,
                 horseId: p.horseId,
@@ -18,7 +21,7 @@ function RaceResultInputModal({ open, onClose, race }) {
                 jockeyName: p.jockeyName,
                 laneNumber: p.laneNumber,
                 rankPosition: "",
-                finishTime: "00:00:00", // HH:mm:ss format
+                finishTime: "",
                 resultStatus: "Finished"
             }));
             setResults(initialResults);
@@ -31,10 +34,37 @@ function RaceResultInputModal({ open, onClose, race }) {
         setResults(prev => prev.map(r => r.participantId === id ? { ...r, [field]: value } : r));
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const requestConfirmation = (e) => {
+        e?.preventDefault();
+        if (results.length === 0) {
+            toast.error("No participants are available for result submission.");
+            return;
+        }
+
+        const missingFields = results.some(r =>
+            !r.rankPosition || !r.finishTime || r.finishTime === "00:00" || r.finishTime === "00:00:00"
+        );
+        if (missingFields) {
+            toast.error("Enter a rank and finish time for every participant.");
+            return;
+        }
+
+        const ranks = results.map(r => Number(r.rankPosition));
+        const expectedRanks = Array.from({ length: results.length }, (_, index) => index + 1);
+        const ranksAreValid = ranks.every(Number.isInteger)
+            && new Set(ranks).size === results.length
+            && [...ranks].sort((a, b) => a - b).every((rank, index) => rank === expectedRanks[index]);
+        if (!ranksAreValid) {
+            toast.error(`Ranks must be unique and use every position from 1 to ${results.length}.`);
+            return;
+        }
+        setShowConfirmation(true);
+    };
+
+    const handleSubmit = async () => {
         try {
             setLoading(true);
+            setShowConfirmation(false);
             
             // Format payload
             const payload = {
@@ -84,12 +114,12 @@ function RaceResultInputModal({ open, onClose, race }) {
                 </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8">
+                <form onSubmit={requestConfirmation} className="flex-1 overflow-y-auto p-8">
                     
                     <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 mb-6 flex gap-4">
                         <AlertTriangle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                         <p className="text-sm text-blue-700 font-medium">
-                            Please verify the finish times and rank positions carefully. Once submitted, these results will be visible to all users. Finish time must be in HH:mm:ss format.
+                            Verify every finish time and rank carefully. Results can only be submitted once and will be permanently locked after confirmation. Finish time must use HH:mm:ss format.
                         </p>
                     </div>
 
@@ -128,11 +158,12 @@ function RaceResultInputModal({ open, onClose, race }) {
                                     <input
                                         type="number"
                                         min="1"
+                                        max={results.length}
+                                        required
                                         placeholder="Rank"
                                         value={res.rankPosition}
                                         onChange={(e) => handleResultChange(res.participantId, 'rankPosition', e.target.value)}
                                         className="w-full px-4 py-2.5 bg-white border border-zinc-200 rounded-xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 font-bold text-zinc-800"
-                                        disabled={res.resultStatus !== 'Finished'}
                                     />
                                 </div>
 
@@ -142,10 +173,10 @@ function RaceResultInputModal({ open, onClose, race }) {
                                     <input
                                         type="time"
                                         step="1"
+                                        required
                                         value={res.finishTime}
                                         onChange={(e) => handleResultChange(res.participantId, 'finishTime', e.target.value)}
                                         className="w-full pl-9 pr-4 py-2.5 bg-white border border-zinc-200 rounded-xl outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-400/20 font-bold text-zinc-800"
-                                        disabled={res.resultStatus !== 'Finished'}
                                     />
                                 </div>
 
@@ -179,7 +210,7 @@ function RaceResultInputModal({ open, onClose, race }) {
                         Cancel
                     </button>
                     <button
-                        onClick={handleSubmit}
+                        onClick={requestConfirmation}
                         disabled={loading}
                         className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white rounded-xl font-bold transition-all shadow-lg shadow-amber-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -193,6 +224,36 @@ function RaceResultInputModal({ open, onClose, race }) {
                         )}
                     </button>
                 </div>
+
+                {showConfirmation && (
+                    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-zinc-950/70 p-4 backdrop-blur-sm">
+                        <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl">
+                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
+                                <AlertTriangle className="h-6 w-6" />
+                            </div>
+                            <h3 className="text-2xl font-black text-zinc-900">Confirm Final Results</h3>
+                            <p className="mt-3 text-sm font-medium leading-6 text-zinc-600">
+                                This is your only submission. After saving, the results will be permanently locked and cannot be edited or submitted again. Have you verified every participant's rank, finish time, and status?
+                            </p>
+                            <div className="mt-7 flex gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConfirmation(false)}
+                                    className="flex-1 rounded-xl border border-zinc-200 px-4 py-3 font-bold text-zinc-700 hover:bg-zinc-50"
+                                >
+                                    Review Again
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={handleSubmit}
+                                    className="flex-1 rounded-xl bg-amber-500 px-4 py-3 font-bold text-white hover:bg-amber-600"
+                                >
+                                    Confirm & Lock
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

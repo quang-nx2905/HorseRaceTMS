@@ -20,6 +20,7 @@ function VNPayReturnPage() {
         const data = await topupService.processIpn(query);
         if (data.RspCode === "00" || data.rspCode === "00") {
           setStatus("success");
+          window.dispatchEvent(new Event("spectator-points-updated"));
         } else {
           setStatus("failed");
         }

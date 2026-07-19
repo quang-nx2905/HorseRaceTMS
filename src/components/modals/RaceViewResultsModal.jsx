@@ -44,6 +44,7 @@ function RaceViewResultsModal({ open, onClose, race, onSuccess }) {
             setCancelingId(predictionId);
             await predictionApi.cancelBet(predictionId);
             toast.success("Bet cancelled successfully! 50% points refunded.");
+            window.dispatchEvent(new Event("spectator-points-updated"));
             fetchMyBets(); // refresh the bets
             setConfirmCancelId(null);
             if (onSuccess) onSuccess();
@@ -81,6 +82,9 @@ function RaceViewResultsModal({ open, onClose, race, onSuccess }) {
     const totalBetOnEvaluated = evaluatedBets.reduce((acc, b) => acc + b.betPoints, 0);
     const totalReward = evaluatedBets.reduce((acc, b) => acc + (b.rewardPoints || 0), 0);
     const netGain = totalReward - totalBetOnEvaluated;
+    const hasActiveBets = myBets.some(b => b.status === "Active");
+    const canCancelBets = race.status === "Open Registration"
+        && (!race.raceDateTime || new Date(race.raceDateTime) > new Date());
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -96,7 +100,9 @@ function RaceViewResultsModal({ open, onClose, race, onSuccess }) {
                             <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-500 flex items-center justify-center">
                                 <Trophy className="w-5 h-5" />
                             </div>
-                            <h2 className="text-3xl font-black text-white tracking-tight">Official Results</h2>
+                            <h2 className="text-3xl font-black text-white tracking-tight">
+                                {hasActiveBets ? "My Bets" : "Official Results"}
+                            </h2>
                         </div>
                         <p className="text-zinc-400 font-medium">
                             {race.raceName} (Round {race.round})
@@ -194,7 +200,7 @@ function RaceViewResultsModal({ open, onClose, race, onSuccess }) {
                                                         + {bet.rewardPoints} pts
                                                     </p>
                                                 )}
-                                                {bet.status === 'Active' && race.status === 'Upcoming' && (
+                                                {bet.status === 'Active' && canCancelBets && (
                                                     <div className="mt-4 flex flex-col items-end">
                                                         {confirmCancelId === bet.predictionId ? (
                                                             <div className="bg-red-500/10 border border-red-500/20 p-3 rounded-xl max-w-sm text-right animate-in fade-in zoom-in-95">

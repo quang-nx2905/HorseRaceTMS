@@ -13,7 +13,7 @@ const PAGE_TITLES = {
     "/jockeys": "Jockeys",
     "/predictions": "Predictions",
     "/leaderboard": "Leaderboard",
-    "/referee": "Referee",
+    "/race-duties": "Race Duties",
     "/spectator": "Race Broadcasts",
     "/settings": "Settings",
     "/profile": "Profile",
