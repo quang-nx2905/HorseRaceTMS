@@ -147,8 +147,8 @@ function Home() {
       <nav className="fixed top-0 inset-x-0 z-50 bg-white/40 backdrop-blur-2xl border-b border-zinc-200/50 shadow-[0_4px_30px_rgba(0,0,0,0.02)]">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2 group cursor-pointer">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex items-center justify-center shadow-inner shadow-white/40 transition-transform group-hover:scale-110 duration-300">
-              <Trophy className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 overflow-hidden flex items-center justify-center transition-transform group-hover:scale-110 duration-300">
+              <img src="/src/assets/logo.png" alt="Horse Racing Logo" className="w-full h-full object-cover rounded-xl shadow-sm" />
             </div>
             <span className="font-black text-xl tracking-tight text-zinc-900">
               HorseRace<span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">TMS</span>

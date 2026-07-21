@@ -73,8 +73,8 @@ function Register() {
 
                 {/* Logo */}
                 <div className="flex items-center gap-3 relative z-10">
-                    <div className="w-11 h-11 rounded-2xl bg-yellow-400 flex items-center justify-center text-xl font-black text-black">
-                        H
+                    <div className="w-12 h-12 overflow-hidden flex items-center justify-center">
+                        <img src="/src/assets/logo.png" alt="Horse Racing Logo" className="w-full h-full object-cover rounded-xl shadow-sm" />
                     </div>
                     <span className="text-white font-bold text-lg tracking-tight">HorseRace TMS</span>
                 </div>
@@ -136,8 +136,8 @@ function Register() {
 
                     {/* Mobile logo */}
                     <div className="flex items-center gap-3 mb-8 lg:hidden">
-                        <div className="w-10 h-10 rounded-xl bg-yellow-400 flex items-center justify-center text-lg font-black">
-                            H
+                        <div className="w-12 h-12 overflow-hidden flex items-center justify-center">
+                            <img src="/src/assets/logo.png" alt="Horse Racing Logo" className="w-full h-full object-cover rounded-xl shadow-sm" />
                         </div>
                         <span className="font-bold text-base">HorseRace TMS</span>
                     </div>
