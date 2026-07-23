@@ -1,91 +1,16 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState, useRef } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Footer from "../components/layout/Footer";
-import { useEffect, useRef, useState } from "react";
+import { useAuth } from "../context/AuthContext";
+import { getAllHorses } from "../api/horseApi";
+import tournamentApi from "../api/tournamentApi";
+import DragCarousel from "../components/common/DragCarousel";
 import {
-  ArrowRight, Trophy, Zap, Shield, TrendingUp,
-  Clock, Users, Star, ChevronRight, Activity,
-  BarChart2, CheckCircle
+  ArrowRight, Trophy, Zap, Shield, 
+  Users, ChevronRight, Activity,
+  BarChart2, CheckCircle, Crosshair,
+  Loader2
 } from "lucide-react";
-
-// --- Animated Counter Hook ---
-function useCountUp(target, duration = 2000, start = false) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    if (!start) return;
-    let startTime = null;
-    const step = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.floor(eased * target));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [target, duration, start]);
-  return count;
-}
-
-// --- Stats Card ---
-function StatCard({ value, suffix = "", label, icon: Icon, color, started }) {
-  const count = useCountUp(value, 2200, started);
-  return (
-    <div className="group relative overflow-hidden p-6 rounded-2xl bg-white border border-zinc-100 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
-      <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${color} blur-2xl -z-10 scale-150`} />
-      <div className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-4 ${color} bg-opacity-10`}>
-        <Icon className="w-6 h-6" />
-      </div>
-      <div className="text-4xl font-black text-zinc-900 tabular-nums">
-        {count.toLocaleString()}{suffix}
-      </div>
-      <p className="text-zinc-500 font-semibold mt-1 text-sm">{label}</p>
-    </div>
-  );
-}
-
-// --- Fun Facts Data ---
-const FUN_FACTS = [
-  {
-    emoji: "🐎",
-    title: "Nearly 360° Vision",
-    desc: "A horse's eyes are positioned on the sides of its head, giving it an almost full-circle field of view — with only a tiny blind spot directly behind its tail.",
-  },
-  {
-    emoji: "⚡",
-    title: "Top Speed: 88 km/h",
-    desc: "Thoroughbred racehorses can reach a top speed of 88 km/h — faster than most motorcycles on city roads!",
-  },
-  {
-    emoji: "🏆",
-    title: "A 400-Year-Old Record",
-    desc: "The Epsom Derby in England has been held since 1780 — making it older than the United States itself!",
-  },
-  {
-    emoji: "❤️",
-    title: "Heart Weighing Up to 5 kg",
-    desc: "An elite racehorse's heart can weigh over 5 kg and beat up to 240 times per minute during a full sprint.",
-  },
-  {
-    emoji: "🔢",
-    title: "Every Horse Shares One Birthday",
-    desc: "All thoroughbreds worldwide share an official birthday of January 1st each year — no matter when they were actually born!",
-  },
-  {
-    emoji: "🌙",
-    title: "They Sleep Standing Up",
-    desc: "Horses can sleep while standing thanks to a special locking mechanism in their legs. They only lie down when they need deep REM sleep.",
-  },
-];
-
-// --- Activity Feed Data ---
-const ACTIVITIES = [
-  { icon: "🏁", text: "Race #42 at Hanoi Track has just finished", time: "2 min ago" },
-  { icon: "🐎", text: "Thunder Storm registered for the Summer 2026 Championship", time: "5 min ago" },
-  { icon: "🏆", text: "Vietnam Grand Prix official results are now live", time: "12 min ago" },
-  { icon: "👤", text: "Jockey Alex Nguyen just updated their profile", time: "18 min ago" },
-  { icon: "⚡", text: "AI prediction for Race #43 has been refreshed", time: "25 min ago" },
-  { icon: "🎯", text: "Spring Cup 2026 is now open for team registration", time: "30 min ago" },
-];
 
 // --- Steps Data ---
 const STEPS = [
@@ -106,39 +31,66 @@ const STEPS = [
   {
     step: "03",
     title: "Track Everything Live",
-    desc: "Watch live results, live leaderboards, and continuously updated AI predictions.",
+    desc: "Watch live results, live leaderboards, and monitor race statuses in real-time.",
     icon: Activity,
     color: "from-rose-400 to-pink-500",
   },
 ];
 
 function Home() {
-  const statsRef = useRef(null);
-  const [statsStarted, setStatsStarted] = useState(false);
-  const [activeFact, setActiveFact] = useState(0);
-  const [activityIndex, setActivityIndex] = useState(0);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [horses, setHorses] = useState([]);
+  const [loadingHorses, setLoadingHorses] = useState(true);
 
-  // IntersectionObserver to trigger stat counters
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setStatsStarted(true); },
-      { threshold: 0.3 }
-    );
-    if (statsRef.current) observer.observe(statsRef.current);
-    return () => observer.disconnect();
+    const fetchFeaturedHorses = async () => {
+      try {
+        const data = await getAllHorses();
+        // Assuming API returns array directly or { data: [...] }
+        const items = data?.data || data || [];
+        const activeHorses = items.filter(h => h.status !== "Banned" && h.status !== "Retired");
+        setHorses(activeHorses);
+      } catch (error) {
+        console.error("Failed to fetch featured horses:", error);
+      } finally {
+        setLoadingHorses(false);
+      }
+    };
+    fetchFeaturedHorses();
   }, []);
 
-  // Auto-cycle fun facts
+  const [tournaments, setTournaments] = useState([]);
+  const [loadingTournaments, setLoadingTournaments] = useState(true);
+
   useEffect(() => {
-    const id = setInterval(() => setActiveFact((f) => (f + 1) % FUN_FACTS.length), 4000);
-    return () => clearInterval(id);
+    const fetchTournaments = async () => {
+      try {
+        const res = await tournamentApi.getAll({ page: 1, pageSize: 100 });
+        const items = res.data?.items || res.items || (res.data && res.data.data && res.data.data.items) || res.data || [];
+        const itemsArray = Array.isArray(items) ? items : [];
+        const sorted = [...itemsArray].sort((a, b) => {
+          const aId = a.tourId || a.id;
+          const bId = b.tourId || b.id;
+          return bId - aId;
+        });
+        setTournaments(sorted);
+      } catch (error) {
+        console.error("Failed to fetch tournaments:", error);
+      } finally {
+        setLoadingTournaments(false);
+      }
+    };
+    fetchTournaments();
   }, []);
 
-  // Auto-cycle activity feed
-  useEffect(() => {
-    const id = setInterval(() => setActivityIndex((i) => (i + 1) % ACTIVITIES.length), 3000);
-    return () => clearInterval(id);
-  }, []);
+  const handleQuickBet = () => {
+    if (!user) {
+      navigate('/login');
+    } else {
+      navigate('/tournaments');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-zinc-50 font-sans selection:bg-amber-200 selection:text-amber-900 overflow-x-hidden relative">
@@ -175,20 +127,6 @@ function Home() {
         </div>
 
         <div className="max-w-5xl mx-auto text-center space-y-8 relative z-10">
-          {/* Live Activity Ticker */}
-          <div className="flex items-center justify-center">
-            <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/90 backdrop-blur-md border border-zinc-200 shadow-md text-xs font-semibold text-zinc-600 transition-all duration-500 max-w-md">
-              <span className="shrink-0 flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-              </span>
-              <span className="truncate transition-all duration-500">
-                {ACTIVITIES[activityIndex].icon} {ACTIVITIES[activityIndex].text}
-              </span>
-              <span className="shrink-0 text-zinc-400">{ACTIVITIES[activityIndex].time}</span>
-            </div>
-          </div>
-
           <div className="animate-float">
             <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/80 backdrop-blur-md border border-zinc-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-sm font-semibold text-zinc-700">
               Next-Generation Tournament Engine
@@ -218,58 +156,132 @@ function Home() {
         </div>
       </section>
 
-      {/* ───────────── Animated Stats ───────────── */}
-      <section ref={statsRef} className="py-16 px-6 bg-white border-y border-zinc-100">
-        <div className="max-w-6xl mx-auto">
-          <p className="text-center text-sm font-bold text-zinc-400 uppercase tracking-widest mb-10">The numbers speak for themselves</p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <StatCard value={1240} suffix="+" label="Tournaments Organized" icon={Trophy} color="bg-amber-400/20 text-amber-600" started={statsStarted} />
-            <StatCard value={8500} suffix="+" label="Races Recorded" icon={Activity} color="bg-orange-400/20 text-orange-600" started={statsStarted} />
-            <StatCard value={340} suffix="+" label="Registered Jockeys" icon={Users} color="bg-rose-400/20 text-rose-600" started={statsStarted} />
-            <StatCard value={97} suffix="%" label="AI Prediction Accuracy" icon={TrendingUp} color="bg-emerald-400/20 text-emerald-600" started={statsStarted} />
-          </div>
-        </div>
-      </section>
+      {/* ───────────── Featured Horses (Dynamic) ───────────── */}
+      {(!loadingHorses && horses.length > 0) && (
+        <section className="py-24 px-6 bg-zinc-50 relative overflow-hidden border-t border-zinc-100">
+            <div className="max-w-6xl mx-auto relative z-10">
+                <div className="text-center mb-16">
+                    <span className="inline-block px-4 py-1.5 bg-rose-100 text-rose-600 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Top Contenders</span>
+                    <h2 className="text-4xl font-black text-zinc-900">Featured Champions</h2>
+                    <p className="text-zinc-500 mt-3 font-medium max-w-xl mx-auto">Witness the finest horses in the league. Place your bets and join the thrill of the race.</p>
+                </div>
 
-      {/* ───────────── Did You Know ───────────── */}
-      <section className="py-24 px-6 relative overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]" />
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1.5 bg-amber-400/20 text-amber-400 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Explore</span>
-            <h2 className="text-4xl font-black text-white">Did You Know? 🤔</h2>
-            <p className="text-zinc-400 mt-3 font-medium">Fascinating facts from the world of horse racing</p>
-          </div>
+                <DragCarousel 
+                    items={horses}
+                    renderItem={(horse, isActive) => {
+                        const hId = horse.horseId || horse.id;
+                        const hName = horse.horseName || horse.name || `Horse #${hId}`;
+                        const hImage = horse.avatarUrl || horse.imageUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${hName}&backgroundColor=fef3c7`;
+                        const ownerName = horse.ownerName || horse.owner?.fullName || "Unknown Owner";
 
-          {/* Main Fact Display */}
-          <div className="relative bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-10 text-center mb-8 min-h-[180px] flex flex-col items-center justify-center transition-all duration-500">
-            <div className="text-5xl mb-4">{FUN_FACTS[activeFact].emoji}</div>
-            <h3 className="text-2xl font-black text-white mb-3">{FUN_FACTS[activeFact].title}</h3>
-            <p className="text-zinc-300 font-medium max-w-2xl leading-relaxed">{FUN_FACTS[activeFact].desc}</p>
-          </div>
+                        return (
+                        <div className={`group w-full h-full rounded-3xl bg-white border border-zinc-200 overflow-hidden transition-all duration-500 flex flex-col select-none ${isActive ? "scale-100 opacity-100 z-10 shadow-2xl" : "scale-[0.85] opacity-50 z-0 shadow-sm"}`}>
+                            <div className="relative h-64 overflow-hidden bg-amber-50 pointer-events-none">
+                                <img src={hImage} alt={hName} draggable="false" className="w-full h-full object-cover" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                                    <h3 className="text-2xl font-black text-white">{hName}</h3>
+                                </div>
+                                <div className="absolute top-4 right-4 flex gap-2">
+                                    <span className="bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full shadow-sm">
+                                        {horse.status || "Active"}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="p-6 flex-1 flex flex-col justify-between gap-6">
+                                <div className="grid grid-cols-2 gap-y-4 gap-x-2 border-b border-zinc-100 pb-5">
+                                    <div>
+                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Breed</p>
+                                        <p className="font-semibold text-sm text-zinc-900 truncate">{horse.breed || "Thoroughbred"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Owner</p>
+                                        <p className="font-semibold text-sm text-zinc-900 truncate">{ownerName}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Age / Gender</p>
+                                        <p className="font-semibold text-sm text-zinc-900">{horse.age || "3"} yrs • {horse.gender || "Stallion"}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Weight / Health</p>
+                                        <p className="font-semibold text-sm text-zinc-900">{horse.weight || "450"} kg • {horse.health || "Good"}</p>
+                                    </div>
+                                </div>
+                                <button onClick={handleQuickBet} className="w-full flex items-center justify-center gap-2 py-3.5 bg-zinc-900 text-white rounded-xl font-bold hover:bg-amber-500 transition-colors shadow-sm">
+                                    <Crosshair size={18} />
+                                    Quick Bet
+                                </button>
+                            </div>
+                        </div>
+                        );
+                    }}
+                    itemClassName="w-[340px]"
+                />
+            </div>
+        </section>
+      )}
 
-          {/* Fact Selector Dots + Tabs */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
-            {FUN_FACTS.map((fact, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveFact(i)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                  i === activeFact
-                    ? "bg-amber-400 text-zinc-900 shadow-lg shadow-amber-400/30 scale-105"
-                    : "bg-white/10 text-zinc-400 hover:bg-white/20 hover:text-white"
-                }`}
-              >
-                <span>{fact.emoji}</span>
-                <span className="hidden sm:inline">{fact.title}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ───────────── Featured Tournaments (Dynamic) ───────────── */}
+      {(!loadingTournaments && tournaments.length > 0) && (
+        <section className="py-24 px-6 bg-white relative overflow-hidden border-t border-zinc-100">
+            <div className="max-w-6xl mx-auto relative z-10">
+                <div className="text-center mb-16">
+                    <span className="inline-block px-4 py-1.5 bg-emerald-100 text-emerald-600 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Latest Events</span>
+                    <h2 className="text-4xl font-black text-zinc-900">Featured Tournaments</h2>
+                    <p className="text-zinc-500 mt-3 font-medium max-w-xl mx-auto">Explore the most recent tournaments. Join the action or track the leaderboards live.</p>
+                </div>
+
+                <DragCarousel 
+                    items={tournaments}
+                    renderItem={(tour, isActive) => {
+                        const tId = tour.tourId || tour.id;
+                        const tName = tour.tourName || tour.name || `Tournament #${tId}`;
+                        const tImage = tour.bannerUrl || tour.thumbnailUrl || tour.imageUrl || `https://api.dicebear.com/7.x/shapes/svg?seed=${tName}&backgroundColor=e5e7eb`;
+                        const dateText = tour.startDate ? new Date(tour.startDate).toLocaleDateString() : "TBA";
+
+                        return (
+                        <div className={`group w-full h-full rounded-3xl bg-zinc-50 border border-zinc-200 overflow-hidden transition-all duration-500 flex flex-col select-none ${isActive ? "scale-100 opacity-100 z-10 shadow-2xl bg-white" : "scale-[0.85] opacity-50 z-0 shadow-sm"}`}>
+                            <div className="relative h-48 overflow-hidden bg-zinc-200 pointer-events-none">
+                                <img src={tImage} alt={tName} draggable="false" className="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:scale-105 transition-transform duration-700" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                                <div className="absolute top-4 right-4">
+                                    <span className="bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full shadow-sm">
+                                        {tour.status || "Upcoming"}
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="p-6 flex-1 flex flex-col justify-between gap-6">
+                                <div>
+                                    <h3 className="text-xl font-black text-zinc-900 mb-4 line-clamp-2 leading-tight">{tName}</h3>
+                                    <div className="space-y-2">
+                                      <div className="flex items-center gap-2 text-sm text-zinc-500 font-medium">
+                                          <Trophy className="w-4 h-4 text-emerald-500" />
+                                          <span className="text-zinc-400">Prize Pool:</span> 
+                                          <span className="text-zinc-900">{tour.prizePool ? `$${tour.prizePool.toLocaleString()}` : "TBA"}</span>
+                                      </div>
+                                      <div className="flex items-center gap-2 text-sm text-zinc-500 font-medium">
+                                          <Activity className="w-4 h-4 text-blue-500" />
+                                          <span className="text-zinc-400">Date:</span> 
+                                          <span className="text-zinc-900">{dateText}</span>
+                                      </div>
+                                    </div>
+                                </div>
+                                <button onClick={() => navigate(`/tournaments`, { state: { openTournamentId: tId } })} className="w-full flex items-center justify-center gap-2 py-3.5 bg-zinc-900 text-white rounded-xl font-bold hover:bg-emerald-500 transition-colors shadow-sm">
+                                    <ArrowRight size={18} />
+                                    View Event
+                                </button>
+                            </div>
+                        </div>
+                        );
+                    }}
+                    itemClassName="w-[340px] h-full flex"
+                />
+            </div>
+        </section>
+      )}
 
       {/* ───────────── How It Works ───────────── */}
-      <section className="py-24 px-6 bg-zinc-50">
+      <section className="py-24 px-6 bg-zinc-50 border-t border-zinc-100">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <span className="inline-block px-4 py-1.5 bg-orange-100 text-orange-600 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Simple — Fast — Effective</span>
@@ -290,10 +302,6 @@ function Home() {
                 <div className="text-6xl font-black text-zinc-100 absolute top-6 right-8 select-none">{step.step}</div>
                 <h3 className="text-xl font-black text-zinc-900 mb-3 relative z-10">{step.title}</h3>
                 <p className="text-zinc-500 font-medium leading-relaxed relative z-10">{step.desc}</p>
-                <div className="mt-6 flex items-center gap-1 text-sm font-bold text-amber-600 group-hover:gap-2 transition-all">
-                  <span>Learn more</span>
-                  <ChevronRight className="w-4 h-4" />
-                </div>
               </div>
             ))}
           </div>
@@ -313,10 +321,10 @@ function Home() {
             {[
               {
                 icon: Zap, color: "bg-amber-100 text-amber-600",
-                title: "Smart AI Predictions",
-                desc: "Our AI models analyze race history, track conditions, and horse form to deliver highly accurate outcome forecasts.",
-                badge: "New 🔥",
-                badgeColor: "bg-red-100 text-red-600"
+                title: "Detailed Horse Profiles",
+                desc: "Access comprehensive records of every horse, including their win rates, past performances, and owner history.",
+                badge: "Insights 📊",
+                badgeColor: "bg-blue-100 text-blue-600"
               },
               {
                 icon: Trophy, color: "bg-emerald-100 text-emerald-600",
@@ -344,10 +352,7 @@ function Home() {
                   </div>
                   <h3 className="text-xl font-bold text-zinc-900 mb-3">{f.title}</h3>
                   <p className="text-zinc-500 font-medium leading-relaxed">{f.desc}</p>
-                  <div className="mt-6 flex items-center gap-1 text-sm font-bold text-zinc-900 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                    <span>View details</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </div>
+                  {/* Action link removed */}
                 </div>
               </div>
             ))}

@@ -10,6 +10,9 @@ const predictionApi = {
     },
     getMyBets: () => {
         return axiosClient.get("/prediction/my-bets");
+    },
+    getAiInsights: () => {
+        return axiosClient.get("/prediction/ai-insights");
     }
 };
 

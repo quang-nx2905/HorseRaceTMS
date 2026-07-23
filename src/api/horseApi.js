@@ -1,8 +1,8 @@
-import api from "./axios";
+import axiosClient from "./axiosClient";
 
 export const getAllHorses = async () => {
 
-    const response = await api.get(
+    const response = await axiosClient.get(
         "/horses"
     );
 
@@ -11,7 +11,7 @@ export const getAllHorses = async () => {
 
 export const createHorse = async (data) => {
 
-    const response = await api.post(
+    const response = await axiosClient.post(
         "/horses",
         data
     );

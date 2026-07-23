@@ -1,4 +1,5 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import predictionApi from "../api/predictionApi";
 import {
     BrainCircuit,
     Sparkles,
@@ -18,78 +19,6 @@ import {
 } from "lucide-react";
 import PredictionDetailsModal from "../components/predictions/PredictionDetailsModal";
 
-const PREDICTIONS_DATA = [
-    {
-        horse: "Thunder Bolt",
-        race: "Golden Cup Final",
-        confidence: 92,
-        odds: "1.8x",
-        status: "High Chance",
-        breed: "Arabian",
-        jockey: "Akira Sato",
-        track: "Tokyo Arena",
-        form: ["W", "W", "W", "L", "W"],
-        raceDate: "12 Jun 2026",
-        gradient: "from-emerald-500 to-teal-600",
-        avatarGrad: "from-emerald-400 to-teal-600",
-    },
-    {
-        horse: "Night Fury",
-        race: "Royal Derby",
-        confidence: 76,
-        odds: "2.4x",
-        status: "Moderate",
-        breed: "Mustang",
-        jockey: "Ryan Cooper",
-        track: "London Track",
-        form: ["W", "L", "W", "W", "L"],
-        raceDate: "20 Jun 2026",
-        gradient: "from-amber-500 to-orange-600",
-        avatarGrad: "from-amber-400 to-orange-600",
-    },
-    {
-        horse: "Silver Storm",
-        race: "Tokyo Sprint",
-        confidence: 61,
-        odds: "3.1x",
-        status: "Risky",
-        breed: "Appaloosa",
-        jockey: "Lucas Fernandez",
-        track: "New York Track",
-        form: ["L", "W", "L", "W", "L"],
-        raceDate: "02 Jul 2026",
-        gradient: "from-red-500 to-rose-600",
-        avatarGrad: "from-red-400 to-rose-600",
-    },
-    {
-        horse: "Golden Sprint",
-        race: "Dubai Masters",
-        confidence: 85,
-        odds: "2.0x",
-        status: "High Chance",
-        breed: "Thoroughbred",
-        jockey: "James Carter",
-        track: "Dubai Racing Club",
-        form: ["W", "W", "L", "W", "W"],
-        raceDate: "18 Jul 2026",
-        gradient: "from-emerald-500 to-green-600",
-        avatarGrad: "from-sky-400 to-blue-600",
-    },
-    {
-        horse: "Crimson Star",
-        race: "Singapore Open",
-        confidence: 70,
-        odds: "2.7x",
-        status: "Moderate",
-        breed: "Quarter Horse",
-        jockey: "Maria Santos",
-        track: "Singapore Racecourse",
-        form: ["L", "W", "W", "L", "W"],
-        raceDate: "28 Jul 2026",
-        gradient: "from-amber-500 to-yellow-600",
-        avatarGrad: "from-rose-400 to-red-600",
-    },
-];
 
 const STATUS_CONFIG = {
     "High Chance": {
@@ -114,20 +43,40 @@ function Predictions() {
     const [filterStatus, setFilterStatus] = useState("All");
     const [openDetails, setOpenDetails] = useState(false);
     const [selectedPrediction, setSelectedPrediction] = useState(null);
+    const [predictionsData, setPredictionsData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPredictions = async () => {
+            try {
+                const response = await predictionApi.getAiInsights();
+                if (response.data && response.data.data) {
+                    setPredictionsData(response.data.data);
+                } else if (response.data) {
+                    setPredictionsData(response.data);
+                }
+            } catch (error) {
+                console.error("Failed to load AI predictions", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchPredictions();
+    }, []);
 
     const filtered = useMemo(() => {
-        return PREDICTIONS_DATA.filter((item) => {
+        return predictionsData.filter((item) => {
             const matchSearch =
                 item.horse.toLowerCase().includes(search.toLowerCase()) ||
                 item.race.toLowerCase().includes(search.toLowerCase());
             const matchStatus = filterStatus === "All" || item.status === filterStatus;
             return matchSearch && matchStatus;
         });
-    }, [search, filterStatus]);
+    }, [search, filterStatus, predictionsData]);
 
-    const avgConfidence = Math.round(
-        PREDICTIONS_DATA.reduce((sum, p) => sum + p.confidence, 0) / PREDICTIONS_DATA.length
-    );
+    const avgConfidence = predictionsData.length > 0 ? Math.round(
+        predictionsData.reduce((sum, p) => sum + p.confidence, 0) / predictionsData.length
+    ) : 0;
 
     return (
         <div className="pb-12">
@@ -142,27 +91,27 @@ function Predictions() {
                     <div>
                         <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-violet-500/20 border border-violet-400/30 text-violet-300 rounded-full text-xs font-bold uppercase tracking-widest mb-5">
                             <BrainCircuit className="w-3.5 h-3.5" />
-                            AI-Powered Engine · Model v3.2
+                            Algorithmic Engine
                         </div>
                         <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight mb-3">
                             Race <span className="bg-gradient-to-r from-violet-300 to-pink-300 bg-clip-text text-transparent">Predictions</span>
                         </h1>
                         <p className="text-violet-300/70 text-base max-w-md">
-                            Machine-learning predictions powered by historical data, real-time telemetry, and jockey performance analytics.
+                            Algorithmic predictions powered by race conditions, real-time data, and mathematical models.
                         </p>
                     </div>
                     <div className="grid grid-cols-3 gap-3 min-w-[280px]">
                         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-                            <p className="text-xs text-violet-300/60 font-bold uppercase tracking-wider mb-1">Accuracy</p>
-                            <p className="text-2xl font-black text-white">86%</p>
+                            <p className="text-xs text-violet-300/60 font-bold uppercase tracking-wider mb-1">Avg Confidence</p>
+                            <p className="text-2xl font-black text-white">{avgConfidence}%</p>
                         </div>
                         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-                            <p className="text-xs text-violet-300/60 font-bold uppercase tracking-wider mb-1">AI Models</p>
-                            <p className="text-2xl font-black text-white">12</p>
+                            <p className="text-xs text-violet-300/60 font-bold uppercase tracking-wider mb-1">Upcoming Races</p>
+                            <p className="text-2xl font-black text-white">{new Set(predictionsData.map(p => p.race)).size}</p>
                         </div>
                         <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-                            <p className="text-xs text-violet-300/60 font-bold uppercase tracking-wider mb-1">Generated</p>
-                            <p className="text-2xl font-black text-white">14.2K</p>
+                            <p className="text-xs text-violet-300/60 font-bold uppercase tracking-wider mb-1">Predictions</p>
+                            <p className="text-2xl font-black text-white">{predictionsData.length}</p>
                         </div>
                     </div>
                 </div>
@@ -180,7 +129,7 @@ function Predictions() {
                             style={{ width: `${avgConfidence}%` }}
                         />
                     </div>
-                    <p className="text-xs text-zinc-400 mt-2 font-medium">{PREDICTIONS_DATA.length} active predictions</p>
+                    <p className="text-xs text-zinc-400 mt-2 font-medium">{predictionsData.length} active predictions</p>
                 </div>
 
                 {/* Search + filters */}
@@ -221,17 +170,21 @@ function Predictions() {
 
             {/* ═══════ PREDICTION CARDS ═══════ */}
             <div className="space-y-5">
-                {filtered.length === 0 && (
+                {isLoading ? (
+                    <div className="text-center py-20 text-zinc-400 font-medium bg-white rounded-3xl border border-zinc-200">
+                        Loading AI Predictions...
+                    </div>
+                ) : filtered.length === 0 ? (
                     <div className="text-center py-20 text-zinc-400 font-medium bg-white rounded-3xl border border-zinc-200">
                         No predictions match your search.
                     </div>
-                )}
-                {filtered.map((item) => {
+                ) : (
+                filtered.map((item, index) => {
                     const cfg = STATUS_CONFIG[item.status] || STATUS_CONFIG["Moderate"];
                     const StatusIcon = cfg.icon;
                     return (
                         <div
-                            key={item.horse}
+                            key={`${item.race}-${item.horse}-${index}`}
                             className="group bg-white border border-zinc-200 rounded-3xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
                         >
                             {/* Top gradient stripe */}
@@ -241,9 +194,17 @@ function Predictions() {
                                 <div className="flex flex-col md:flex-row md:items-center gap-6">
                                     {/* Horse avatar + info */}
                                     <div className="flex items-center gap-4 flex-1">
-                                        <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${item.avatarGrad} text-white flex items-center justify-center font-black text-lg shadow-sm flex-shrink-0`}>
-                                            {item.horse.split(" ").map(w => w[0]).join("")}
-                                        </div>
+                                        {item.imageUrl ? (
+                                            <img 
+                                                src={item.imageUrl} 
+                                                alt={item.horse} 
+                                                className="w-14 h-14 rounded-2xl object-cover shadow-sm flex-shrink-0"
+                                            />
+                                        ) : (
+                                            <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center font-black text-lg shadow-sm flex-shrink-0">
+                                                {item.horse.split(" ").map(w => w[0]).join("").toUpperCase()}
+                                            </div>
+                                        )}
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
                                                 <h2 className="text-lg font-black text-zinc-900 group-hover:text-violet-700 transition-colors">
@@ -307,7 +268,7 @@ function Predictions() {
                             </div>
                         </div>
                     );
-                })}
+                }))}
             </div>
 
             <PredictionDetailsModal

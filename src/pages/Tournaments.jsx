@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 
 import { useState, useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 import CreateTournamentModal from "../components/modals/CreateTournamentModal";
@@ -129,6 +130,9 @@ function Tournaments() {
           featured: false,
         }));
         
+        // Sort descending by id to show newest first
+        mapped.sort((a, b) => b.id - a.id);
+        
         setTournaments(mapped);
         if (res.data?.totalPrize !== undefined) {
           setBackendTotalPrize(res.data.totalPrize);
@@ -164,6 +168,20 @@ function Tournaments() {
   useEffect(() => {
     setCurrentPage(1);
   }, [search, filter, setCurrentPage]);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.openTournamentId && tournaments.length > 0) {
+      const tour = tournaments.find((t) => t.id === location.state.openTournamentId);
+      if (tour) {
+        setSelectedTournament(tour);
+        setOpenDrawer(true);
+        // Clear state to avoid reopening on reload
+        window.history.replaceState({}, document.title);
+      }
+    }
+  }, [location.state, tournaments]);
 
   const totalLive = useMemo(() => tournaments.filter((i) => i.status === "Live").length, [tournaments]);
   const totalUpcoming = useMemo(() => tournaments.filter((i) => i.status === "Upcoming").length, [tournaments]);

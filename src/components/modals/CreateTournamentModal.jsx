@@ -257,6 +257,7 @@ function CreateTournamentModal({ open, onClose }) {
                             <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
                             <input
                                 type="date"
+                                min={new Date().toISOString().split("T")[0]}
                                 value={basicInfo.startDate}
                                 onChange={e => setBasicInfo({ ...basicInfo, startDate: e.target.value })}
                                 className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-3.5 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium text-zinc-700"
@@ -270,6 +271,7 @@ function CreateTournamentModal({ open, onClose }) {
                             <Calendar size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
                             <input
                                 type="date"
+                                min={basicInfo.startDate || new Date().toISOString().split("T")[0]}
                                 value={basicInfo.endDate}
                                 onChange={e => setBasicInfo({ ...basicInfo, endDate: e.target.value })}
                                 className="w-full bg-zinc-50 border border-zinc-200 rounded-2xl pl-11 pr-5 py-3.5 outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium text-zinc-700"
@@ -444,15 +446,24 @@ function CreateTournamentModal({ open, onClose }) {
                                             {availableReferees.map(ref => {
                                                 const refId = ref.id || ref.userId;
                                                 const refName = ref.name || ref.fullName || `Referee #${refId}`;
+                                                const refAvatar = ref.avatarUrl || ref.avatar || ref.imageUrl || ref.profilePicture;
                                                 const isSelected = (activeRace.refereeIds || []).includes(refId.toString());
+                                                
                                                 return (
-                                                    <label key={refId} className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all hover:bg-zinc-100/50 ${isSelected ? 'bg-amber-50/50' : 'bg-white'}`}>
+                                                    <label key={refId} className={`flex items-center gap-4 px-4 py-3 cursor-pointer transition-all hover:bg-zinc-100/50 ${isSelected ? 'bg-amber-50/50' : 'bg-white'}`}>
                                                         <input 
                                                             type="checkbox" 
-                                                            className="accent-amber-500 w-4 h-4 rounded border-zinc-300 focus:ring-amber-400"
+                                                            className="accent-amber-500 w-4 h-4 rounded border-zinc-300 focus:ring-amber-400 flex-shrink-0"
                                                             checked={isSelected}
                                                             onChange={() => toggleReferee(activeRaceIndex, refId.toString())}
                                                         />
+                                                        {refAvatar ? (
+                                                            <img src={refAvatar} alt={refName} className="w-8 h-8 rounded-full border border-zinc-200 object-cover flex-shrink-0 bg-white" />
+                                                        ) : (
+                                                            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 border border-blue-200 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                                                                {refName.charAt(0).toUpperCase()}
+                                                            </div>
+                                                        )}
                                                         <span className={`font-medium text-sm ${isSelected ? 'text-amber-900 font-semibold' : 'text-zinc-700'}`}>{refName}</span>
                                                     </label>
                                                 );
