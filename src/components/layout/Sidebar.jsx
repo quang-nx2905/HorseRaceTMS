@@ -212,7 +212,7 @@ function Sidebar() {
         <div className="relative z-10 mx-3 mb-2 p-3.5 rounded-2xl bg-gradient-to-br from-amber-500/10 to-amber-900/10 border border-amber-500/20">
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-amber-500/80">Total Points</span>
-            <span className="text-sm font-bold text-amber-400">{spectatorPoints ?? 0} pts</span>
+            <span className="text-sm font-bold text-amber-400">{(spectatorPoints ?? 0).toLocaleString()} pts</span>
           </div>
         </div>
       )}

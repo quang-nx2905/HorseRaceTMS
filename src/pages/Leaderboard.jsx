@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
     Trophy,
     Crown,
@@ -16,122 +16,11 @@ import {
     Flame,
     TrendingDown,
 } from "lucide-react";
+import leaderboardApi from "../api/leaderboardApi";
 import RankingDetailsModal from "../components/leaderboard/RankingDetailsModal";
 
-const initialRankings = [
-    {
-        horse: "Thunder Bolt",
-        jockey: "Akira Sato",
-        wins: 48,
-        points: 1240,
-        winRate: 78,
-        breed: "Arabian",
-        form: ["W", "W", "L", "W", "W"],
-        avatarBg: "from-amber-400 to-amber-600",
-        textCol: "text-amber-500",
-    },
-    {
-        horse: "Golden Sprint",
-        jockey: "James Carter",
-        wins: 41,
-        points: 1130,
-        winRate: 72,
-        breed: "Thoroughbred",
-        form: ["W", "L", "W", "W", "L"],
-        avatarBg: "from-slate-300 to-slate-500",
-        textCol: "text-slate-400",
-    },
-    {
-        horse: "Night Fury",
-        jockey: "Ryan Cooper",
-        wins: 36,
-        points: 980,
-        winRate: 65,
-        breed: "Mustang",
-        form: ["L", "W", "W", "L", "W"],
-        avatarBg: "from-orange-400 to-orange-600",
-        textCol: "text-orange-600",
-    },
-    {
-        horse: "Silver Storm",
-        jockey: "Lucas Fernandez",
-        wins: 24,
-        points: 760,
-        winRate: 58,
-        breed: "Appaloosa",
-        form: ["W", "L", "L", "W", "L"],
-        avatarBg: "from-teal-400 to-emerald-600",
-        textCol: "text-emerald-500",
-    },
-    {
-        horse: "Crimson Star",
-        jockey: "Maria Santos",
-        wins: 29,
-        points: 710,
-        winRate: 62,
-        breed: "Quarter Horse",
-        form: ["L", "W", "L", "W", "W"],
-        avatarBg: "from-red-400 to-rose-600",
-        textCol: "text-red-500",
-    },
-    {
-        horse: "Blizzard King",
-        jockey: "Hans Mueller",
-        wins: 22,
-        points: 680,
-        winRate: 50,
-        breed: "Arabian",
-        form: ["W", "W", "L", "L", "L"],
-        avatarBg: "from-sky-400 to-blue-600",
-        textCol: "text-blue-500",
-    },
-    {
-        horse: "Shadow Dancer",
-        jockey: "Yuki Tanaka",
-        wins: 19,
-        points: 620,
-        winRate: 45,
-        breed: "Mustang",
-        form: ["L", "L", "W", "W", "L"],
-        avatarBg: "from-slate-600 to-zinc-800",
-        textCol: "text-zinc-600",
-    },
-    {
-        horse: "Desert Wind",
-        jockey: "Ahmed Ali",
-        wins: 15,
-        points: 580,
-        winRate: 40,
-        breed: "Thoroughbred",
-        form: ["W", "L", "L", "L", "W"],
-        avatarBg: "from-yellow-400 to-amber-600",
-        textCol: "text-amber-600",
-    },
-    {
-        horse: "Mystic Ocean",
-        jockey: "Emma Watson",
-        wins: 18,
-        points: 530,
-        winRate: 42,
-        breed: "Appaloosa",
-        form: ["L", "W", "L", "L", "W"],
-        avatarBg: "from-cyan-400 to-blue-500",
-        textCol: "text-cyan-500",
-    },
-    {
-        horse: "Eclipse",
-        jockey: "Oliver Green",
-        wins: 12,
-        points: 490,
-        winRate: 35,
-        breed: "Quarter Horse",
-        form: ["L", "L", "L", "W", "L"],
-        avatarBg: "from-violet-400 to-purple-600",
-        textCol: "text-purple-500",
-    },
-];
-
 function Leaderboard() {
+    const [leaderboardData, setLeaderboardData] = useState([]);
     const [search, setSearch] = useState("");
     const [sortBy, setSortBy] = useState("points"); // "points" | "wins"
     const [openDetails, setOpenDetails] = useState(false);
@@ -139,14 +28,20 @@ function Leaderboard() {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
+    useEffect(() => {
+        leaderboardApi.getGlobalHorseLeaderboard()
+            .then(res => setLeaderboardData(res.data.data))
+            .catch(err => console.error("Error fetching leaderboard", err));
+    }, []);
+
     // Dynamically sort items and attach ranks
     const sortedRankings = useMemo(() => {
-        const sorted = [...initialRankings].sort((a, b) => b[sortBy] - a[sortBy]);
+        const sorted = [...leaderboardData].sort((a, b) => b[sortBy] - a[sortBy]);
         return sorted.map((item, index) => ({
             ...item,
             rank: index + 1,
         }));
-    }, [sortBy]);
+    }, [sortBy, leaderboardData]);
 
     // Filter by search query
     const filteredRankings = useMemo(() => {
@@ -169,12 +64,12 @@ function Leaderboard() {
 
     // Stats calculations
     const totalPointsSum = useMemo(() => {
-        return initialRankings.reduce((sum, item) => sum + item.points, 0);
-    }, []);
+        return leaderboardData.reduce((sum, item) => sum + item.points, 0);
+    }, [leaderboardData]);
 
     const totalWinsSum = useMemo(() => {
-        return initialRankings.reduce((sum, item) => sum + item.wins, 0);
-    }, []);
+        return leaderboardData.reduce((sum, item) => sum + item.wins, 0);
+    }, [leaderboardData]);
 
     const topLeader = sortedRankings[0];
 
@@ -259,9 +154,11 @@ function Leaderboard() {
                 <div className="bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
                     <div>
                         <p className="text-zinc-500 text-sm font-semibold mb-1">Current Leader</p>
-                        <h3 className="text-xl font-bold text-zinc-950 truncate max-w-[150px]">{topLeader.horse}</h3>
+                        <h3 className="text-xl font-bold text-zinc-950 truncate max-w-[150px]">
+                            {topLeader ? topLeader.horse : "Loading..."}
+                        </h3>
                         <p className="text-amber-600 text-xs font-semibold mt-1">
-                            {topLeader.points} Pts ({topLeader.wins} wins)
+                            {topLeader ? `${topLeader.points} Pts (${topLeader.wins} wins)` : "0 Pts"}
                         </p>
                     </div>
                     <div className="w-12 h-12 bg-emerald-500/10 rounded-2xl flex items-center justify-center text-emerald-600">
@@ -273,8 +170,10 @@ function Leaderboard() {
                 <div className="bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-all flex items-center justify-between">
                     <div>
                         <p className="text-zinc-500 text-sm font-semibold mb-1">MVP Jockey</p>
-                        <h3 className="text-xl font-bold text-zinc-950 truncate max-w-[150px]">{topLeader.jockey}</h3>
-                        <p className="text-zinc-500 text-xs mt-1">Win Rate: {topLeader.winRate}%</p>
+                        <h3 className="text-xl font-bold text-zinc-950 truncate max-w-[150px]">
+                            {topLeader ? topLeader.jockey : "Loading..."}
+                        </h3>
+                        <p className="text-zinc-500 text-xs mt-1">Win Rate: {topLeader ? `${topLeader.winRate}%` : "0%"}</p>
                     </div>
                     <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-600">
                         <Star className="w-6 h-6" />
@@ -322,9 +221,13 @@ function Leaderboard() {
                         <div className="absolute top-0 -translate-y-1/2 w-16 h-16 rounded-full bg-zinc-200 border-4 border-white flex items-center justify-center shadow-md text-zinc-500 font-extrabold text-2xl group-hover:scale-110 transition-transform">
                             2
                         </div>
-                        <div className="w-14 h-14 bg-gradient-to-br from-slate-300 to-slate-500 text-white rounded-2xl flex items-center justify-center font-black text-xl mb-4 shadow-inner">
-                            {podiumData[0].horse.split(" ").map(w => w[0]).join("")}
-                        </div>
+                        {podiumData[0].imageUrl ? (
+                            <img src={podiumData[0].imageUrl} alt={podiumData[0].horse} className="w-14 h-14 rounded-2xl object-cover mb-4 shadow-inner" />
+                        ) : (
+                            <div className={`w-14 h-14 bg-gradient-to-br ${podiumData[0].avatarBg || 'from-slate-300 to-slate-500'} text-white rounded-2xl flex items-center justify-center font-black text-xl mb-4 shadow-inner`}>
+                                {podiumData[0].horse.split(" ").map(w => w[0]).join("").toUpperCase()}
+                            </div>
+                        )}
                         <div>
                             <h3 className="font-extrabold text-zinc-900 text-lg group-hover:text-amber-500 transition-colors">
                                 {podiumData[0].horse}
@@ -354,17 +257,22 @@ function Leaderboard() {
                     </div>
 
                     {/* 1st Place: Gold Crown */}
-                    <div className="group relative bg-zinc-950 border border-zinc-900 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 order-1 md:order-2 flex flex-col items-center pt-16 text-center md:h-[350px] justify-between overflow-hidden">
+                    <div className="group relative bg-zinc-950 border border-zinc-900 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300 order-1 md:order-2 flex flex-col items-center pt-16 text-center md:h-[350px] justify-between">
                         {/* Glow and decoration background */}
+                        <div className="absolute inset-0 bg-amber-500/10 rounded-3xl blur-xl pointer-events-none overflow-hidden" style={{ clipPath: 'inset(0 0 0 0 round 1.5rem)' }} />
                         <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
-                        <div className="absolute top-0 -translate-y-1/2 w-20 h-20 rounded-full bg-amber-400 border-4 border-zinc-950 flex items-center justify-center shadow-lg text-zinc-950 font-black text-3xl group-hover:scale-110 transition-transform">
+                        <div className="absolute top-0 -translate-y-1/2 w-20 h-20 rounded-full bg-amber-400 border-4 border-zinc-950 flex items-center justify-center shadow-lg text-zinc-950 font-black text-3xl group-hover:scale-110 transition-transform z-10">
                             <Crown className="w-8 h-8 text-zinc-950 animate-bounce mt-[-3px]" />
                         </div>
                         
-                        <div className="relative">
-                            <div className="w-16 h-16 bg-gradient-to-br from-amber-400 to-amber-600 text-zinc-950 rounded-2xl flex items-center justify-center font-black text-2xl mx-auto mb-4 shadow-lg border border-amber-300/30">
-                                {podiumData[1].horse.split(" ").map(w => w[0]).join("")}
-                            </div>
+                        <div className="relative z-10">
+                            {podiumData[1].imageUrl ? (
+                                <img src={podiumData[1].imageUrl} alt={podiumData[1].horse} className="w-16 h-16 rounded-2xl object-cover mx-auto mb-4 shadow-lg border border-amber-300/30" />
+                            ) : (
+                                <div className={`w-16 h-16 bg-gradient-to-br ${podiumData[1].avatarBg || 'from-amber-400 to-amber-600'} text-zinc-950 rounded-2xl flex items-center justify-center font-black text-2xl mx-auto mb-4 shadow-lg border border-amber-300/30`}>
+                                    {podiumData[1].horse.split(" ").map(w => w[0]).join("").toUpperCase()}
+                                </div>
+                            )}
                             <h3 className="font-black text-white text-xl tracking-tight group-hover:text-amber-400 transition-colors">
                                 {podiumData[1].horse}
                             </h3>
@@ -398,9 +306,13 @@ function Leaderboard() {
                         <div className="absolute top-0 -translate-y-1/2 w-16 h-16 rounded-full bg-orange-100 border-4 border-white flex items-center justify-center shadow-md text-orange-600 font-extrabold text-2xl group-hover:scale-110 transition-transform">
                             3
                         </div>
-                        <div className="w-14 h-14 bg-gradient-to-br from-orange-400 to-orange-600 text-white rounded-2xl flex items-center justify-center font-black text-xl mb-4 shadow-inner">
-                            {podiumData[2].horse.split(" ").map(w => w[0]).join("")}
-                        </div>
+                        {podiumData[2].imageUrl ? (
+                            <img src={podiumData[2].imageUrl} alt={podiumData[2].horse} className="w-14 h-14 rounded-2xl object-cover mb-4 shadow-inner" />
+                        ) : (
+                            <div className={`w-14 h-14 bg-gradient-to-br ${podiumData[2].avatarBg || 'from-orange-400 to-orange-600'} text-white rounded-2xl flex items-center justify-center font-black text-xl mb-4 shadow-inner`}>
+                                {podiumData[2].horse.split(" ").map(w => w[0]).join("").toUpperCase()}
+                            </div>
+                        )}
                         <div>
                             <h3 className="font-extrabold text-zinc-900 text-lg group-hover:text-amber-500 transition-colors">
                                 {podiumData[2].horse}
@@ -495,9 +407,17 @@ function Leaderboard() {
 
                                     {/* Horse details column */}
                                     <div className="col-span-5 md:col-span-4 flex items-center gap-3">
-                                        <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${item.avatarBg} text-white flex items-center justify-center font-black text-sm shadow-inner`}>
-                                            {item.horse.split(" ").map(w => w[0]).join("")}
-                                        </div>
+                                        {item.imageUrl ? (
+                                            <img
+                                                src={item.imageUrl}
+                                                alt={item.horse}
+                                                className="w-10 h-10 rounded-xl object-cover shadow-inner flex-shrink-0"
+                                            />
+                                        ) : (
+                                            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${item.avatarBg} text-white flex items-center justify-center font-black text-sm shadow-inner flex-shrink-0`}>
+                                                {item.horse.split(" ").map(w => w[0]).join("").toUpperCase()}
+                                            </div>
+                                        )}
                                         <div className="truncate pr-2">
                                             <h4 className="font-bold text-zinc-900 group-hover:text-amber-500 transition-colors truncate">
                                                 {item.horse}
