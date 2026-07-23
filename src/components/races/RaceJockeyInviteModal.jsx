@@ -78,7 +78,7 @@ function CustomJockeySelect({ value, onChange, options, disabled }) {
   );
 }
 
-function RaceJockeyInviteModal({ registration, registrations, onClose }) {
+function RaceJockeyInviteModal({ registration, onClose }) {
   const [jockeys, setJockeys] = useState([]);
   const [jockeyId, setJockeyId] = useState("");
   const [message, setMessage] = useState("");
@@ -86,14 +86,14 @@ function RaceJockeyInviteModal({ registration, registrations, onClose }) {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    jockeyApi.getJockeys()
+    jockeyApi.getAvailableJockeys(registration.tourId)
       .then(response => {
-          const allJockeys = (response?.data || []).filter(j => j.user?.isActive !== false);
-          setJockeys(allJockeys);
+          const availableJockeys = (response?.data || []);
+          setJockeys(availableJockeys);
       })
       .catch(error => toast.error(error.response?.data?.message || "Failed to load jockeys."))
       .finally(() => setLoading(false));
-  }, []);
+  }, [registration.tourId]);
 
   const submit = async event => {
     event.preventDefault();
@@ -107,19 +107,6 @@ function RaceJockeyInviteModal({ registration, registrations, onClose }) {
     } finally { setSending(false); }
   };
 
-  const availableJockeys = useMemo(() => {
-      // Filter out jockeys who already accepted an invite or are pending admin approval for THIS race
-      const takenJockeyIds = (registrations || [])
-          .filter(r => ['Accepted', 'AcceptedPendingAdmin', 'Pending'].includes(r.invitationStatus) || r.jockeyId)
-          .map(r => r.jockeyId)
-          .filter(Boolean);
-          
-      return jockeys.filter(j => {
-          const id = j.userId || j.user?.id || j.id;
-          return !takenJockeyIds.includes(id);
-      });
-  }, [jockeys, registrations]);
-
   return <div className="fixed inset-0 z-[80] flex items-center justify-center bg-zinc-950/45 p-4 backdrop-blur-sm">
     <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
       <div className="flex items-start justify-between border-b p-6"><div><h3 className="text-xl font-black">Invite a Jockey</h3><p className="mt-1 text-sm text-zinc-500"><b>{registration.horseName}</b> · {registration.raceName}</p></div><button onClick={onClose} className="rounded-full bg-zinc-100 p-2"><X size={18}/></button></div>
@@ -129,7 +116,7 @@ function RaceJockeyInviteModal({ registration, registrations, onClose }) {
             {loading ? (
                 <div className="flex gap-2 rounded-xl bg-zinc-50 p-3 text-sm"><Loader2 size={16} className="animate-spin"/>Loading...</div>
             ) : (
-                <CustomJockeySelect value={jockeyId} onChange={setJockeyId} options={availableJockeys} />
+                <CustomJockeySelect value={jockeyId} onChange={setJockeyId} options={jockeys} />
             )}
         </div>
         <div><label className="mb-1.5 block text-sm font-bold">Message (optional)</label><textarea rows={3} value={message} onChange={e => setMessage(e.target.value)} className="w-full resize-none rounded-xl border bg-zinc-50 px-4 py-3 text-sm" placeholder="Write a message..."/></div>
