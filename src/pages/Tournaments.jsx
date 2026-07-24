@@ -19,11 +19,13 @@ import {
   Star,
   Activity,
   BarChart3,
+  MonitorPlay,
 } from "lucide-react";
 
 import { useState, useEffect, useMemo } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import axiosClient from "../api/axiosClient";
 
 import CreateTournamentModal from "../components/modals/CreateTournamentModal";
 import tournamentApi from "../api/tournamentApi";
@@ -93,6 +95,7 @@ function StatusBadge({ status }) {
 }
 
 function Tournaments() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
@@ -103,9 +106,8 @@ function Tournaments() {
   const [openEdit, setOpenEdit] = useState(false);
   const [loading, setLoading] = useState(true);
 
-
-
   const [tournaments, setTournaments] = useState([]);
+  const [liveRaces, setLiveRaces] = useState([]);
   const [backendTotalPrize, setBackendTotalPrize] = useState(0);
 
   useEffect(() => {
@@ -128,6 +130,7 @@ function Tournaments() {
           bannerUrl: t.bannerUrl || fallbackTournamentBanner,
           participants: t.participantCount || 0,
           featured: false,
+          liveRacesCount: t.liveRacesCount || 0
         }));
         
         // Sort descending by id to show newest first
@@ -146,14 +149,34 @@ function Tournaments() {
       }
     };
 
+    const fetchLiveRaces = async () => {
+      try {
+        const res = await axiosClient.get("/Races/streams/active");
+        const data = res.data;
+        const liveStatuses = ["LIVE", "STARTED", "ONGOING", "RACING"];
+        const lives = data.filter(r => liveStatuses.includes(r.status?.toUpperCase()) && r.youtubeId);
+        
+        const mappedLives = lives.map(r => ({
+            ...r,
+            race: r.raceName,
+            tournamentName: r.tournamentName || "Uncategorized"
+        }));
+        
+        setLiveRaces(mappedLives);
+      } catch (err) {
+        console.error("Failed to fetch live races", err);
+      }
+    };
+
     fetchTournaments();
+    fetchLiveRaces();
   }, []);
 
   const filteredTournaments = useMemo(() => {
     return tournaments.filter((item) => {
       const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
         item.location.toLowerCase().includes(search.toLowerCase());
-      const matchesFilter = filter === "All" ? true : item.status === filter;
+        const matchesFilter = filter === "All" ? true : (filter === "Live" ? (item.liveRacesCount > 0 || item.status === "Live" || item.status === "Ongoing") : item.status === filter);
       return matchesSearch && matchesFilter;
     });
   }, [tournaments, search, filter]);
@@ -183,7 +206,7 @@ function Tournaments() {
     }
   }, [location.state, tournaments]);
 
-  const totalLive = useMemo(() => tournaments.filter((i) => i.status === "Live").length, [tournaments]);
+  const totalLive = useMemo(() => tournaments.reduce((sum, t) => sum + (t.liveRacesCount || 0), 0), [tournaments]);
   const totalUpcoming = useMemo(() => tournaments.filter((i) => i.status === "Upcoming").length, [tournaments]);
   const totalCompleted = useMemo(() => tournaments.filter((i) => i.status === "Completed").length, [tournaments]);
   const totalPrize = useMemo(() => {
@@ -197,7 +220,7 @@ function Tournaments() {
     const finalPrize = sum > 0 ? sum : (backendTotalPrize > 0 ? backendTotalPrize : 0);
     return finalPrize >= 1000 ? `$${(finalPrize / 1000).toFixed(0)}K` : `$${finalPrize}`;
   }, [tournaments, backendTotalPrize]);
-  const featuredTournament = useMemo(() => tournaments.find((t) => t.featured && t.status === "Live") || tournaments.find((t) => t.status === "Live") || null, [tournaments]);
+  const featuredTournament = useMemo(() => tournaments.find((t) => t.featured && (t.liveRacesCount > 0 || t.status === "Live" || t.status === "Ongoing")) || tournaments.find((t) => t.liveRacesCount > 0 || t.status === "Live" || t.status === "Ongoing") || null, [tournaments]);
 
   const handleViewDetails = (tournament) => {
     setSelectedTournament(tournament);
@@ -335,6 +358,46 @@ function Tournaments() {
           </div>
         </div>
       </div>
+
+      {/* ── LIVE RACES SPOTLIGHT ── */}
+      {liveRaces.length > 0 && !search && filter === "All" && (
+        <div className="mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <h2 className="text-xl font-black text-zinc-900 mb-4 flex items-center gap-2">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+                </span>
+                HAPPENING NOW: Live Races
+            </h2>
+            <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
+                {liveRaces.map((race) => (
+                    <div 
+                        key={race.raceId}
+                        onClick={() => navigate('/spectator', { state: { targetRace: race } })}
+                        className="flex-shrink-0 w-80 bg-zinc-950 border border-zinc-800 rounded-3xl p-5 cursor-pointer hover:-translate-y-1 transition-all duration-300 shadow-lg group snap-start"
+                    >
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="w-12 h-12 rounded-2xl bg-zinc-900 flex items-center justify-center border border-zinc-800 shadow-inner group-hover:scale-110 transition-transform">
+                                <span className="text-xl font-black text-white">{race.race.charAt(0)}</span>
+                            </div>
+                            <span className="px-2.5 py-1 bg-red-500/10 text-red-500 text-[10px] font-black rounded-lg border border-red-500/20 uppercase tracking-widest">
+                                Live
+                            </span>
+                        </div>
+                        <h3 className="font-black text-white text-lg mb-1 truncate">{race.race}</h3>
+                        <p className="text-zinc-400 text-xs mb-4 truncate flex items-center gap-1.5">
+                            <Trophy className="w-3 h-3" />
+                            {race.tournamentName}
+                        </p>
+                        <button className="w-full py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2">
+                            <MonitorPlay className="w-4 h-4" />
+                            Watch Live
+                        </button>
+                    </div>
+                ))}
+            </div>
+        </div>
+      )}
 
       {/* ═══════════════════ FEATURED LIVE TOURNAMENT ═══════════════════ */}
       {!search && filter === "All" && featuredTournament && !loading && (
