@@ -17,9 +17,11 @@ import {
     Flag,
     ChevronDown,
     ChevronUp,
-    FileWarning
+    FileWarning,
+    MonitorPlay
 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import tournamentApi from "../../api/tournamentApi";
 import { useAuth } from "../../context/AuthContext";
 import { toast } from "react-hot-toast";
@@ -74,6 +76,7 @@ function InfoRow({ icon: Icon, label, value, accent }) {
 }
 
 function TournamentDetailsDrawer({ open, onClose, tournament }) {
+    const navigate = useNavigate();
     const { user } = useAuth();
     const [detail, setDetail] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -355,6 +358,13 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-3">
+                                            <button
+                                                onClick={(e) => { e.stopPropagation(); navigate('/spectator', { state: { targetRace: race } }); }}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-lg text-xs font-bold transition-colors shadow-sm"
+                                            >
+                                                <MonitorPlay className="w-3.5 h-3.5" />
+                                                Watch
+                                            </button>
                                             {(race.status === "Completed" || race.status === "Awarded") && race.hasResults && (
                                                 <button
                                                     onClick={(e) => { e.stopPropagation(); setSelectedRaceForModal(race); setShowViewModal(true); }}
