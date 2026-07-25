@@ -23,6 +23,7 @@ import {
     ReceiptText
 } from "lucide-react";
 import TopupModal from "../components/TopupModal";
+import WithdrawModal from "../components/WithdrawModal";
 
 function Profile() {
     const { user, setUser } = useAuth();
@@ -40,6 +41,7 @@ function Profile() {
     });
 
     const [isTopupModalOpen, setIsTopupModalOpen] = useState(false);
+    const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
     const [pointTransactions, setPointTransactions] = useState([]);
     const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
 
@@ -220,12 +222,20 @@ function Profile() {
                                 <div className="text-3xl font-black text-amber-500 flex items-center gap-2">
                                     {profile.totalPoints.toLocaleString()} <span className="text-sm font-bold text-zinc-400">PTS</span>
                                 </div>
-                                <button 
-                                    onClick={() => setIsTopupModalOpen(true)}
-                                    className="mt-3 w-full py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2"
-                                >
-                                    <Wallet size={16} /> Top Up Points
-                                </button>
+                                <div className="mt-3 flex gap-2 w-full">
+                                    <button 
+                                        onClick={() => setIsTopupModalOpen(true)}
+                                        className="flex-1 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <Wallet size={16} /> Top Up
+                                    </button>
+                                    <button 
+                                        onClick={() => setIsWithdrawModalOpen(true)}
+                                        className="flex-1 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <Wallet size={16} className="text-zinc-600" /> Withdraw
+                                    </button>
+                                </div>
                             </div>
                         )}
 
@@ -516,7 +526,8 @@ function Profile() {
                 </div>
             </div>
 
-            <TopupModal isOpen={isTopupModalOpen} onClose={() => setIsTopupModalOpen(false)} />
+            <TopupModal isOpen={isTopupModalOpen} onClose={() => setIsTopupModalOpen(false)} onSuccess={() => fetchProfile()} />
+            <WithdrawModal isOpen={isWithdrawModalOpen} onClose={() => setIsWithdrawModalOpen(false)} onSuccess={() => fetchProfile()} currentPoints={profile.totalPoints} />
         </div>
     );
 }

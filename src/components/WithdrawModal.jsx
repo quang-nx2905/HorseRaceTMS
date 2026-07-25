@@ -55,8 +55,8 @@ export default function WithdrawModal({ isOpen, onClose, onSuccess, currentPoint
             });
             
             toast.success("Withdrawal processed successfully!");
-            onSuccess(); // Trigger refresh on profile page
             onClose();
+            window.location.reload();
             // Reset form
             setAmount("");
             setBankName("");
