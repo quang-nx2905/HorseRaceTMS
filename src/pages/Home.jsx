@@ -1,389 +1,325 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Footer from "../components/layout/Footer";
-import { useAuth } from "../context/AuthContext";
-import { getAllHorses } from "../api/horseApi";
-import tournamentApi from "../api/tournamentApi";
-import DragCarousel from "../components/common/DragCarousel";
 import {
-  ArrowRight, Trophy, Zap, Shield, 
-  Users, ChevronRight, Activity,
-  BarChart2, CheckCircle, Crosshair,
-  Loader2
+  ArrowRight,
+  BarChart3,
+  CalendarDays,
+  Check,
+  ChevronRight,
+  CirclePlay,
+  Clock3,
+  Gauge,
+  Menu,
+  ShieldCheck,
+  Sparkles,
+  Trophy,
+  Users,
+  X,
+  Zap,
 } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import tournamentApi from "../api/tournamentApi";
+import heroHorse from "../assets/horse-hero-cinematic.png";
+import logo from "../assets/logo.png";
+import "./Home.css";
 
-// --- Steps Data ---
-const STEPS = [
+const FEATURES = [
   {
-    step: "01",
-    title: "Create a Free Account",
-    desc: "Sign up in under 60 seconds. No credit card required, no hidden fees.",
-    icon: Users,
-    color: "from-amber-400 to-orange-500",
+    icon: CalendarDays,
+    label: "RACE SCHEDULE",
+    title: "Never miss the next race.",
+    copy: "Track upcoming tournaments, race times and registration status from one clear schedule.",
+    accent: "cyan",
   },
   {
-    step: "02",
-    title: "Set Up Your Tournament",
-    desc: "Create events, add horses and jockeys, and schedule races in just a few clicks.",
-    icon: BarChart2,
-    color: "from-orange-400 to-rose-500",
+    icon: Trophy,
+    label: "TOURNAMENT ENGINE",
+    title: "Built for the whole season.",
+    copy: "Create brackets, schedule heats and manage every championship from one command center.",
+    accent: "gold",
   },
   {
-    step: "03",
-    title: "Track Everything Live",
-    desc: "Watch live results, live leaderboards, and monitor race statuses in real-time.",
-    icon: Activity,
-    color: "from-rose-400 to-pink-500",
+    icon: ShieldCheck,
+    label: "TRUSTED RESULTS",
+    title: "Fairness, engineered in.",
+    copy: "Role-based referee tools and transparent records keep every result clear and verifiable.",
+    accent: "violet",
   },
+];
+
+const FALLBACK_EVENTS = [
+  { name: "Saigon Night Derby", date: "28 JUL", status: "Registration", prize: "50K", entries: 24 },
+  { name: "Golden Hoof Cup", date: "03 AUG", status: "Upcoming", prize: "80K", entries: 32 },
+  { name: "Champions Grand Prix", date: "12 AUG", status: "Upcoming", prize: "120K", entries: 18 },
 ];
 
 function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [horses, setHorses] = useState([]);
-  const [loadingHorses, setLoadingHorses] = useState(true);
+  const heroRef = useRef(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [events, setEvents] = useState(FALLBACK_EVENTS);
 
   useEffect(() => {
-    const fetchFeaturedHorses = async () => {
-      try {
-        const data = await getAllHorses();
-        // Assuming API returns array directly or { data: [...] }
-        const items = data?.data || data || [];
-        const activeHorses = items.filter(h => h.status !== "Banned" && h.status !== "Retired");
-        setHorses(activeHorses);
-      } catch (error) {
-        console.error("Failed to fetch featured horses:", error);
-      } finally {
-        setLoadingHorses(false);
+    const loadOverview = async () => {
+      const tournamentResult = await Promise.resolve(
+        tournamentApi.getAll({ page: 1, pageSize: 3 }),
+      ).then(
+        (value) => ({ status: "fulfilled", value }),
+        (reason) => ({ status: "rejected", reason }),
+      );
+
+      if (tournamentResult.status === "fulfilled") {
+        const result = tournamentResult.value;
+        const raw =
+          result?.data?.items ||
+          result?.items ||
+          result?.data?.data?.items ||
+          result?.data ||
+          [];
+
+        if (Array.isArray(raw) && raw.length) {
+          setEvents(
+            raw.slice(0, 3).map((event, index) => {
+              const start = event.startDate ? new Date(event.startDate) : null;
+              return {
+                id: event.tourId || event.id,
+                name: event.tourName || event.name || `Tournament ${index + 1}`,
+                date: start
+                  ? start.toLocaleDateString("en-US", { day: "2-digit", month: "short" }).toUpperCase()
+                  : "TBA",
+                status: event.status || "Upcoming",
+                prize: event.prizePool
+                  ? Number(event.prizePool).toLocaleString("en-US", { notation: "compact" })
+                  : "TBA",
+                entries: event.maxParticipants || event.participantCount || 16,
+              };
+            }),
+          );
+        }
       }
     };
-    fetchFeaturedHorses();
-  }, []);
 
-  const [tournaments, setTournaments] = useState([]);
-  const [loadingTournaments, setLoadingTournaments] = useState(true);
+    loadOverview();
+  }, []);
 
   useEffect(() => {
-    const fetchTournaments = async () => {
-      try {
-        const res = await tournamentApi.getAll({ page: 1, pageSize: 100 });
-        const items = res.data?.items || res.items || (res.data && res.data.data && res.data.data.items) || res.data || [];
-        const itemsArray = Array.isArray(items) ? items : [];
-        const sorted = [...itemsArray].sort((a, b) => {
-          const aId = a.tourId || a.id;
-          const bId = b.tourId || b.id;
-          return bId - aId;
-        });
-        setTournaments(sorted);
-      } catch (error) {
-        console.error("Failed to fetch tournaments:", error);
-      } finally {
-        setLoadingTournaments(false);
-      }
+    const hero = heroRef.current;
+    if (!hero || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return undefined;
+
+    const handleMove = (event) => {
+      const bounds = hero.getBoundingClientRect();
+      const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+      const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+      hero.style.setProperty("--mx", `${x * 18}px`);
+      hero.style.setProperty("--my", `${y * 12}px`);
     };
-    fetchTournaments();
+    const reset = () => {
+      hero.style.setProperty("--mx", "0px");
+      hero.style.setProperty("--my", "0px");
+    };
+
+    hero.addEventListener("pointermove", handleMove);
+    hero.addEventListener("pointerleave", reset);
+    return () => {
+      hero.removeEventListener("pointermove", handleMove);
+      hero.removeEventListener("pointerleave", reset);
+    };
   }, []);
 
-  const handleQuickBet = () => {
-    if (!user) {
-      navigate('/login');
-    } else {
-      navigate('/tournaments');
-    }
-  };
+  const primaryDestination = user ? "/dashboard" : "/register";
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans selection:bg-amber-200 selection:text-amber-900 overflow-x-hidden relative">
+    <main className="home-premium">
+      <nav className="home-nav" aria-label="Main navigation">
+        <Link to="/" className="home-brand" aria-label="HorseRace TMS home">
+          <span className="home-brand-mark"><img src={logo} alt="" /></span>
+          <span>HORSE<span>RACE</span></span>
+        </Link>
 
-      {/* ───────────── Navbar ───────────── */}
-      <nav className="fixed top-0 inset-x-0 z-50 bg-white/40 backdrop-blur-2xl border-b border-zinc-200/50 shadow-[0_4px_30px_rgba(0,0,0,0.02)]">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2 group cursor-pointer">
-            <div className="w-12 h-12 overflow-hidden flex items-center justify-center transition-transform group-hover:scale-110 duration-300">
-              <img src="/src/assets/logo.png" alt="Horse Racing Logo" className="w-full h-full object-cover rounded-xl shadow-sm" />
-            </div>
-            <span className="font-black text-xl tracking-tight text-zinc-900">
-              HorseRace<span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-500">TMS</span>
-            </span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Link to="/login" className="px-5 py-2.5 text-sm font-bold text-zinc-600 hover:text-zinc-900 transition-colors">
-              Sign In
-            </Link>
-            <Link to="/register" className="px-6 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-zinc-900 to-zinc-800 hover:from-zinc-800 hover:to-zinc-700 rounded-full transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95">
-              Get Started
-            </Link>
-          </div>
+        <div className={`home-nav-links ${menuOpen ? "is-open" : ""}`}>
+          <a href="#experience" onClick={() => setMenuOpen(false)}>Experience</a>
+          <a href="#events" onClick={() => setMenuOpen(false)}>Races</a>
+          <a href="#platform" onClick={() => setMenuOpen(false)}>Platform</a>
+          <Link to="/leaderboard" onClick={() => setMenuOpen(false)}>Leaderboard</Link>
         </div>
+
+        <div className="home-nav-actions">
+          {user ? (
+            <Link to="/dashboard" className="nav-ghost">Dashboard</Link>
+          ) : (
+            <Link to="/login" className="nav-ghost">Sign in</Link>
+          )}
+          <Link to={primaryDestination} className="nav-primary">
+            {user ? "Enter platform" : "Get started"} <ArrowRight size={15} />
+          </Link>
+        </div>
+
+        <button
+          type="button"
+          className="home-menu"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+        >
+          {menuOpen ? <X /> : <Menu />}
+        </button>
       </nav>
 
-      {/* ───────────── Hero ───────────── */}
-      <section className="pt-40 pb-16 px-6 relative overflow-hidden min-h-[90vh] flex items-center justify-center">
-        <div className="absolute inset-0 -z-20 h-full w-full bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:24px_24px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_50%,#000_70%,transparent_100%)] opacity-80" />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-[1200px] h-full -z-10 pointer-events-none mix-blend-multiply opacity-90">
-          <div className="absolute top-[0%] left-[10%] w-[500px] h-[500px] bg-amber-300/40 rounded-full blur-[120px] animate-blob" />
-          <div className="absolute top-[20%] right-[10%] w-[450px] h-[450px] bg-rose-300/40 rounded-full blur-[120px] animate-blob" style={{ animationDelay: "2s" }} />
-          <div className="absolute top-[40%] left-[25%] w-[600px] h-[600px] bg-orange-300/40 rounded-full blur-[120px] animate-blob" style={{ animationDelay: "4s" }} />
-        </div>
+      <section className="home-hero" ref={heroRef}>
+        <div className="hero-photo" style={{ backgroundImage: `url(${heroHorse})` }} />
+        <div className="hero-grid" />
+        <div className="hero-glow hero-glow-one" />
+        <div className="hero-glow hero-glow-two" />
 
-        <div className="max-w-5xl mx-auto text-center space-y-8 relative z-10">
-          <div className="animate-float">
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/80 backdrop-blur-md border border-zinc-200/60 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-sm font-semibold text-zinc-700">
-              Next-Generation Tournament Engine
-            </div>
+        <div className="hero-content">
+          <div className="hero-kicker">
+            <span><Sparkles size={13} /></span>
+            The future of horse racing
           </div>
-
-          <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black tracking-tight leading-[1.05] text-zinc-900 drop-shadow-sm">
-            Manage Horse Races <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 animate-gradient-x">
-              Like a Pro.
-            </span>
+          <h1>
+            BUILT FOR
+            <span>THE <em>WIN.</em></span>
           </h1>
-
-          <p className="text-xl sm:text-2xl text-zinc-600 font-medium max-w-3xl mx-auto leading-relaxed">
-            The all-in-one horse racing management platform — schedule, track, analyze, and predict, all in one place.
+          <p>
+            One intelligent platform for the people who race, manage and live for every
+            heart-pounding second.
           </p>
+          <div className="hero-actions">
+            <Link to={primaryDestination} className="hero-primary">
+              {user ? "Open dashboard" : "Start racing"} <ArrowRight size={19} />
+            </Link>
+            <a href="#experience" className="hero-secondary">
+              <CirclePlay size={21} /> Explore the platform
+            </a>
+          </div>
+          <div className="hero-trust">
+            <div className="avatar-stack">
+              {["JD", "MK", "AT"].map((name) => <span key={name}>{name}</span>)}
+            </div>
+            <div>
+              <strong>Trusted by the racing community</strong>
+              <span>Owners · Jockeys · Referees</span>
+            </div>
+          </div>
+        </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-4">
-            <Link to="/dashboard" className="group relative flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-full font-bold text-lg transition-all shadow-[0_0_40px_-10px_rgba(245,158,11,0.5)] hover:shadow-[0_0_60px_-15px_rgba(245,158,11,0.8)] hover:-translate-y-1 overflow-hidden">
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-              <span className="relative z-10 flex items-center gap-2">
-                Go to Dashboard <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+        <div className="hero-scroll"><span /> SCROLL TO DISCOVER</div>
+      </section>
+
+      <section className="experience-section" id="experience">
+        <div className="section-heading">
+          <div>
+            <span className="eyebrow">ENGINEERED TO PERFORM</span>
+            <h2>More than a race.<br /><em>An experience.</em></h2>
+          </div>
+          <p>
+            From the starting gate to the final result, every detail is connected,
+            immediate and built to keep you ahead.
+          </p>
+        </div>
+
+        <div className="feature-grid" id="platform">
+          {FEATURES.map((feature, index) => (
+            <article className={`feature-card accent-${feature.accent}`} key={feature.title}>
+              <div className="feature-number">0{index + 1}</div>
+              <div className="feature-icon"><feature.icon /></div>
+              <span>{feature.label}</span>
+              <h3>{feature.title}</h3>
+              <p>{feature.copy}</p>
+              <Link to={primaryDestination} aria-label={`Explore ${feature.title}`}>
+                Explore feature <ChevronRight size={16} />
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="race-control-section">
+        <div className="control-visual">
+          <div className="track-orbit orbit-one" />
+          <div className="track-orbit orbit-two" />
+          <div className="track-core">
+            <Trophy />
+            <strong>2.45x</strong>
+            <span>LIVE WIN ODDS</span>
+          </div>
+          <div className="telemetry telemetry-one"><Gauge /> YOUR PICK <b>THUNDER</b></div>
+          <div className="telemetry telemetry-two"><Zap /> POTENTIAL WIN <b>245 PTS</b></div>
+        </div>
+        <div className="control-copy">
+          <span className="eyebrow">SMART RACE BETTING</span>
+          <h2>Back your pick.<br />Feel every <em>second.</em></h2>
+          <p>
+            Study the contenders, compare live odds and place your prediction before
+            the gates open. Every point and result stays clear from bet to payout.
+          </p>
+          <ul>
+            <li><Check /> Live odds for every eligible contender</li>
+            <li><Check /> Clear potential payout before confirming</li>
+            <li><Check /> Transparent bet and result history</li>
+          </ul>
+          <Link to={user ? "/predictions" : "/login"}>Explore race betting <ArrowRight size={18} /></Link>
+        </div>
+      </section>
+
+      <section className="events-section" id="events">
+        <div className="section-heading events-heading">
+          <div>
+            <span className="eyebrow">NEXT ON THE TRACK</span>
+            <h2>The pulse never <em>stops.</em></h2>
+          </div>
+          <button type="button" onClick={() => navigate(user ? "/tournaments" : "/login")}>
+            View all races <ArrowRight size={17} />
+          </button>
+        </div>
+
+        <div className="event-list">
+          {events.map((event, index) => (
+            <button
+              type="button"
+              className="event-row"
+              key={event.id || `${event.name}-${index}`}
+              onClick={() => navigate(user ? "/tournaments" : "/login", { state: { openTournamentId: event.id } })}
+            >
+              <span className="event-date">{event.date}</span>
+              <span className="event-index">0{index + 1}</span>
+              <span className="event-name">
+                <small>{event.status}</small>
+                <strong>{event.name}</strong>
               </span>
-            </Link>
-
-          </div>
+              <span className="event-detail"><Trophy /> <b>{event.prize}</b> prize pool</span>
+              <span className="event-detail"><Users /> <b>{event.entries}</b> entries</span>
+              <span className="event-arrow"><ArrowRight /></span>
+            </button>
+          ))}
         </div>
       </section>
 
-      {/* ───────────── Featured Horses (Dynamic) ───────────── */}
-      {(!loadingHorses && horses.length > 0) && (
-        <section className="py-24 px-6 bg-zinc-50 relative overflow-hidden border-t border-zinc-100">
-            <div className="max-w-6xl mx-auto relative z-10">
-                <div className="text-center mb-16">
-                    <span className="inline-block px-4 py-1.5 bg-rose-100 text-rose-600 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Top Contenders</span>
-                    <h2 className="text-4xl font-black text-zinc-900">Featured Champions</h2>
-                    <p className="text-zinc-500 mt-3 font-medium max-w-xl mx-auto">Witness the finest horses in the league. Place your bets and join the thrill of the race.</p>
-                </div>
-
-                <DragCarousel 
-                    items={horses}
-                    renderItem={(horse, isActive) => {
-                        const hId = horse.horseId || horse.id;
-                        const hName = horse.horseName || horse.name || `Horse #${hId}`;
-                        const hImage = horse.avatarUrl || horse.imageUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${hName}&backgroundColor=fef3c7`;
-                        const ownerName = horse.ownerName || horse.owner?.fullName || "Unknown Owner";
-
-                        return (
-                        <div className={`group w-full h-full rounded-3xl bg-white border border-zinc-200 overflow-hidden transition-all duration-500 flex flex-col select-none ${isActive ? "scale-100 opacity-100 z-10 shadow-2xl" : "scale-[0.85] opacity-50 z-0 shadow-sm"}`}>
-                            <div className="relative h-64 overflow-hidden bg-amber-50 pointer-events-none">
-                                <img src={hImage} alt={hName} draggable="false" className="w-full h-full object-cover" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
-                                    <h3 className="text-2xl font-black text-white">{hName}</h3>
-                                </div>
-                                <div className="absolute top-4 right-4 flex gap-2">
-                                    <span className="bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full shadow-sm">
-                                        {horse.status || "Active"}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="p-6 flex-1 flex flex-col justify-between gap-6">
-                                <div className="grid grid-cols-2 gap-y-4 gap-x-2 border-b border-zinc-100 pb-5">
-                                    <div>
-                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Breed</p>
-                                        <p className="font-semibold text-sm text-zinc-900 truncate">{horse.breed || "Thoroughbred"}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Owner</p>
-                                        <p className="font-semibold text-sm text-zinc-900 truncate">{ownerName}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Age / Gender</p>
-                                        <p className="font-semibold text-sm text-zinc-900">{horse.age || "3"} yrs • {horse.gender || "Stallion"}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider mb-1">Weight / Health</p>
-                                        <p className="font-semibold text-sm text-zinc-900">{horse.weight || "450"} kg • {horse.health || "Good"}</p>
-                                    </div>
-                                </div>
-                                <button onClick={handleQuickBet} className="w-full flex items-center justify-center gap-2 py-3.5 bg-zinc-900 text-white rounded-xl font-bold hover:bg-amber-500 transition-colors shadow-sm">
-                                    <Crosshair size={18} />
-                                    Quick Bet
-                                </button>
-                            </div>
-                        </div>
-                        );
-                    }}
-                    itemClassName="w-[340px]"
-                />
-            </div>
-        </section>
-      )}
-
-      {/* ───────────── Featured Tournaments (Dynamic) ───────────── */}
-      {(!loadingTournaments && tournaments.length > 0) && (
-        <section className="py-24 px-6 bg-white relative overflow-hidden border-t border-zinc-100">
-            <div className="max-w-6xl mx-auto relative z-10">
-                <div className="text-center mb-16">
-                    <span className="inline-block px-4 py-1.5 bg-emerald-100 text-emerald-600 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Latest Events</span>
-                    <h2 className="text-4xl font-black text-zinc-900">Featured Tournaments</h2>
-                    <p className="text-zinc-500 mt-3 font-medium max-w-xl mx-auto">Explore the most recent tournaments. Join the action or track the leaderboards live.</p>
-                </div>
-
-                <DragCarousel 
-                    items={tournaments}
-                    renderItem={(tour, isActive) => {
-                        const tId = tour.tourId || tour.id;
-                        const tName = tour.tourName || tour.name || `Tournament #${tId}`;
-                        const tImage = tour.bannerUrl || tour.thumbnailUrl || tour.imageUrl || `https://api.dicebear.com/7.x/shapes/svg?seed=${tName}&backgroundColor=e5e7eb`;
-                        const dateText = tour.startDate ? new Date(tour.startDate).toLocaleDateString() : "TBA";
-
-                        return (
-                        <div className={`group w-full h-full rounded-3xl bg-zinc-50 border border-zinc-200 overflow-hidden transition-all duration-500 flex flex-col select-none ${isActive ? "scale-100 opacity-100 z-10 shadow-2xl bg-white" : "scale-[0.85] opacity-50 z-0 shadow-sm"}`}>
-                            <div className="relative h-48 overflow-hidden bg-zinc-200 pointer-events-none">
-                                <img src={tImage} alt={tName} draggable="false" className="w-full h-full object-cover mix-blend-multiply opacity-90 group-hover:scale-105 transition-transform duration-700" />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-                                <div className="absolute top-4 right-4">
-                                    <span className="bg-white/20 backdrop-blur-md border border-white/30 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full shadow-sm">
-                                        {tour.status || "Upcoming"}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="p-6 flex-1 flex flex-col justify-between gap-6">
-                                <div>
-                                    <h3 className="text-xl font-black text-zinc-900 mb-4 line-clamp-2 leading-tight">{tName}</h3>
-                                    <div className="space-y-2">
-                                      <div className="flex items-center gap-2 text-sm text-zinc-500 font-medium">
-                                          <Trophy className="w-4 h-4 text-emerald-500" />
-                                          <span className="text-zinc-400">Prize Pool:</span> 
-                                          <span className="text-zinc-900">{tour.prizePool ? `$${tour.prizePool.toLocaleString()}` : "TBA"}</span>
-                                      </div>
-                                      <div className="flex items-center gap-2 text-sm text-zinc-500 font-medium">
-                                          <Activity className="w-4 h-4 text-blue-500" />
-                                          <span className="text-zinc-400">Date:</span> 
-                                          <span className="text-zinc-900">{dateText}</span>
-                                      </div>
-                                    </div>
-                                </div>
-                                <button onClick={() => navigate(`/tournaments`, { state: { openTournamentId: tId } })} className="w-full flex items-center justify-center gap-2 py-3.5 bg-zinc-900 text-white rounded-xl font-bold hover:bg-emerald-500 transition-colors shadow-sm">
-                                    <ArrowRight size={18} />
-                                    View Event
-                                </button>
-                            </div>
-                        </div>
-                        );
-                    }}
-                    itemClassName="w-[340px] h-full flex"
-                />
-            </div>
-        </section>
-      )}
-
-      {/* ───────────── How It Works ───────────── */}
-      <section className="py-24 px-6 bg-zinc-50 border-t border-zinc-100">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 bg-orange-100 text-orange-600 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Simple — Fast — Effective</span>
-            <h2 className="text-4xl font-black text-zinc-900">Get Started in 3 Steps</h2>
-            <p className="text-zinc-500 mt-3 font-medium max-w-xl mx-auto">No complex setup needed. Up and running in under 5 minutes.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 relative">
-            {/* Connecting line */}
-            <div className="hidden md:block absolute top-16 left-1/3 w-1/3 h-0.5 bg-gradient-to-r from-amber-300 to-orange-300 -z-0" />
-            <div className="hidden md:block absolute top-16 left-2/3 w-1/6 h-0.5 bg-gradient-to-r from-orange-300 to-rose-300 -z-0" />
-
-            {STEPS.map((step, i) => (
-              <div key={i} className="group relative bg-white border border-zinc-100 rounded-3xl p-8 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 z-10">
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                  <step.icon className="w-7 h-7 text-white" />
-                </div>
-                <div className="text-6xl font-black text-zinc-100 absolute top-6 right-8 select-none">{step.step}</div>
-                <h3 className="text-xl font-black text-zinc-900 mb-3 relative z-10">{step.title}</h3>
-                <p className="text-zinc-500 font-medium leading-relaxed relative z-10">{step.desc}</p>
-              </div>
-            ))}
-          </div>
+      <section className="home-cta">
+        <div className="cta-noise" />
+        <span className="eyebrow">YOUR RACE STARTS HERE</span>
+        <h2>Ready to leave the<br />competition <em>behind?</em></h2>
+        <p>Join the modern home of professional horse racing.</p>
+        <Link to={primaryDestination}>
+          {user ? "Enter HorseRace TMS" : "Create your free account"} <ArrowRight size={19} />
+        </Link>
+        <div className="cta-notes">
+          <span><Check /> Free to start</span>
+          <span><Clock3 /> Setup in minutes</span>
+          <span><BarChart3 /> Built to scale</span>
         </div>
       </section>
 
-      {/* ───────────── Feature Cards ───────────── */}
-      <section className="py-24 px-6 bg-white border-t border-zinc-100">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="inline-block px-4 py-1.5 bg-zinc-100 text-zinc-600 text-xs font-bold uppercase tracking-widest rounded-full mb-4">Key Features</span>
-            <h2 className="text-4xl font-black text-zinc-900">Everything You Need to Run the Show</h2>
-            <p className="text-zinc-500 mt-3 font-medium">Built for tournament organizers, horse owners, and racing enthusiasts alike.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Zap, color: "bg-amber-100 text-amber-600",
-                title: "Detailed Horse Profiles",
-                desc: "Access comprehensive records of every horse, including their win rates, past performances, and owner history.",
-                badge: "Insights 📊",
-                badgeColor: "bg-blue-100 text-blue-600"
-              },
-              {
-                icon: Trophy, color: "bg-emerald-100 text-emerald-600",
-                title: "Tournament Hub",
-                desc: "Organize full tournaments, schedule race brackets, and maintain live leaderboards — all in one seamless place.",
-                badge: "Popular ⭐",
-                badgeColor: "bg-amber-100 text-amber-700"
-              },
-              {
-                icon: Shield, color: "bg-blue-100 text-blue-600",
-                title: "Transparent & Fair",
-                desc: "Referee tools and comprehensive permission management ensure every result is clear and fair for all parties.",
-                badge: "Trusted ✓",
-                badgeColor: "bg-blue-100 text-blue-600"
-              },
-            ].map((f, i) => (
-              <div key={i} className="group p-8 rounded-3xl bg-zinc-50 border border-zinc-100 transition-all duration-500 hover:shadow-2xl hover:-translate-y-2 hover:bg-white relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-white to-zinc-50 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="relative z-10">
-                  <div className="flex items-start justify-between mb-6">
-                    <div className={`w-12 h-12 rounded-2xl ${f.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                      <f.icon className="w-6 h-6" />
-                    </div>
-                    <span className={`text-xs font-bold px-3 py-1 rounded-full ${f.badgeColor}`}>{f.badge}</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-zinc-900 mb-3">{f.title}</h3>
-                  <p className="text-zinc-500 font-medium leading-relaxed">{f.desc}</p>
-                  {/* Action link removed */}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ───────────── CTA Banner ───────────── */}
-      <section className="py-24 px-6 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.15),transparent_60%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(255,255,255,0.1),transparent_60%)]" />
-        <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h2 className="text-4xl sm:text-5xl font-black text-white mb-6 drop-shadow">
-            Ready to Elevate Your Tournament?
-          </h2>
-          <p className="text-white/90 text-xl font-medium mb-10 max-w-2xl mx-auto">
-            Hundreds of organizers already trust HorseRaceTMS. Now it's your turn.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link to="/register" className="group flex items-center gap-2 px-8 py-4 bg-white text-zinc-900 rounded-full font-black text-lg hover:-translate-y-1 transition-all shadow-2xl hover:shadow-white/30">
-              Sign Up for Free <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <div className="flex items-center gap-2 text-white/90 font-semibold">
-              <CheckCircle className="w-5 h-5" /> No credit card required
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <Footer />
-    </div>
+      <footer className="home-footer">
+        <Link to="/" className="home-brand">
+          <span className="home-brand-mark"><img src={logo} alt="" /></span>
+          <span>HORSE<span>RACE</span></span>
+        </Link>
+        <p>Precision in motion. Excellence by design.</p>
+        <span>© {new Date().getFullYear()} HorseRace TMS</span>
+      </footer>
+    </main>
   );
 }
 

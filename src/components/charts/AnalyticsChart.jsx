@@ -1,153 +1,166 @@
-import React, { useState, useEffect } from 'react';
-import api from '../../api/axiosClient';
+import { useEffect, useMemo, useState } from "react";
+import { Activity, BarChart3, Database, RefreshCw } from "lucide-react";
+import api from "../../api/axiosClient";
 
-function AnalyticsChart() {
-    const [chartType, setChartType] = useState('races');
-    const [chartRange, setChartRange] = useState('W');
-    const [data, setData] = useState([
-        { label: "Mon", value: 0 },
-        { label: "Tue", value: 0 },
-        { label: "Wed", value: 0 },
-        { label: "Thu", value: 0 },
-        { label: "Fri", value: 0 },
-        { label: "Sat", value: 0 },
-        { label: "Sun", value: 0 },
-    ]);
-    const [isLoading, setIsLoading] = useState(false);
+const TABS = [
+    { id: "races", label: "Races" },
+    { id: "predictions", label: "Predictions" },
+    { id: "participants", label: "Participants" },
+];
+
+const RANGES = [
+    { id: "D", label: "5D" },
+    { id: "W", label: "7D" },
+    { id: "M", label: "4W" },
+    { id: "Y", label: "12M" },
+];
+
+function AnalyticsChart({ refreshKey = 0 }) {
+    const [chartType, setChartType] = useState("races");
+    const [chartRange, setChartRange] = useState("W");
+    const [data, setData] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
+        let active = true;
         const fetchChartData = async () => {
             setIsLoading(true);
+            setError("");
             try {
-                const response = await api.get(`/dashboard/chart?type=${chartType}&range=${chartRange}`);
-                if (response.data && response.data.length > 0) {
-                    setData(response.data);
+                const response = await api.get(
+                    `/dashboard/chart?type=${chartType}&range=${chartRange}`,
+                );
+                if (active) setData(Array.isArray(response.data) ? response.data : []);
+            } catch (requestError) {
+                console.error("Failed to fetch chart data:", requestError);
+                if (active) {
+                    setData([]);
+                    setError("Analytics data is unavailable.");
                 }
-            } catch (error) {
-                console.error("Failed to fetch chart data:", error);
             } finally {
-                setIsLoading(false);
+                if (active) setIsLoading(false);
             }
         };
 
         fetchChartData();
-    }, [chartType, chartRange]);
+        return () => {
+            active = false;
+        };
+    }, [chartType, chartRange, refreshKey]);
 
-    const max = Math.max(...data.map((d) => d.value), 10); // Minimum max of 10 to provide scale even if all are 0
-    const ticks = [max, Math.round(max * 0.75), Math.round(max * 0.5), Math.round(max * 0.25), 0];
-
-    const tabs = [
-        { id: 'races', label: 'Races' },
-        { id: 'predictions', label: 'Predictions' },
-        { id: 'participants', label: 'Participants' }
-    ];
-
-    const rangeTabs = [
-        { id: 'D', label: 'D' },
-        { id: 'W', label: 'W' },
-        { id: 'M', label: 'M' },
-        { id: 'Y', label: 'Y' }
-    ];
+    const total = useMemo(
+        () => data.reduce((sum, point) => sum + Number(point.value || 0), 0),
+        [data],
+    );
+    const highest = useMemo(
+        () => Math.max(0, ...data.map((point) => Number(point.value || 0))),
+        [data],
+    );
+    const hasActivity = data.some((point) => Number(point.value) > 0);
 
     return (
-        <div className="bg-white border border-zinc-200 rounded-3xl p-6 h-[420px] flex flex-col">
-
-            {/* HEADER */}
-            <div className="flex items-start justify-between flex-shrink-0 mb-6">
+        <article className="flex min-h-[470px] flex-col overflow-hidden rounded-[28px] border border-zinc-200 bg-white">
+            <header className="flex flex-col justify-between gap-5 border-b border-zinc-100 px-6 py-6 sm:flex-row sm:items-start lg:px-7">
                 <div>
-                    <h2 className="text-xl font-black text-zinc-900">
-                        Weekly Analytics
-                    </h2>
-                    <div className="flex gap-2 mt-2">
-                        {tabs.map((tab) => (
-                            <button
-                                key={tab.id}
-                                onClick={() => setChartType(tab.id)}
-                                className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${chartType === tab.id ? "bg-zinc-900 text-white" : "text-zinc-500 bg-zinc-100 hover:bg-zinc-200"}`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
+                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-amber-600">
+                        <Activity size={14} />
+                        Real platform activity
                     </div>
+                    <h2 className="mt-2 text-2xl font-black tracking-[-0.03em] text-zinc-950">
+                        Performance analytics
+                    </h2>
+                    <p className="mt-1 text-xs text-zinc-400">Data returned by the dashboard analytics API.</p>
                 </div>
+                <div className="flex rounded-xl border border-zinc-200 bg-zinc-50 p-1">
+                    {RANGES.map((range) => (
+                        <button
+                            key={range.id}
+                            type="button"
+                            onClick={() => setChartRange(range.id)}
+                            className={`min-w-10 rounded-lg px-2.5 py-2 text-[10px] font-black transition ${
+                                chartRange === range.id
+                                    ? "bg-zinc-950 text-white shadow-sm"
+                                    : "text-zinc-400 hover:text-zinc-700"
+                            }`}
+                        >
+                            {range.label}
+                        </button>
+                    ))}
+                </div>
+            </header>
 
-                <div className="flex gap-2 bg-zinc-50 p-1 rounded-xl border border-zinc-100">
-                    {rangeTabs.map((tab) => (
+            <div className="flex flex-wrap items-center justify-between gap-4 px-6 pt-5 lg:px-7">
+                <div className="flex gap-2">
+                    {TABS.map((tab) => (
                         <button
                             key={tab.id}
-                            onClick={() => setChartRange(tab.id)}
-                            className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${chartRange === tab.id ? "bg-white text-zinc-900 shadow-sm" : "text-zinc-400 hover:text-zinc-600"}`}
+                            type="button"
+                            onClick={() => setChartType(tab.id)}
+                            className={`rounded-xl px-3 py-2 text-[10px] font-black uppercase tracking-wide transition ${
+                                chartType === tab.id
+                                    ? "bg-amber-400 text-zinc-950"
+                                    : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
+                            }`}
                         >
                             {tab.label}
                         </button>
                     ))}
                 </div>
-            </div>
-
-            {/* CHART */}
-            <div className="flex-1 flex flex-col relative">
-                {isLoading && (
-                    <div className="absolute inset-0 bg-white/50 z-10 flex items-center justify-center">
-                        <div className="w-8 h-8 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+                {!isLoading && !error && (
+                    <div className="flex items-center gap-5 text-right">
+                        <div>
+                            <span className="block text-[9px] font-bold uppercase tracking-widest text-zinc-400">Total</span>
+                            <strong className="text-xl font-black text-zinc-950">{total.toLocaleString()}</strong>
+                        </div>
+                        <div className="h-8 w-px bg-zinc-200" />
+                        <div>
+                            <span className="block text-[9px] font-bold uppercase tracking-widest text-zinc-400">Peak</span>
+                            <strong className="text-xl font-black text-zinc-950">{highest.toLocaleString()}</strong>
+                        </div>
                     </div>
                 )}
-                {/* Y LABELS */}
-                <div className="flex items-end gap-3 flex-1">
-
-                    {/* Y axis */}
-                    <div className="flex flex-col justify-between h-full text-xs text-zinc-400 text-right w-8 flex-shrink-0 pb-6">
-                        {ticks.map((tick, index) => (
-                            <span key={index}>{tick}</span>
-                        ))}
-                    </div>
-
-                    {/* BARS */}
-                    <div className="flex-1 flex flex-col">
-                        {/* Grid lines */}
-                        <div className="relative flex-1">
-                            {[0, 25, 50, 75, 100].map((line) => (
-                                <div
-                                    key={line}
-                                    className="absolute w-full border-t border-zinc-100"
-                                    style={{ bottom: `${line}%` }}
-                                />
-                            ))}
-
-                            {/* Bars */}
-                            <div className="absolute inset-0 flex items-end gap-3 px-1">
-                                {data.map((d, i) => {
-                                    const heightPercentage = max > 0 ? (d.value / max) * 100 : 0;
-                                    return (
-                                        <div key={i} className="flex-1 h-full flex flex-col justify-end items-center gap-1">
-                                            <div
-                                                className="w-full rounded-t-xl bg-gradient-to-t from-yellow-500 to-yellow-300 hover:from-yellow-400 hover:to-yellow-200 transition-all duration-300 cursor-pointer relative group shadow-sm shadow-yellow-500/20"
-                                                style={{ height: `${heightPercentage}%`, minHeight: heightPercentage > 0 ? '4px' : '0px' }}
-                                            >
-                                                {/* Tooltip */}
-                                                <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-zinc-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 group-hover:-translate-y-1 transition-all whitespace-nowrap shadow-xl">
-                                                    {d.value}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-
-                        {/* X LABELS */}
-                        <div className="flex gap-3 mt-2 px-1">
-                            {data.map((d, i) => (
-                                <div key={i} className="flex-1 text-center text-xs text-zinc-400 font-medium">
-                                    {d.label}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                </div>
             </div>
 
-        </div>
+            <div className="relative flex flex-1 px-6 pb-6 pt-5 lg:px-7">
+                {isLoading ? (
+                    <div className="flex w-full items-center justify-center rounded-2xl bg-zinc-50">
+                        <RefreshCw className="animate-spin text-amber-500" size={24} />
+                    </div>
+                ) : error ? (
+                    <div className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-red-200 bg-red-50/50 text-center">
+                        <Database size={24} className="text-red-300" />
+                        <p className="mt-3 text-sm font-bold text-red-700">{error}</p>
+                        <p className="mt-1 text-xs text-red-500">No substitute data is displayed.</p>
+                    </div>
+                ) : !data.length || !hasActivity ? (
+                    <div className="flex w-full flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-200 bg-zinc-50/70 text-center">
+                        <BarChart3 size={26} className="text-zinc-300" />
+                        <p className="mt-3 text-sm font-bold text-zinc-600">No activity recorded</p>
+                        <p className="mt-1 text-xs text-zinc-400">There are no {chartType} in this period.</p>
+                    </div>
+                ) : (
+                    <div className="flex w-full items-end gap-3 border-b border-zinc-200 bg-[linear-gradient(to_bottom,transparent_24%,#f4f4f5_25%,transparent_25%,transparent_49%,#f4f4f5_50%,transparent_50%,transparent_74%,#f4f4f5_75%,transparent_75%)] px-2 pt-5">
+                        {data.map((point, index) => {
+                            const value = Number(point.value || 0);
+                            const height = highest ? Math.max((value / highest) * 82, value > 0 ? 5 : 0) : 0;
+                            return (
+                                <div key={`${point.label}-${index}`} className="group flex h-full min-w-0 flex-1 flex-col items-center justify-end">
+                                    <span className="mb-2 translate-y-2 rounded-lg bg-zinc-950 px-2 py-1 text-[10px] font-black text-white opacity-0 transition group-hover:translate-y-0 group-hover:opacity-100">
+                                        {value}
+                                    </span>
+                                    <div
+                                        className="w-full max-w-14 rounded-t-xl bg-gradient-to-t from-amber-500 to-amber-300 shadow-[0_8px_24px_rgba(245,158,11,0.18)] transition group-hover:brightness-105"
+                                        style={{ height: `${height}%` }}
+                                    />
+                                    <span className="my-3 max-w-full truncate text-[10px] font-bold text-zinc-400">{point.label}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
+            </div>
+        </article>
     );
 }
 
