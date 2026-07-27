@@ -61,11 +61,14 @@ function Referee() {
     const [openResultInput, setOpenResultInput] = useState(false);
     const [openResultView, setOpenResultView] = useState(false);
     const [loadingParticipants, setLoadingParticipants] = useState(null);
+    const [viewMode, setViewMode] = useState("my");
 
     const fetchRaces = async () => {
         try {
+            setLoading(true);
             setLoadError("");
-            const res = await axiosClient.get("/Races/referee-list");
+            const endpoint = viewMode === "my" ? "/Races/referee-list" : "/Races";
+            const res = await axiosClient.get(endpoint);
             const latestFirst = [...res.data].sort((a, b) => {
                 const tournamentOrder =
                     Number(b.tournamentId || 0) - Number(a.tournamentId || 0);
@@ -85,7 +88,7 @@ function Referee() {
             }, {}));
         } catch (err) {
             console.error("Failed to fetch races for referee", err);
-            setLoadError(err.response?.data?.message || "Failed to load assigned races.");
+            setLoadError(err.response?.data?.message || "Failed to load races.");
         } finally {
             setLoading(false);
         }
@@ -93,7 +96,7 @@ function Referee() {
 
     useEffect(() => {
         Promise.resolve().then(fetchRaces);
-    }, []);
+    }, [viewMode]);
 
     const openInputResults = async (race) => {
         try {
@@ -183,7 +186,9 @@ function Referee() {
                             Race <span className="text-amber-400">Duties</span>
                         </h1>
                         <p className="max-w-xl text-sm font-medium leading-6 text-zinc-400 md:text-base">
-                            Manage your assigned races from start to official result submission.
+                            {viewMode === "my"
+                                ? "Manage your assigned races from start to official result submission."
+                                : "Browse all races across every tournament. Operational actions remain available only in My Duties."}
                         </p>
                     </div>
 
@@ -226,6 +231,31 @@ function Referee() {
             </div>
 
             <div>
+                <div className="mb-4 inline-flex rounded-2xl border border-zinc-200 bg-white p-1.5 shadow-sm">
+                    <button
+                        type="button"
+                        onClick={() => setViewMode("my")}
+                        className={`rounded-xl px-5 py-2.5 text-sm font-black transition-all ${
+                            viewMode === "my"
+                                ? "bg-zinc-950 text-white shadow-md"
+                                : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
+                        }`}
+                    >
+                        My Duties
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setViewMode("all")}
+                        className={`rounded-xl px-5 py-2.5 text-sm font-black transition-all ${
+                            viewMode === "all"
+                                ? "bg-amber-400 text-zinc-950 shadow-md"
+                                : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
+                        }`}
+                    >
+                        All Races
+                    </button>
+                </div>
+
                 {/* ═══════ SEARCH BAR ═══════ */}
                 <div className="relative mb-6">
                     <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
@@ -257,7 +287,11 @@ function Referee() {
                     <div className="rounded-3xl border border-zinc-200 bg-white py-20 text-center shadow-sm">
                         <Shield className="mx-auto mb-4 h-16 w-16 text-zinc-200" />
                         <h3 className="mb-2 text-xl font-bold text-zinc-900">No Races Found</h3>
-                        <p className="text-zinc-500">You have no assigned races matching your criteria.</p>
+                        <p className="text-zinc-500">
+                            {viewMode === "my"
+                                ? "You have no assigned races matching your criteria."
+                                : "No races match your criteria."}
+                        </p>
                     </div>
                 ) : (
                     /* ═══════ RACE LIST BY TOURNAMENT ═══════ */
@@ -292,7 +326,9 @@ function Referee() {
                                                 <Trophy className="w-6 h-6 text-white" />
                                             </div>
                                             <div className="text-left">
-                                                <p className="mb-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-300">Assigned Tournament</p>
+                                                <p className="mb-1 text-[9px] font-black uppercase tracking-[0.2em] text-amber-300">
+                                                    {viewMode === "my" ? "Assigned Tournament" : "Tournament"}
+                                                </p>
                                                 <h2 className="text-xl font-black tracking-tight text-white md:text-2xl">{tournamentName}</h2>
                                             </div>
                                         </div>
@@ -363,7 +399,7 @@ function Referee() {
 
                                                             {/* Role-based actions */}
                                                             <div className="mt-2 flex w-full flex-wrap items-center gap-2 xl:mt-0 xl:w-auto xl:justify-end">
-                                                                {["Registration Closed", "Ready To Start"].includes(item.status) && (
+                                                                {viewMode === "my" && ["Registration Closed", "Ready To Start"].includes(item.status) && (
                                                                     <button
                                                                         onClick={() => startRace(item)}
                                                                         className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-black text-white shadow-sm transition-all hover:bg-emerald-700"
@@ -372,7 +408,7 @@ function Referee() {
                                                                         Start Race
                                                                     </button>
                                                                 )}
-                                                                {["Started", "Live", "LIVE", "Racing", "Ongoing"].includes(item.status) && (
+                                                                {viewMode === "my" && ["Started", "Live", "LIVE", "Racing", "Ongoing"].includes(item.status) && (
                                                                     <button
                                                                         onClick={() => markRaceCompleted(item)}
                                                                         className="flex items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-black text-white shadow-sm transition-all hover:bg-red-700"
@@ -388,7 +424,7 @@ function Referee() {
                                                                     <Activity className="w-5 h-5" />
                                                                     Monitor
                                                                 </button>
-                                                                {user?.role === "Referee" && (
+                                                                {viewMode === "my" && user?.role === "Referee" && (
                                                                     <button
                                                                         onClick={() => { setSelectedRace({...item, race: item.raceName, horses: item.horsesCount, incidents: item.incidentsCount}); setOpenIncident(true); }}
                                                                         className="flex items-center justify-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-2.5 text-sm font-black text-orange-700 transition-all hover:bg-orange-100"
@@ -397,7 +433,7 @@ function Referee() {
                                                                         Report Incident
                                                                     </button>
                                                                 )}
-                                                                {user?.role === "Referee" && item.status === "Completed" && !item.hasResults && (
+                                                                {viewMode === "my" && user?.role === "Referee" && item.status === "Completed" && !item.hasResults && (
                                                                     <button
                                                                         disabled={loadingParticipants === item.raceId}
                                                                         onClick={() => openInputResults(item)}

@@ -1,20 +1,7 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../api/axiosClient";
-import {
-  LayoutDashboard,
-  Trophy,
-  Users,
-  BrainCircuit,
-  BarChart3,
-  Shield,
-  Eye,
-  GanttChartSquare,
-  Zap,
-  ChevronRight,
-  UserCog,
-  Mail,
-} from "lucide-react";
+import { LayoutDashboard, Trophy, Users, BrainCircuit, BarChart3, Shield, Eye, GanttChartSquare, ChevronRight, UserCog, Mail } from "lucide-react";
 import { useLayout } from "../../context/LayoutContext";
 import { useAuth } from "../../context/AuthContext";
 

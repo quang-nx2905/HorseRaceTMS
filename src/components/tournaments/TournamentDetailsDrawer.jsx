@@ -1,25 +1,4 @@
-import {
-    X,
-    CalendarDays,
-    MapPin,
-    Trophy,
-    Users,
-    TrendingUp,
-    DollarSign,
-    Flame,
-    Clock,
-    CheckCircle2,
-    Globe,
-    Activity,
-    BarChart3,
-    Star,
-    Zap,
-    Flag,
-    ChevronDown,
-    ChevronUp,
-    FileWarning,
-    MonitorPlay
-} from "lucide-react";
+import { X, CalendarDays, MapPin, Trophy, Users, Flame, Clock, CheckCircle2, Globe, Activity, Zap, Flag, ChevronDown, ChevronUp, FileWarning, MonitorPlay } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import tournamentApi from "../../api/tournamentApi";

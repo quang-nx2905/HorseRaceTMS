@@ -56,7 +56,7 @@ function CreateTournamentModal({ open, onClose }) {
 
                     const refereesResponse = await userApi.getUsers({ role: 'Referee', page: 1, pageSize: 100 });
                     setAvailableReferees(refereesResponse.items || refereesResponse.data?.items || []);
-                } catch (error) {
+                } catch {
                     toast.error("Failed to load horses and jockeys");
                 }
             };

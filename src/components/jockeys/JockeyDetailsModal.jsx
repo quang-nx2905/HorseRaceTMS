@@ -1,5 +1,5 @@
 import Modal from "../common/Modal";
-import { Phone, Scale, Briefcase, Trophy, Mail } from "lucide-react";
+import { Phone, Briefcase, Trophy, Mail } from "lucide-react";
 
 function JockeyDetailsModal({
     open,

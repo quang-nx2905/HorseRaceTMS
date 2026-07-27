@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, Link } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { topupService } from "../services/topupService";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 
 function VNPayReturnPage() {
   const [status, setStatus] = useState("loading"); // 'loading', 'success', 'failed'
   const location = useLocation();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const processReturn = async () => {

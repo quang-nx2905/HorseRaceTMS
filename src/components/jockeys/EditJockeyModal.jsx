@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { User, Phone, Image, Scale, Briefcase, AlertTriangle } from "lucide-react";
+import { Phone, Briefcase, AlertTriangle } from "lucide-react";
 import Modal from "../common/Modal";
 import ImageUpload from "../common/ImageUpload";
 

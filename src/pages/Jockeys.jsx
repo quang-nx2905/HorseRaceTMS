@@ -1,23 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-    Plus,
-    Search,
-    Trophy,
-    Users,
-    Star,
-    Eye,
-    Pencil,
-    Trash2,
-    MapPin,
-    TrendingUp,
-    Medal,
-    ChevronLeft,
-    ChevronRight,
-    Loader2,
-    AlertTriangle,
-    ClipboardEdit,
-    Unlock,
-} from "lucide-react";
+import { Plus, Search, Trophy, Users, Star, Eye, Pencil, Trash2, MapPin, Medal, ChevronLeft, ChevronRight, Loader2, AlertTriangle, ClipboardEdit, Unlock } from "lucide-react";
 
 import JockeyDetailsModal from "../components/jockeys/JockeyDetailsModal";
 import EditJockeyModal from "../components/jockeys/EditJockeyModal";
@@ -85,9 +67,8 @@ const getJockeyStatus = (exp) => {
 };
 
 // ── JockeyCard ───────────────────────────────────────────
-function JockeyCard({ jockey, index, onView, onEdit, onAdminEdit, onDelete, onReview, onSendInvite, currentUser }) {
+function JockeyCard({ jockey, index, onView, onAdminEdit, onDelete, onReview, onSendInvite, currentUser }) {
     const jockeyName = jockey.user?.fullName || jockey.name || "Unknown";
-    const experienceText = jockey.experienceYear ? `${jockey.experienceYear} Years` : "No experience";
     const statusVal = getJockeyStatus(jockey.experienceYear);
     const status = statusConfig[statusVal] || statusConfig.Amateur;
     const gradient = avatarColors[index % avatarColors.length];
@@ -378,7 +359,7 @@ function Jockeys() {
 
             // Optionally fetch in background to sync
             fetchJockeys(true);
-        } catch (error) {
+        } catch {
             toast.error("Failed to update jockey status");
         } finally {
             setOpenDelete(false);

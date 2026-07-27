@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import axiosClient from "../../api/axiosClient";
 import toast from "react-hot-toast";
 import { User, Settings, LogOut, ChevronDown, BadgeCheck } from "lucide-react";
 
@@ -12,17 +13,15 @@ function UserDropdown() {
   
   useEffect(() => {
     if (user && user.avatarUrl === undefined) {
-      import("../../api/axiosClient").then(({ default: axiosClient }) => {
-        axiosClient.get("/Profile/Me")
-          .then(res => {
-            setUser(prev => {
-              const updatedUser = { ...prev, avatarUrl: res.data.avatarUrl || null, name: res.data.fullName || prev?.name };
-              localStorage.setItem("user", JSON.stringify(updatedUser));
-              return updatedUser;
-            });
-          })
-          .catch(err => console.error("Failed to fetch user profile in dropdown:", err));
-      });
+      axiosClient.get("/Profile/Me")
+        .then(res => {
+          setUser(prev => {
+            const updatedUser = { ...prev, avatarUrl: res.data.avatarUrl || null, name: res.data.fullName || prev?.name };
+            localStorage.setItem("user", JSON.stringify(updatedUser));
+            return updatedUser;
+          });
+        })
+        .catch(err => console.error("Failed to fetch user profile in dropdown:", err));
     }
   }, [user?.id, user?.avatarUrl, setUser]);
 

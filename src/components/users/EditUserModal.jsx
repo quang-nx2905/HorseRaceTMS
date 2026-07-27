@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { User, Mail, ShieldAlert, Phone, Scale, Clock, Star, Trash2, ImageOff } from "lucide-react";
+import { User, Mail, ShieldAlert, Phone, Clock, Star, Trash2, ImageOff } from "lucide-react";
 import Modal from "../common/Modal";
 
 function EditUserModal({ open, onClose, onSave, user }) {

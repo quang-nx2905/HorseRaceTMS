@@ -3,7 +3,7 @@ import { X, Loader2, Landmark, CircleDollarSign } from "lucide-react";
 import toast from "react-hot-toast";
 import axiosClient from "../api/axiosClient";
 
-export default function WithdrawModal({ isOpen, onClose, onSuccess, currentPoints }) {
+export default function WithdrawModal({ isOpen, onClose, currentPoints }) {
     const [amount, setAmount] = useState("");
     const [bankName, setBankName] = useState("");
     const [accountNumber, setAccountNumber] = useState("");

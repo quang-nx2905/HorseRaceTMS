@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Trophy, Clock, Medal, DollarSign } from "lucide-react";
+import { X, Trophy, Clock, Medal } from "lucide-react";
 import raceApi from "../../api/raceApi";
 import predictionApi from "../../api/predictionApi";
 import { useAuth } from "../../context/AuthContext";
@@ -256,8 +256,7 @@ function RaceViewResultsModal({ open, onClose, race, onSuccess }) {
                         </div>
                     ) : (
                         <div className="space-y-4">
-                            {results.map((res, index) => {
-                                const rankDisplay = res.resultStatus === 'Finished' ? res.rankPosition : res.resultStatus;
+                            {results.map((res) => {
                                 const isTop3 = res.resultStatus === 'Finished' && res.rankPosition <= 3;
                                 const participant = race?.participants?.find(p => p.participantId === res.participantId) || {};
                                 const horseAvatar = res.horseAvatar || participant.horseAvatar;

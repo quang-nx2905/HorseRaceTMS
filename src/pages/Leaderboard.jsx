@@ -1,21 +1,5 @@
 import { useState, useMemo, useEffect } from "react";
-import {
-    Trophy,
-    Crown,
-    Medal,
-    Search,
-    TrendingUp,
-    Zap,
-    Star,
-    Award,
-    Eye,
-    ChevronLeft,
-    ChevronRight,
-    ArrowUpRight,
-    Sparkles,
-    Flame,
-    TrendingDown,
-} from "lucide-react";
+import { Trophy, Crown, Search, TrendingUp, Zap, Star, Eye, ChevronLeft, ChevronRight, ArrowUpRight, Sparkles } from "lucide-react";
 import leaderboardApi from "../api/leaderboardApi";
 import RankingDetailsModal from "../components/leaderboard/RankingDetailsModal";
 

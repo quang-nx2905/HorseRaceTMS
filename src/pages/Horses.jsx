@@ -1,20 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
-import {
-    Eye,
-    Pencil,
-    Trash2,
-    Plus,
-    Search,
-    GanttChartSquare,
-    Trophy,
-    Activity,
-    Filter,
-    ClipboardList,
-    Ban,
-    CheckCircle,
-    FileEdit
-} from "lucide-react";
+import { Eye, Pencil, Trash2, Search, GanttChartSquare, Trophy, Activity, Filter, ClipboardList, Ban, CheckCircle, FileEdit } from "lucide-react";
 
 import HorseDetailsModal from "../components/horses/HorseDetailsModal";
 import PendingHorsesModal from "../components/horses/PendingHorsesModal";
@@ -285,11 +271,6 @@ function Horses() {
             console.error("Failed to update horse:", error);
             toast.error("Failed to update horse.");
         }
-    };
-
-    const handleDeleteHorse = (id) => {
-        setHorses((prev) => prev.filter((h) => h.id !== id));
-        toast.success("Horse deleted successfully!");
     };
 
     const handleConfirmDelete = async () => {

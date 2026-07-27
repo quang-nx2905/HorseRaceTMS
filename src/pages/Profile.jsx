@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import axiosClient from "../api/axiosClient";
@@ -26,7 +26,7 @@ import TopupModal from "../components/TopupModal";
 import WithdrawModal from "../components/WithdrawModal";
 
 function Profile() {
-    const { user, setUser } = useAuth();
+    const { setUser } = useAuth();
 
     const [profile, setProfile] = useState({
         name: "",
@@ -50,44 +50,44 @@ function Profile() {
     const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef(null);
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const response = await axiosClient.get("/Profile/Me");
-                const data = response.data;
-                setProfile(prev => ({
-                    ...prev,
-                    name: data.fullName || "",
-                    email: data.email || "",
-                    phone: data.phone || "",
-                    avatarUrl: data.avatarUrl || null,
-                    role: data.role || prev.role,
-                    joinedDate: data.joinedDate,
-                    isActive: data.isActive,
-                    totalPoints: data.totalPoints || 0
-                }));
-                setUser(prev => ({ ...prev, avatarUrl: data.avatarUrl, name: data.fullName || prev?.name }));
-                if (data.role === "Spectator") {
-                    setIsLoadingTransactions(true);
-                    try {
-                        const historyResponse = await axiosClient.get("/points/history?limit=50");
-                        setPointTransactions(historyResponse.data?.data || []);
-                    } catch (historyError) {
-                        console.error("Failed to load point history:", historyError);
-                    } finally {
-                        setIsLoadingTransactions(false);
-                    }
+    const fetchProfile = useCallback(async () => {
+        try {
+            const response = await axiosClient.get("/Profile/Me");
+            const data = response.data;
+            setProfile(prev => ({
+                ...prev,
+                name: data.fullName || "",
+                email: data.email || "",
+                phone: data.phone || "",
+                avatarUrl: data.avatarUrl || null,
+                role: data.role || prev.role,
+                joinedDate: data.joinedDate,
+                isActive: data.isActive,
+                totalPoints: data.totalPoints || 0
+            }));
+            setUser(prev => ({ ...prev, avatarUrl: data.avatarUrl, name: data.fullName || prev?.name }));
+            if (data.role === "Spectator") {
+                setIsLoadingTransactions(true);
+                try {
+                    const historyResponse = await axiosClient.get("/points/history?limit=50");
+                    setPointTransactions(historyResponse.data?.data || []);
+                } catch (historyError) {
+                    console.error("Failed to load point history:", historyError);
+                } finally {
+                    setIsLoadingTransactions(false);
                 }
-            } catch (error) {
-                console.error("Failed to fetch profile:", error);
-                toast.error("Failed to load profile details.");
-            } finally {
-                setIsLoading(false);
             }
-        };
+        } catch (error) {
+            console.error("Failed to fetch profile:", error);
+            toast.error("Failed to load profile details.");
+        } finally {
+            setIsLoading(false);
+        }
+    }, [setUser]);
 
-        fetchProfile();
-    }, []);
+    useEffect(() => {
+        Promise.resolve().then(fetchProfile);
+    }, [fetchProfile]);
 
     const handleUpdate = async () => {
         setIsSaving(true);

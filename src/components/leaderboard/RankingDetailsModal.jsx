@@ -1,13 +1,5 @@
 import Modal from "../common/Modal";
-import {
-    Trophy,
-    Zap,
-    Medal,
-    Crown,
-    Star,
-    Award,
-    Activity,
-} from "lucide-react";
+import { Trophy, Zap, Star, Activity } from "lucide-react";
 
 function RankingDetailsModal({
     open,
@@ -17,8 +9,6 @@ function RankingDetailsModal({
     if (!ranking) return null;
 
     const isFirst = ranking.rank === 1;
-    const isSecond = ranking.rank === 2;
-    const isThird = ranking.rank === 3;
 
     return (
         <Modal

@@ -12,7 +12,7 @@ const parseJwt = (token) => {
       return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
     return JSON.parse(jsonPayload);
-  } catch (e) {
+  } catch {
     return null;
   }
 };
@@ -47,7 +47,7 @@ export function AuthProvider({ children }) {
           if (cachedUser && cachedUser.avatarUrl !== undefined) {
             decodedUser.avatarUrl = cachedUser.avatarUrl;
           }
-        } catch (e) {
+        } catch {
           // ignore parsing error
         }
         return decodedUser;

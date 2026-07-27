@@ -23,6 +23,20 @@ function CustomJockeySelect({ value, onChange, options, disabled }) {
       return String(id) === String(value);
   });
 
+  const getJockeyName = (jockey) =>
+    jockey.user?.fullName || jockey.name || `Jockey #${jockey.userId || jockey.user?.id || jockey.id}`;
+
+  const getJockeyFallback = (jockey) =>
+    `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(getJockeyName(jockey))}&backgroundColor=f3f4f6`;
+
+  const getJockeyAvatar = (jockey) =>
+    jockey.avatar || jockey.avatarUrl || jockey.user?.avatar || jockey.user?.avatarUrl || getJockeyFallback(jockey);
+
+  const handleImageError = (event, jockey) => {
+    event.currentTarget.onerror = null;
+    event.currentTarget.src = getJockeyFallback(jockey);
+  };
+
   return (
     <div className="relative min-w-0 flex-1" ref={ref}>
       <button
@@ -34,9 +48,14 @@ function CustomJockeySelect({ value, onChange, options, disabled }) {
         {selectedOption ? (
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-zinc-200 overflow-hidden shrink-0 border border-zinc-300">
-                <img src={selectedOption.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${selectedOption.user?.fullName || selectedOption.name || selectedOption.userId}&backgroundColor=f3f4f6`} alt={selectedOption.user?.fullName || selectedOption.name} className="w-full h-full object-cover" />
+                <img
+                  src={getJockeyAvatar(selectedOption)}
+                  onError={(event) => handleImageError(event, selectedOption)}
+                  alt={getJockeyName(selectedOption)}
+                  className="w-full h-full object-cover"
+                />
             </div>
-            <span className="font-semibold text-zinc-800">{selectedOption.user?.fullName || selectedOption.name || `Jockey #${selectedOption.userId}`}</span>
+            <span className="font-semibold text-zinc-800">{getJockeyName(selectedOption)}</span>
           </div>
         ) : (
           <span className="text-zinc-500">Select a jockey</span>
@@ -51,7 +70,7 @@ function CustomJockeySelect({ value, onChange, options, disabled }) {
           ) : (
             options.map((jockey) => {
               const id = jockey.userId || jockey.user?.id || jockey.id;
-              const name = jockey.user?.fullName || jockey.name || `Jockey #${id}`;
+              const name = getJockeyName(jockey);
               const isSelected = String(value) === String(id);
               return (
                 <button
@@ -64,7 +83,12 @@ function CustomJockeySelect({ value, onChange, options, disabled }) {
                   className={`w-full flex items-center gap-3 px-4 py-3 text-sm text-left hover:bg-zinc-50 ${isSelected ? "bg-amber-50" : ""}`}
                 >
                   <div className="w-8 h-8 rounded-full bg-zinc-200 overflow-hidden shrink-0 border border-zinc-300">
-                      <img src={jockey.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}&backgroundColor=f3f4f6`} alt={name} className="w-full h-full object-cover" />
+                      <img
+                        src={getJockeyAvatar(jockey)}
+                        onError={(event) => handleImageError(event, jockey)}
+                        alt={name}
+                        className="w-full h-full object-cover"
+                      />
                   </div>
                   <span className="flex-1 font-semibold text-zinc-800">{name}</span>
                   {isSelected && <Check size={16} className="text-amber-500" />}

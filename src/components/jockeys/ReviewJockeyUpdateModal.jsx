@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, CheckCircle, XCircle, Phone, Scale, Briefcase, Image } from "lucide-react";
+import { X, CheckCircle, XCircle, Phone, Briefcase } from "lucide-react";
 
 function ReviewJockeyUpdateModal({ open, onClose, jockey, onReview }) {
     const [notes, setNotes] = useState("");
