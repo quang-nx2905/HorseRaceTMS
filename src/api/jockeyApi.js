@@ -5,8 +5,8 @@ export const jockeyApi = {
         const response = await api.get("/jockeys");
         return response.data;
     },
-    getAvailableJockeys: async (tourId) => {
-        const response = await api.get(`/jockeys/available/${tourId}`);
+    getAvailableJockeys: async (raceId) => {
+        const response = await api.get(`/jockeys/available/race/${raceId}`);
         return response.data;
     },
     requestUpdateJockey: async (id, data) => {

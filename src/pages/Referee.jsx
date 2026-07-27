@@ -66,8 +66,15 @@ function Referee() {
         try {
             setLoadError("");
             const res = await axiosClient.get("/Races/referee-list");
-            setRaces(res.data);
-            const grouped = res.data.reduce((acc, r) => {
+            const latestFirst = [...res.data].sort((a, b) => {
+                const tournamentOrder =
+                    Number(b.tournamentId || 0) - Number(a.tournamentId || 0);
+                return tournamentOrder !== 0
+                    ? tournamentOrder
+                    : Number(b.raceId || 0) - Number(a.raceId || 0);
+            });
+            setRaces(latestFirst);
+            const grouped = latestFirst.reduce((acc, r) => {
                 if (!acc[r.tournamentName]) acc[r.tournamentName] = [];
                 acc[r.tournamentName].push(r);
                 return acc;
@@ -85,7 +92,7 @@ function Referee() {
     };
 
     useEffect(() => {
-        fetchRaces();
+        Promise.resolve().then(fetchRaces);
     }, []);
 
     const openInputResults = async (race) => {

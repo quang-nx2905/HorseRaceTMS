@@ -3,6 +3,7 @@ import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, CheckCircle2 } from "lucide-react";
+import AuthRacingPanel from "../components/auth/AuthRacingPanel";
 
 const passwordRules = [
     { id: "length", label: "Between 9 and 19 characters", test: (p) => p.length >= 9 && p.length <= 19 },
@@ -64,83 +65,19 @@ function Register() {
     return (
         <div className="min-h-screen flex">
 
-            {/* ── LEFT PANEL – Dark Brand ── */}
-            <div className="hidden lg:flex lg:w-[46%] bg-zinc-950 flex-col justify-between p-14 relative overflow-hidden">
-
-                {/* Blobs */}
-                <div className="absolute top-[-80px] right-[-80px] w-[420px] h-[420px] rounded-full bg-yellow-400/10 blur-3xl pointer-events-none" />
-                <div className="absolute bottom-[-60px] left-[-60px] w-[300px] h-[300px] rounded-full bg-yellow-400/5 blur-3xl pointer-events-none" />
-
-                {/* Logo */}
-                <div className="flex items-center gap-3 relative z-10">
-                    <div className="w-12 h-12 overflow-hidden flex items-center justify-center">
-                        <img src="/src/assets/logo.png" alt="Horse Racing Logo" className="w-full h-full object-cover rounded-xl shadow-sm" />
-                    </div>
-                    <span className="text-white font-bold text-lg tracking-tight">HorseRace TMS</span>
-                </div>
-
-                {/* Content */}
-                <div className="relative z-10">
-                    <div className="inline-flex items-center gap-2 bg-yellow-400/15 border border-yellow-400/30 rounded-full px-4 py-1.5 mb-8">
-                        <span className="w-2 h-2 bg-yellow-400 rounded-full" />
-                        <span className="text-yellow-400 text-xs font-semibold tracking-wider uppercase">
-                            Join the Platform
-                        </span>
-                    </div>
-
-                    <h2 className="text-5xl font-black text-white leading-[1.1] mb-6">
-                        Start Your<br />
-                        <span className="text-yellow-400">Racing</span><br />
-                        Journey
-                    </h2>
-
-                    <p className="text-zinc-400 text-base leading-7 max-w-sm mb-12">
-                        Create a free account and gain access to professional tournament
-                        management tools, AI predictions, and live race data.
-                    </p>
-
-                    {/* Perks */}
-                    <div className="space-y-3">
-                        {[
-                            "Full tournament management suite",
-                            "Real-time race tracking & analytics",
-                            "AI-powered win predictions",
-                            "Multi-role access control",
-                        ].map((perk) => (
-                            <div key={perk} className="flex items-center gap-3">
-                                <CheckCircle2 size={16} className="text-yellow-400 flex-shrink-0" />
-                                <span className="text-zinc-300 text-sm">{perk}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Stats row */}
-                <div className="relative z-10 grid grid-cols-3 gap-4">
-                    {[
-                        { label: "Horses", value: "2.4k" },
-                        { label: "Tournaments", value: "320+" },
-                        { label: "Accuracy", value: "86%" },
-                    ].map(({ label, value }) => (
-                        <div key={label} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-center">
-                            <p className="text-yellow-400 font-black text-2xl">{value}</p>
-                            <p className="text-zinc-500 text-xs mt-0.5">{label}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
+            <AuthRacingPanel variant="register" />
 
             {/* ── RIGHT PANEL – Form ── */}
             <div className="flex-1 bg-white flex items-center justify-center p-8 lg:p-14 overflow-y-auto">
                 <div className="w-full max-w-[440px]">
 
                     {/* Mobile logo */}
-                    <div className="flex items-center gap-3 mb-8 lg:hidden">
+                    <Link to="/" className="flex items-center gap-3 mb-8 lg:hidden" aria-label="Back to home">
                         <div className="w-12 h-12 overflow-hidden flex items-center justify-center">
                             <img src="/src/assets/logo.png" alt="Horse Racing Logo" className="w-full h-full object-cover rounded-xl shadow-sm" />
                         </div>
                         <span className="font-bold text-base">HorseRace TMS</span>
-                    </div>
+                    </Link>
 
                     {/* Heading */}
                     <div className="mb-7">

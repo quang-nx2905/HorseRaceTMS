@@ -23,13 +23,22 @@ function RecentRaces({ refreshKey = 0 }) {
             setLoading(true);
             setError("");
             try {
-                const response = await tournamentApi.getAll({ page: 1, pageSize: 5 });
+                // Match the Tournaments page: fetch the collection, then sort by
+                // descending tournament ID because newer records have higher IDs.
+                const response = await tournamentApi.getAll({ page: 1, pageSize: 100 });
                 const items =
                     response.data?.items ||
                     response.items ||
                     response.data?.data?.items ||
                     [];
-                if (active) setTournaments(Array.isArray(items) ? items : []);
+                if (active) {
+                    const latest = Array.isArray(items)
+                        ? [...items]
+                            .sort((a, b) => Number(b.tourId || b.id || 0) - Number(a.tourId || a.id || 0))
+                            .slice(0, 5)
+                        : [];
+                    setTournaments(latest);
+                }
             } catch (requestError) {
                 console.error("Failed to fetch recent tournaments", requestError);
                 if (active) {
