@@ -1,0 +1,154 @@
+.auth-racing-panel {
+    position: relative;
+    display: none;
+    width: 52%;
+    min-height: 100vh;
+    overflow: hidden;
+    flex-direction: column;
+    isolation: isolate;
+    padding: 38px 46px 34px;
+    background: #07090a;
+    color: #fff;
+}
+
+.auth-racing-photo {
+    position: absolute;
+    z-index: -3;
+    inset: 0 0 25% 0;
+    background-position: 66% center;
+    background-size: cover;
+    animation: auth-horse-reveal 1.1s ease-out both;
+}
+
+.auth-racing-panel::before {
+    content: "";
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(4,6,7,.48), transparent 55%),
+        linear-gradient(0deg, #07090a 18%, rgba(7,9,10,.94) 29%, transparent 62%),
+        linear-gradient(180deg, rgba(4,6,7,.38), transparent 24%);
+}
+
+.auth-racing-panel::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 46px;
+    right: 46px;
+    bottom: 91px;
+    height: 1px;
+    background: linear-gradient(90deg, #e7bd70, rgba(231,189,112,.06));
+}
+
+.auth-racing-brand {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.auth-racing-brand > span {
+    width: 39px;
+    height: 39px;
+    overflow: hidden;
+    border: 1px solid rgba(231,189,112,.55);
+    border-radius: 50%;
+    background: #0d1012;
+}
+
+.auth-racing-brand img { width: 100%; height: 100%; object-fit: cover; }
+.auth-racing-brand div { display: flex; flex-direction: column; gap: 4px; }
+.auth-racing-brand strong { font-size: 13px; letter-spacing: -.03em; }
+.auth-racing-brand strong span { color: #e7bd70; }
+.auth-racing-brand small { color: rgba(255,255,255,.4); font-size: 6px; font-weight: 800; letter-spacing: .22em; }
+
+.auth-racing-content {
+    width: min(590px, 88%);
+    margin-top: auto;
+    margin-bottom: 72px;
+}
+
+.auth-racing-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: #e7bd70;
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: .24em;
+}
+
+.auth-racing-content h2 {
+    margin: 15px 0 18px;
+    font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+    font-size: clamp(48px, 4.5vw, 72px);
+    font-weight: 800;
+    line-height: .95;
+    letter-spacing: -.035em;
+    text-transform: uppercase;
+}
+
+.auth-racing-content h2 em {
+    color: #e7bd70;
+    font-style: italic;
+}
+
+.auth-racing-summary {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.auth-racing-summary p {
+    max-width: 390px;
+    color: rgba(255,255,255,.5);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.auth-racing-summary > span {
+    display: grid;
+    width: 35px;
+    height: 35px;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid rgba(231,189,112,.5);
+    border-radius: 50%;
+    color: #e7bd70;
+}
+
+.auth-racing-footer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255,255,255,.32);
+    font-size: 7px;
+    font-weight: 800;
+    letter-spacing: .22em;
+}
+
+.auth-racing-footer i {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #e7bd70;
+}
+
+@keyframes auth-horse-reveal {
+    from { opacity: 0; transform: scale(1.035); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@media (min-width: 1024px) {
+    .auth-racing-panel { display: flex; }
+}
+
+@media (min-width: 1500px) {
+    .auth-racing-panel { padding: 44px 56px 38px; }
+    .auth-racing-panel::after { left: 56px; right: 56px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .auth-racing-photo { animation: none; }
+}

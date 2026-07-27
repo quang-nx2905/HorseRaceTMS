@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Loader2, Send, X, ChevronDown, Check } from "lucide-react";
 import toast from "react-hot-toast";
 import { jockeyApi } from "../../api/jockeyApi";
@@ -86,14 +86,14 @@ function RaceJockeyInviteModal({ registration, onClose }) {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    jockeyApi.getAvailableJockeys(registration.tourId)
+    jockeyApi.getAvailableJockeys(registration.raceId)
       .then(response => {
           const availableJockeys = (response?.data || []);
           setJockeys(availableJockeys);
       })
       .catch(error => toast.error(error.response?.data?.message || "Failed to load jockeys."))
       .finally(() => setLoading(false));
-  }, [registration.tourId]);
+  }, [registration.raceId]);
 
   const submit = async event => {
     event.preventDefault();
