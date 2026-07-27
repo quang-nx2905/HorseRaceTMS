@@ -3,29 +3,7 @@ import { useLocation } from "react-router-dom";
 import * as signalR from "@microsoft/signalr";
 import axiosClient from "../api/axiosClient";
 import { useAuth } from "../context/AuthContext";
-import {
-    Play,
-    Eye,
-    Users,
-    Wifi,
-    Star,
-    MapPin,
-    TrendingUp,
-    Volume2,
-    Maximize2,
-    Radio,
-    MessageSquare,
-    Send,
-    Flame,
-    Clock,
-    Trophy,
-    ChevronRight,
-    Signal,
-    Link as LinkIcon,
-    MonitorOff,
-    MonitorPlay,
-    X
-} from "lucide-react";
+import { Play, MapPin, Volume2, Maximize2, Radio, MessageSquare, Send, Flame, Trophy, Signal, Link as LinkIcon, MonitorPlay, X } from "lucide-react";
 
 const extractYoutubeId = (url) => {
     const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|live\/|shorts\/))([^&?/\s]+)/);

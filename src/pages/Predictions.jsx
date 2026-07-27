@@ -1,22 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import predictionApi from "../api/predictionApi";
-import {
-    BrainCircuit,
-    Sparkles,
-    Search,
-    Zap,
-    TrendingUp,
-    Target,
-    FlaskConical,
-    Eye,
-    ChevronRight,
-    ArrowUpRight,
-    BarChart3,
-    Cpu,
-    AlertCircle,
-    CheckCircle2,
-    Clock,
-} from "lucide-react";
+import { BrainCircuit, Search, Eye, AlertCircle, CheckCircle2, Clock } from "lucide-react";
 import PredictionDetailsModal from "../components/predictions/PredictionDetailsModal";
 
 

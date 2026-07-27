@@ -1,4 +1,4 @@
-import { X, Clock, Eye } from "lucide-react";
+import { Clock, Eye } from "lucide-react";
 import Modal from "../common/Modal";
 
 function PendingJockeysModal({ open, onClose, jockeys, onReview }) {

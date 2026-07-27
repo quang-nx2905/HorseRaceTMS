@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { UploadCloud, X, Loader2, Image as ImageIcon } from "lucide-react";
 import toast from "react-hot-toast";
 import axiosClient from "../../api/axiosClient";

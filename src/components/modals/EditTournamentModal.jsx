@@ -204,7 +204,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
 
             onClose();
             window.location.reload();
-        } catch (error) {
+        } catch {
             toast.error("Failed to update tournament.");
         }
     };

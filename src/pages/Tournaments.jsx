@@ -1,26 +1,4 @@
-import {
-  Search,
-  Plus,
-  CalendarDays,
-  MapPin,
-  Trophy,
-  Flame,
-  Clock,
-  CheckCircle2,
-  DollarSign,
-  Users,
-  TrendingUp,
-  Zap,
-  Eye,
-  EyeOff,
-  Pencil,
-  Filter,
-  Globe,
-  Star,
-  Activity,
-  BarChart3,
-  MonitorPlay,
-} from "lucide-react";
+import { Search, Plus, CalendarDays, MapPin, Trophy, Flame, Clock, CheckCircle2, DollarSign, Users, Zap, Eye, EyeOff, Pencil, MonitorPlay } from "lucide-react";
 
 import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";

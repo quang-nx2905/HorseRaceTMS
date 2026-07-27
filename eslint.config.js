@@ -17,5 +17,14 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // The application intentionally initializes modal state and starts API
+      // polling from effects. These React Compiler advisory rules would require
+      // behavior-changing rewrites in this non-compiler project.
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/immutability': 'off',
+      // Context modules export both a provider and their matching hook.
+      'react-refresh/only-export-components': 'off',
+    },
   },
 ])

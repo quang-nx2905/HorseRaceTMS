@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Mail, ShieldAlert, Phone, Scale, Clock, Star } from "lucide-react";
+import { User, Mail, ShieldAlert, Phone, Clock, Star } from "lucide-react";
 import Modal from "../common/Modal";
 
 function CreateUserModal({ open, onClose, onCreate, initialRole = "Spectator", fixedRole = false }) {

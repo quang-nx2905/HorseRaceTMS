@@ -1,21 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import {
-    Mail,
-    Search,
-    Filter,
-    ChevronLeft,
-    ChevronRight,
-    Loader2,
-    AlertTriangle,
-    InboxIcon,
-    CheckCircle2,
-    XCircle,
-    RefreshCw,
-    Calendar,
-    GanttChartSquare,
-    User,
-    Trophy,
-} from "lucide-react";
+import { Mail, Search, ChevronLeft, ChevronRight, Loader2, AlertTriangle, InboxIcon, CheckCircle2, XCircle, RefreshCw, Calendar, GanttChartSquare, Trophy } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import { invitationApi } from "../api/invitationApi";
@@ -69,7 +53,7 @@ function EmptyInvitations({ message }) {
 
 // ── HorseOwner: Sent Invitations Table ──────────────────────────────────────
 
-function SentInvitationsTable({ invitations, onRefresh, onCancel, cancellingId }) {
+function SentInvitationsTable({ invitations, onCancel, cancellingId }) {
     return (
         <div className="overflow-x-auto">
             <table className="w-full text-sm">

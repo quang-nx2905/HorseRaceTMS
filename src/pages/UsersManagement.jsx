@@ -6,7 +6,6 @@ import CreateUserModal from "../components/users/CreateUserModal";
 import EditUserModal from "../components/users/EditUserModal";
 import ConfirmModal from "../components/common/ConfirmModal";
 import Pagination from "../components/common/Pagination";
-import { useAuth } from "../context/AuthContext";
 import { userApi } from "../api/userApi";
 
 const roleConfig = {
@@ -119,7 +118,6 @@ function UserCard({ user, onEdit, onToggleStatus, onDelete }) {
 }
 
 function UsersManagement() {
-    const { user: currentUser } = useAuth();
     const [search, setSearch] = useState("");
     const [filterRole, setFilterRole] = useState("All");
 
@@ -219,7 +217,7 @@ function UsersManagement() {
 
             setUsersList(updatedUsers);
             toast.success(`User has been ${selectedUser.status === "Active" ? "deactivated" : "reactivated"} successfully!`);
-        } catch (error) {
+        } catch {
             toast.error("Failed to update user status");
         } finally {
             setOpenDelete(false);

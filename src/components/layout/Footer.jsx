@@ -1,5 +1,5 @@
-import React from 'react';
-import { Trophy } from 'lucide-react';
+
+
 function Footer() {
     return (
         <footer className="bg-white border-t border-zinc-200 text-zinc-500 py-6 px-8 mt-auto text-center text-sm flex flex-col gap-3 items-center justify-center">

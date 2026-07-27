@@ -20,6 +20,13 @@ function CustomHorseSelect({ value, onChange, options, disabled }) {
   }, []);
 
   const selectedOption = options.find((o) => String(o.horseId) === String(value));
+  const getHorseFallback = (horse) =>
+    `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(horse.horseName || horse.horseId)}&backgroundColor=fef3c7`;
+
+  const handleImageError = (event, horse) => {
+    event.currentTarget.onerror = null;
+    event.currentTarget.src = getHorseFallback(horse);
+  };
 
   return (
     <div className="relative min-w-0 flex-1" ref={ref}>
@@ -32,7 +39,12 @@ function CustomHorseSelect({ value, onChange, options, disabled }) {
         {selectedOption ? (
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-amber-100 overflow-hidden shrink-0 border border-amber-200">
-                <img src={selectedOption.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${selectedOption.horseName || selectedOption.horseId}&backgroundColor=fef3c7`} alt={selectedOption.horseName} className="w-full h-full object-cover" />
+                <img
+                  src={selectedOption.imageUrl || getHorseFallback(selectedOption)}
+                  onError={(event) => handleImageError(event, selectedOption)}
+                  alt={selectedOption.horseName}
+                  className="w-full h-full object-cover"
+                />
             </div>
             <span className="font-semibold text-zinc-800">{selectedOption.horseName}</span>
           </div>
@@ -58,7 +70,12 @@ function CustomHorseSelect({ value, onChange, options, disabled }) {
                 className={`w-full flex items-center gap-3 px-3 py-2 text-sm text-left hover:bg-zinc-50 ${String(value) === String(horse.horseId) ? "bg-amber-50" : ""}`}
               >
                 <div className="w-8 h-8 rounded-full bg-amber-100 overflow-hidden shrink-0 border border-amber-200">
-                    <img src={horse.avatarUrl || `https://api.dicebear.com/7.x/bottts/svg?seed=${horse.horseName || horse.horseId}&backgroundColor=fef3c7`} alt={horse.horseName} className="w-full h-full object-cover" />
+                    <img
+                      src={horse.imageUrl || getHorseFallback(horse)}
+                      onError={(event) => handleImageError(event, horse)}
+                      alt={horse.horseName}
+                      className="w-full h-full object-cover"
+                    />
                 </div>
                 <span className="flex-1 font-semibold text-zinc-800">{horse.horseName}</span>
                 {String(value) === String(horse.horseId) && <Check size={16} className="text-amber-500" />}
