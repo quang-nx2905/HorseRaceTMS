@@ -1,117 +1,86 @@
-import React, { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import StatCard from "../components/ui/StatCard";
 import AnalyticsChart from "../components/charts/AnalyticsChart";
 import RecentRaces from "../components/dashboard/RecentRaces";
 import api from "../api/axiosClient";
 import {
-    GanttChartSquare,
-    Zap,
-    TrendingUp,
-    Target,
-    ArrowUpRight,
     CalendarDays,
+    Flag,
+    GanttChartSquare,
+    RefreshCw,
+    Target,
+    Trophy,
     Users,
+    Zap,
 } from "lucide-react";
 
+const STAT_CONFIG = [
+    {
+        key: "totalHorses",
+        title: "Total Horses",
+        subtitle: "Registered in the system",
+        icon: GanttChartSquare,
+        tone: "gold",
+    },
+    {
+        key: "activeTournaments",
+        title: "Active Tournaments",
+        subtitle: "Currently in progress",
+        icon: Zap,
+        tone: "emerald",
+    },
+    {
+        key: "totalJockeys",
+        title: "Total Jockeys",
+        subtitle: "Verified racing profiles",
+        icon: Users,
+        tone: "blue",
+    },
+    {
+        key: "completedTournaments",
+        title: "Completed Events",
+        subtitle: "Tournaments concluded",
+        icon: Target,
+        tone: "violet",
+    },
+];
+
 function Dashboard() {
-    const [stats, setStats] = useState([
-        {
-            title: "Total Horses",
-            value: "...",
-            subtitle: "Registered horses",
-            icon: GanttChartSquare,
-            accent: "bg-yellow-400",
-            iconColor: "text-yellow-900",
-            trend: "+0",
-            trendUp: true,
-        },
-        {
-            title: "Active Tournaments",
-            value: "...",
-            subtitle: "Currently ongoing",
-            icon: Zap,
-            accent: "bg-emerald-400",
-            iconColor: "text-emerald-900",
-            trend: "+0",
-            trendUp: true,
-        },
-        {
-            title: "Total Jockeys",
-            value: "...",
-            subtitle: "Professional riders",
-            icon: Users,
-            accent: "bg-blue-400",
-            iconColor: "text-blue-900",
-            trend: "+0",
-            trendUp: true,
-        },
-        {
-            title: "Completed Tournaments",
-            value: "...",
-            subtitle: "Successful events",
-            icon: Target,
-            accent: "bg-violet-400",
-            iconColor: "text-violet-900",
-            trend: "+0",
-            trendUp: true,
-        },
-    ]);
+    const [statsData, setStatsData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [refreshKey, setRefreshKey] = useState(0);
+
+    const fetchStats = useCallback(async () => {
+        try {
+            const response = await api.get("/dashboard/stats");
+            setStatsData(response.data);
+        } catch (requestError) {
+            console.error("Failed to fetch dashboard stats", requestError);
+            setStatsData(null);
+            setError("Dashboard statistics could not be loaded.");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const response = await api.get('/dashboard/stats');
-                const data = response.data;
-                
-                setStats([
-                    {
-                        title: "Total Horses",
-                        value: data.totalHorses.toLocaleString(),
-                        subtitle: "Registered horses",
-                        icon: GanttChartSquare,
-                        accent: "bg-yellow-400",
-                        iconColor: "text-yellow-900",
-                        trend: "Live",
-                        trendUp: true,
-                    },
-                    {
-                        title: "Active Tournaments",
-                        value: data.activeTournaments.toLocaleString(),
-                        subtitle: "Currently ongoing",
-                        icon: Zap,
-                        accent: "bg-emerald-400",
-                        iconColor: "text-emerald-900",
-                        trend: "Live",
-                        trendUp: true,
-                    },
-                    {
-                        title: "Total Jockeys",
-                        value: data.totalJockeys.toLocaleString(),
-                        subtitle: "Professional riders",
-                        icon: Users,
-                        accent: "bg-blue-400",
-                        iconColor: "text-blue-900",
-                        trend: "Live",
-                        trendUp: true,
-                    },
-                    {
-                        title: "Completed Tournaments",
-                        value: data.completedTournaments.toLocaleString(),
-                        subtitle: "Successful events",
-                        icon: Target,
-                        accent: "bg-violet-400",
-                        iconColor: "text-violet-900",
-                        trend: "Done",
-                        trendUp: true,
-                    },
-                ]);
-            } catch (error) {
-                console.error("Failed to fetch dashboard stats", error);
-            }
+        const request = Promise.resolve().then(fetchStats);
+        return () => {
+            void request;
         };
+    }, [fetchStats, refreshKey]);
 
-        fetchStats();
-    }, []);
+    const stats = useMemo(
+        () =>
+            statsData
+                ? STAT_CONFIG.map((item) => ({
+                    ...item,
+                    value: statsData[item.key],
+                }))
+                : [],
+        [statsData],
+    );
 
     const today = new Date().toLocaleDateString("en-US", {
         weekday: "long",
@@ -120,74 +89,96 @@ function Dashboard() {
         day: "numeric",
     });
 
+    const refreshDashboard = () => {
+        setLoading(true);
+        setError("");
+        setRefreshKey((key) => key + 1);
+    };
+
     return (
-        <div className="space-y-8">
+        <div className="mx-auto w-full max-w-[1680px] space-y-6">
+            <section className="relative overflow-hidden rounded-[32px] bg-[#0a0c0e] px-7 py-8 text-white shadow-[0_24px_70px_rgba(9,11,13,0.16)] lg:px-10 lg:py-10">
+                <div className="pointer-events-none absolute -right-24 -top-36 h-96 w-96 rounded-full bg-amber-400/10 blur-3xl" />
+                <div className="pointer-events-none absolute right-[20%] top-0 h-full w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
+                <div className="relative flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
+                    <div>
+                        <div className="mb-5 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.25em] text-amber-400">
+                            <span className="h-px w-8 bg-amber-400" />
+                            Race operations center
+                        </div>
+                        <h1 className="text-4xl font-black tracking-[-0.04em] sm:text-5xl">
+                            Your racing world,
+                            <span className="block text-zinc-500">in one clear view.</span>
+                        </h1>
+                        <p className="mt-4 max-w-xl text-sm leading-6 text-zinc-400">
+                            Live system totals, tournament activity and performance data
+                            retrieved directly from your platform.
+                        </p>
+                    </div>
 
-            {/* HERO HEADER */}
-            <div className="flex items-end justify-between">
-                <div>
-                    <p className="text-sm font-semibold text-yellow-600 uppercase tracking-widest mb-2">
-                        Overview
-                    </p>
-                    <h1 className="text-5xl font-black text-zinc-900 leading-tight">
-                        Dashboard
-                    </h1>
-                    <p className="text-zinc-500 mt-3 text-base">
-                        Welcome back to the Horse Race Tournament Management System.
-                    </p>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-xs text-zinc-300 backdrop-blur">
+                            <CalendarDays size={16} className="text-amber-400" />
+                            {today}
+                        </div>
+                        <button
+                            type="button"
+                            onClick={refreshDashboard}
+                            disabled={loading}
+                            className="flex items-center gap-2 rounded-2xl bg-amber-400 px-4 py-3 text-xs font-black text-zinc-950 transition hover:bg-amber-300 disabled:cursor-wait disabled:opacity-70"
+                        >
+                            <RefreshCw size={15} className={loading ? "animate-spin" : ""} />
+                            Refresh data
+                        </button>
+                    </div>
                 </div>
+            </section>
 
-                <div className="flex items-center gap-2 bg-white border border-zinc-200 px-5 py-3 rounded-2xl text-zinc-500 text-sm font-medium shadow-sm">
-                    <CalendarDays size={16} className="text-yellow-500" />
-                    {today}
-                </div>
-            </div>
-
-            {/* STATS GRID */}
-            <div className="grid grid-cols-4 gap-5">
-                {stats.map((stat) => (
-                    <StatCard
-                        key={stat.title}
-                        title={stat.title}
-                        value={stat.value}
-                        subtitle={stat.subtitle}
-                        icon={stat.icon}
-                        accent={stat.accent}
-                        iconColor={stat.iconColor}
-                        trend={stat.trend}
-                        trendUp={stat.trendUp}
-                    />
-                ))}
-            </div>
-
-            {/* QUICK ACTIONS */}
-            <div className="grid grid-cols-3 gap-4">
-                {[
-                    { label: "Schedule Race", color: "bg-yellow-400 hover:bg-yellow-500 text-black", icon: CalendarDays },
-                    { label: "View Standings", color: "bg-zinc-900 hover:bg-zinc-700 text-white", icon: TrendingUp },
-                    { label: "AI Predictions", color: "bg-blue-500 hover:bg-blue-600 text-white", icon: Zap },
-                ].map(({ label, color, icon: Icon }) => (
-                    <button
-                        key={label}
-                        className={`${color} flex items-center justify-center gap-2.5 py-4 rounded-2xl font-bold text-sm transition-all duration-200 hover:-translate-y-0.5 shadow-sm hover:shadow-md`}
-                    >
-                        <Icon size={18} />
-                        {label}
+            {error && (
+                <div className="flex items-center justify-between rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+                    <span>{error} No placeholder values are being shown.</span>
+                    <button type="button" onClick={refreshDashboard} className="font-bold underline">
+                        Try again
                     </button>
-                ))}
-            </div>
-
-            {/* CHARTS + RECENT RACES */}
-            <div className="grid grid-cols-3 gap-5">
-
-                <div className="col-span-2">
-                    <AnalyticsChart />
                 </div>
+            )}
 
-                <RecentRaces />
+            <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                {loading
+                    ? STAT_CONFIG.map((item) => (
+                        <div key={item.key} className="h-[190px] animate-pulse rounded-[28px] border border-zinc-200 bg-white p-6">
+                            <div className="h-11 w-11 rounded-xl bg-zinc-100" />
+                            <div className="mt-8 h-3 w-28 rounded bg-zinc-100" />
+                            <div className="mt-3 h-10 w-16 rounded bg-zinc-100" />
+                        </div>
+                    ))
+                    : stats.map((stat, index) => (
+                        <StatCard key={stat.key} {...stat} index={index + 1} />
+                    ))}
+            </section>
 
-            </div>
+            <section className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1.75fr)_minmax(350px,0.75fr)]">
+                <AnalyticsChart refreshKey={refreshKey} />
+                <RecentRaces refreshKey={refreshKey} />
+            </section>
 
+            <section className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                {[
+                    { icon: Flag, title: "Race activity", copy: "Built from scheduled races in the selected period." },
+                    { icon: Trophy, title: "Tournament feed", copy: "Pulled from the latest tournament records." },
+                    { icon: Users, title: "Participant data", copy: "Counted from actual race participation records." },
+                ].map((item) => (
+                    <div key={item.title} className="flex items-center gap-4 rounded-2xl border border-zinc-200 bg-white px-5 py-4">
+                        <div className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-zinc-950 text-amber-400">
+                            <item.icon size={17} />
+                        </div>
+                        <div>
+                            <p className="text-sm font-black text-zinc-900">{item.title}</p>
+                            <p className="mt-1 text-xs text-zinc-500">{item.copy}</p>
+                        </div>
+                    </div>
+                ))}
+            </section>
         </div>
     );
 }
