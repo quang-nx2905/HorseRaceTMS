@@ -6,51 +6,28 @@ import {
     Mail,
     Lock,
     User,
-    Bell,
-    Smartphone,
     ShieldCheck,
     Eye,
     EyeOff,
     Save,
     Key,
     UserCheck,
+    BadgeCheck,
+    CheckCircle2,
+    Loader2,
 } from "lucide-react";
-
-// Premium Toggle Switch component
-function ToggleSwitch({ checked, onChange, id }) {
-    return (
-        <button
-            id={id}
-            type="button"
-            onClick={onChange}
-            className={`
-                w-12 h-6.5 rounded-full transition-colors relative duration-200 focus:outline-none flex-shrink-0
-                ${checked ? "bg-amber-500 shadow-sm shadow-amber-500/20" : "bg-zinc-200"}
-            `}
-            style={{ height: "26px" }}
-        >
-            <span
-                className={`
-                    w-5 h-5 rounded-lg bg-white absolute top-[3px] transition-transform duration-200 shadow-sm
-                    ${checked ? "translate-x-6" : "translate-x-1"}
-                `}
-            />
-        </button>
-    );
-}
+import { getProfileAvatar } from "../utils/media";
 
 function Settings() {
     const { user } = useAuth();
-
-    // Notification states
-    const [emailNotification, setEmailNotification] = useState(true);
-    const [smsNotification, setSmsNotification] = useState(false);
-    const [pushNotification, setPushNotification] = useState(true);
 
     // Profile states
     const [fullName, setFullName] = useState(user?.name || "");
     const [email, setEmail] = useState(user?.email || "");
     const [isSavingProfile, setIsSavingProfile] = useState(false);
+    const avatar = getProfileAvatar(user);
+    const displayName = fullName || user?.name || "Account";
+    const roleName = user?.role || "User";
 
     useEffect(() => {
         if (user) {
@@ -116,269 +93,170 @@ function Settings() {
         }
     };
 
+    const inputClass = "w-full rounded-2xl border border-zinc-200 bg-white py-3.5 pl-12 pr-4 text-sm font-semibold text-zinc-800 outline-none transition-all placeholder:font-normal placeholder:text-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10";
+    const passwordClass = `${inputClass} pr-12`;
+
     return (
-        <div className="space-y-8 max-w-[1000px] mx-auto pb-12 animate-in fade-in duration-300">
-            {/* HEADER */}
-            <div className="flex flex-col gap-1.5">
-                <h1 className="text-4xl font-extrabold text-zinc-900 tracking-tight">
-                    System Settings
-                </h1>
-                <p className="text-zinc-500 text-sm">
-                    Customize your notification preferences, update credentials, and configure account parameters.
-                </p>
-            </div>
-
-            {/* SETTINGS CONTENT */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* LEFT: INFO CARD */}
-                <div className="md:col-span-1 space-y-6">
-                    <div className="bg-white border border-zinc-200/80 rounded-3xl p-6 shadow-sm flex flex-col gap-5">
-                        <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-500">
-                            <ShieldCheck size={24} />
+        <div className="mx-auto max-w-[1180px] space-y-6 pb-12 animate-in fade-in duration-300">
+            <section className="relative overflow-hidden rounded-[2rem] bg-zinc-950 px-7 py-8 text-white shadow-xl shadow-zinc-300/40 md:px-10">
+                <div className="absolute -right-20 -top-28 h-72 w-72 rounded-full bg-amber-400/15 blur-3xl" />
+                <div className="absolute bottom-0 right-12 h-32 w-32 rounded-full border border-white/5" />
+                <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.22em] text-amber-400">
+                            <ShieldCheck size={15} /> Account center
                         </div>
+                        <h1 className="text-3xl font-black tracking-tight md:text-4xl">Settings</h1>
+                        <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-400">
+                            Keep your profile details accurate and protect your account credentials.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur">
+                        <CheckCircle2 size={18} className="text-emerald-400" />
                         <div>
-                            <h3 className="font-bold text-zinc-800 text-base">Configuration Panel</h3>
-                            <p className="text-xs text-zinc-400 mt-1 leading-relaxed">
-                                Control notification delivery methods, general metadata settings, and manage account security protocols.
-                            </p>
-                        </div>
-                        {user?.role === "Admin" && (
-                            <div className="bg-zinc-50 rounded-2xl p-4 border border-zinc-100 space-y-3.5">
-                                <div className="flex items-center gap-2.5 text-xs font-semibold text-zinc-500">
-                                    <UserCheck size={14} className="text-zinc-400" />
-                                    <span>Role: System Admin</span>
-                                </div>
-                                <div className="flex items-center gap-2.5 text-xs font-semibold text-zinc-500">
-                                    <Key size={14} className="text-zinc-400" />
-                                    <span>Encryption: AES-256</span>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* RIGHT: CONFIG SECTIONS */}
-                <div className="md:col-span-2 space-y-8">
-                    {/* CARD 1: NOTIFICATIONS */}
-                    <div className="bg-white border border-zinc-200/80 rounded-3xl p-8 shadow-sm flex flex-col gap-6">
-                        <h3 className="text-lg font-bold text-zinc-900 border-b border-zinc-100 pb-3 flex items-center gap-2.5">
-                            <Bell size={18} className="text-amber-500" />
-                            Notifications Configuration
-                        </h3>
-
-                        <div className="divide-y divide-zinc-100">
-                            {/* Email Row */}
-                            <div className="flex items-start justify-between py-4 gap-4">
-                                <div className="flex gap-3">
-                                    <div className="w-9 h-9 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-500 mt-0.5">
-                                        <Mail size={16} />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm font-semibold text-zinc-800">Email Alerts</h4>
-                                        <p className="text-xs text-zinc-400 mt-0.5">
-                                            Receive daily digests, summaries, and race outcome report cards.
-                                        </p>
-                                    </div>
-                                </div>
-                                <ToggleSwitch
-                                    id="settings-email-toggle"
-                                    checked={emailNotification}
-                                    onChange={() => setEmailNotification(!emailNotification)}
-                                />
-                            </div>
-
-                            {/* SMS Row */}
-                            <div className="flex items-start justify-between py-4 gap-4">
-                                <div className="flex gap-3">
-                                    <div className="w-9 h-9 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-500 mt-0.5">
-                                        <Smartphone size={16} />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm font-semibold text-zinc-800">SMS Alerts</h4>
-                                        <p className="text-xs text-zinc-400 mt-0.5">
-                                            Send instant text messages when racing matches start.
-                                        </p>
-                                    </div>
-                                </div>
-                                <ToggleSwitch
-                                    id="settings-sms-toggle"
-                                    checked={smsNotification}
-                                    onChange={() => setSmsNotification(!smsNotification)}
-                                />
-                            </div>
-
-                            {/* Push Row */}
-                            <div className="flex items-start justify-between py-4 gap-4">
-                                <div className="flex gap-3">
-                                    <div className="w-9 h-9 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-500 mt-0.5">
-                                        <Bell size={16} />
-                                    </div>
-                                    <div>
-                                        <h4 className="text-sm font-semibold text-zinc-800">Browser Push Alerts</h4>
-                                        <p className="text-xs text-zinc-400 mt-0.5">
-                                            Display system dashboard browser popups in real-time.
-                                        </p>
-                                    </div>
-                                </div>
-                                <ToggleSwitch
-                                    id="settings-push-toggle"
-                                    checked={pushNotification}
-                                    onChange={() => setPushNotification(!pushNotification)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* CARD 2: ACCOUNT PREFERENCES */}
-                    <div className="bg-white border border-zinc-200/80 rounded-3xl p-8 shadow-sm flex flex-col gap-6">
-                        <h3 className="text-lg font-bold text-zinc-900 border-b border-zinc-100 pb-3 flex items-center gap-2.5">
-                            <User size={18} className="text-amber-500" />
-                            Account Profile Info
-                        </h3>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            {/* Full Name */}
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
-                                    Full Name
-                                </label>
-                                <div className="relative">
-                                    <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                                    <input
-                                        type="text"
-                                        value={fullName}
-                                        onChange={(e) => setFullName(e.target.value)}
-                                        className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
-                                        placeholder="Full Name"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Email */}
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
-                                    Email Address
-                                </label>
-                                <div className="relative">
-                                    <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
-                                        placeholder="Email Address"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Save Profile Button */}
-                        <div className="flex justify-end pt-2 border-t border-zinc-100">
-                            <button
-                                onClick={handleSaveProfile}
-                                disabled={isSavingProfile}
-                                className="bg-yellow-400 hover:bg-yellow-500 disabled:bg-zinc-200 text-black px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm hover:shadow hover:shadow-yellow-400/25 flex items-center justify-center gap-1.5 text-xs"
-                            >
-                                <Save size={14} />
-                                {isSavingProfile ? "Saving Details..." : "Save Preferences"}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* CARD 3: SECURITY CONTROLS */}
-                    <div className="bg-white border border-zinc-200/80 rounded-3xl p-8 shadow-sm flex flex-col gap-6">
-                        <h3 className="text-lg font-bold text-zinc-900 border-b border-zinc-100 pb-3 flex items-center gap-2.5">
-                            <Lock size={18} className="text-amber-500" />
-                            Security & Credentials
-                        </h3>
-
-                        <div className="space-y-4">
-                            {/* Current Password */}
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
-                                    Current Password
-                                </label>
-                                <div className="relative">
-                                    <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                                    <input
-                                        type={showCurrent ? "text" : "password"}
-                                        value={currentPassword}
-                                        onChange={(e) => setCurrentPassword(e.target.value)}
-                                        className="w-full pl-11 pr-12 py-3 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
-                                        placeholder="Enter current password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowCurrent(!showCurrent)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
-                                    >
-                                        {showCurrent ? <EyeOff size={15} /> : <Eye size={15} />}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* New Password */}
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
-                                    New Password
-                                </label>
-                                <div className="relative">
-                                    <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                                    <input
-                                        type={showNew ? "text" : "password"}
-                                        value={newPassword}
-                                        onChange={(e) => setNewPassword(e.target.value)}
-                                        className="w-full pl-11 pr-12 py-3 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
-                                        placeholder="Enter new password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowNew(!showNew)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
-                                    >
-                                        {showNew ? <EyeOff size={15} /> : <Eye size={15} />}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {/* Confirm Password */}
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
-                                    Confirm New Password
-                                </label>
-                                <div className="relative">
-                                    <Lock size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                                    <input
-                                        type={showConfirm ? "text" : "password"}
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        className="w-full pl-11 pr-12 py-3 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
-                                        placeholder="Confirm new password"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowConfirm(!showConfirm)}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 transition-colors"
-                                    >
-                                        {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Save Password Button */}
-                        <div className="flex justify-end pt-2 border-t border-zinc-100">
-                            <button
-                                onClick={handleChangePassword}
-                                disabled={isChangingPass}
-                                className="bg-zinc-900 hover:bg-zinc-800 disabled:bg-zinc-200 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm flex items-center justify-center gap-1.5 text-xs"
-                            >
-                                <Key size={14} />
-                                {isChangingPass ? "Changing Password..." : "Change Password"}
-                            </button>
+                            <p className="text-xs font-bold text-white">Account protected</p>
+                            <p className="text-[10px] text-zinc-400">Security controls are active</p>
                         </div>
                     </div>
                 </div>
+            </section>
+
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+                <aside className="space-y-4">
+                    <div className="overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm">
+                        <div className="h-20 bg-gradient-to-br from-amber-300 via-amber-400 to-orange-500" />
+                        <div className="-mt-10 px-6 pb-6">
+                            <div className="h-20 w-20 overflow-hidden rounded-3xl border-4 border-white bg-zinc-900 shadow-lg">
+                                {avatar ? (
+                                    <img src={avatar} alt={displayName} className="h-full w-full object-cover" />
+                                ) : (
+                                    <div className="flex h-full w-full items-center justify-center text-2xl font-black text-white">
+                                        {displayName.charAt(0).toUpperCase()}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="mt-4">
+                                <div className="flex items-center gap-1.5">
+                                    <h2 className="truncate text-lg font-black text-zinc-900">{displayName}</h2>
+                                    <BadgeCheck size={17} className="flex-shrink-0 text-amber-500" />
+                                </div>
+                                <p className="mt-1 truncate text-xs text-zinc-400">{email || user?.email}</p>
+                            </div>
+                            <div className="mt-5 grid grid-cols-2 gap-2 border-t border-zinc-100 pt-5">
+                                <div className="rounded-2xl bg-zinc-50 p-3">
+                                    <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400">Role</p>
+                                    <p className="mt-1 truncate text-xs font-bold text-zinc-800">{roleName}</p>
+                                </div>
+                                <div className="rounded-2xl bg-emerald-50 p-3">
+                                    <p className="text-[9px] font-black uppercase tracking-wider text-emerald-500">Status</p>
+                                    <p className="mt-1 text-xs font-bold text-emerald-700">Active</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="rounded-3xl border border-amber-100 bg-amber-50/70 p-5">
+                        <div className="flex items-center gap-2 text-sm font-bold text-amber-900">
+                            <UserCheck size={17} /> Account tip
+                        </div>
+                        <p className="mt-2 text-xs leading-relaxed text-amber-700/80">
+                            Use a unique password and update it regularly to keep your account secure.
+                        </p>
+                    </div>
+                </aside>
+
+                <main className="space-y-6">
+                    <section className="rounded-[2rem] border border-zinc-200 bg-white p-6 shadow-sm md:p-8">
+                        <div className="mb-7 flex items-start gap-4 border-b border-zinc-100 pb-6">
+                            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
+                                <User size={20} />
+                            </div>
+                            <div>
+                                <h2 className="text-lg font-black text-zinc-900">Profile information</h2>
+                                <p className="mt-1 text-xs leading-relaxed text-zinc-400">Update the personal details associated with your account.</p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                            <label className="space-y-2">
+                                <span className="text-[11px] font-black uppercase tracking-wider text-zinc-500">Full name</span>
+                                <div className="relative">
+                                    <User size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                    <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} className={inputClass} placeholder="Enter your full name" />
+                                </div>
+                            </label>
+                            <label className="space-y-2">
+                                <span className="text-[11px] font-black uppercase tracking-wider text-zinc-500">Email address</span>
+                                <div className="relative">
+                                    <Mail size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} placeholder="Enter your email" />
+                                </div>
+                            </label>
+                        </div>
+                        <div className="mt-7 flex justify-end border-t border-zinc-100 pt-6">
+                            <button onClick={handleSaveProfile} disabled={isSavingProfile} className="flex min-w-40 items-center justify-center gap-2 rounded-2xl bg-amber-400 px-5 py-3 text-xs font-black text-zinc-950 shadow-lg shadow-amber-200/60 transition-all hover:-translate-y-0.5 hover:bg-amber-500 disabled:translate-y-0 disabled:bg-zinc-200 disabled:shadow-none">
+                                {isSavingProfile ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
+                                {isSavingProfile ? "Saving..." : "Save changes"}
+                            </button>
+                        </div>
+                    </section>
+
+                    <section className="rounded-[2rem] border border-zinc-200 bg-white p-6 shadow-sm md:p-8">
+                        <div className="mb-7 flex items-start gap-4 border-b border-zinc-100 pb-6">
+                            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-zinc-900 text-white">
+                                <Lock size={19} />
+                            </div>
+                            <div>
+                                <h2 className="text-lg font-black text-zinc-900">Password & security</h2>
+                                <p className="mt-1 text-xs leading-relaxed text-zinc-400">Choose a strong password that you do not use elsewhere.</p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                            <label className="space-y-2 md:col-span-2">
+                                <span className="text-[11px] font-black uppercase tracking-wider text-zinc-500">Current password</span>
+                                <div className="relative">
+                                    <Key size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                    <input type={showCurrent ? "text" : "password"} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className={passwordClass} placeholder="Enter current password" />
+                                    <button type="button" aria-label="Toggle current password visibility" onClick={() => setShowCurrent(!showCurrent)} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 transition-colors hover:text-zinc-700">
+                                        {showCurrent ? <EyeOff size={17} /> : <Eye size={17} />}
+                                    </button>
+                                </div>
+                            </label>
+                            <label className="space-y-2">
+                                <span className="text-[11px] font-black uppercase tracking-wider text-zinc-500">New password</span>
+                                <div className="relative">
+                                    <Lock size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                    <input type={showNew ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className={passwordClass} placeholder="Enter new password" />
+                                    <button type="button" aria-label="Toggle new password visibility" onClick={() => setShowNew(!showNew)} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 transition-colors hover:text-zinc-700">
+                                        {showNew ? <EyeOff size={17} /> : <Eye size={17} />}
+                                    </button>
+                                </div>
+                            </label>
+                            <label className="space-y-2">
+                                <span className="text-[11px] font-black uppercase tracking-wider text-zinc-500">Confirm new password</span>
+                                <div className="relative">
+                                    <Lock size={17} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                                    <input type={showConfirm ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className={passwordClass} placeholder="Repeat new password" />
+                                    <button type="button" aria-label="Toggle confirmation password visibility" onClick={() => setShowConfirm(!showConfirm)} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 transition-colors hover:text-zinc-700">
+                                        {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}
+                                    </button>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div className="mt-6 flex flex-col gap-4 rounded-2xl bg-zinc-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+                            <div className="flex flex-wrap gap-2 text-[10px] font-bold text-zinc-500">
+                                <span className="rounded-full bg-white px-3 py-1.5 ring-1 ring-zinc-200">8+ characters</span>
+                                <span className="rounded-full bg-white px-3 py-1.5 ring-1 ring-zinc-200">Upper & lowercase</span>
+                                <span className="rounded-full bg-white px-3 py-1.5 ring-1 ring-zinc-200">Number or symbol</span>
+                            </div>
+                            <button onClick={handleChangePassword} disabled={isChangingPass} className="flex flex-shrink-0 items-center justify-center gap-2 rounded-2xl bg-zinc-900 px-5 py-3 text-xs font-black text-white transition-all hover:-translate-y-0.5 hover:bg-zinc-800 disabled:translate-y-0 disabled:bg-zinc-300">
+                                {isChangingPass ? <Loader2 size={15} className="animate-spin" /> : <Key size={15} />}
+                                {isChangingPass ? "Updating..." : "Update password"}
+                            </button>
+                        </div>
+                    </section>
+                </main>
             </div>
         </div>
     );

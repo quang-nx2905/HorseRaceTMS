@@ -1,5 +1,6 @@
 import Modal from "../common/Modal";
 import { useAuth } from "../../context/AuthContext";
+import { getHorseImage } from "../../utils/media";
 
 function HorseDetailsModal({ open, onClose, horse, onVerify }) {
     const { user } = useAuth();
@@ -7,6 +8,7 @@ function HorseDetailsModal({ open, onClose, horse, onVerify }) {
 
     const isPending = horse.status === "Pending";
     const isAdmin = user?.role === "Admin";
+    const horseImage = getHorseImage(horse);
 
     return (
         <Modal
@@ -15,6 +17,12 @@ function HorseDetailsModal({ open, onClose, horse, onVerify }) {
             title={isPending ? "Application Form (Pending Review)" : "Horse Profile"}
         >
             <div className="space-y-6">
+                {horseImage && (
+                    <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-zinc-900">
+                        <img src={horseImage} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-35 blur-xl" />
+                        <img src={horseImage} alt={horse.name} className="relative h-full w-full object-contain p-3" />
+                    </div>
+                )}
                 
                 {/* Basic Info - Always shown */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-zinc-50 p-5 rounded-2xl border border-zinc-100">

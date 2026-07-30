@@ -1,5 +1,6 @@
 import Modal from "../common/Modal";
 import { Phone, Briefcase, Trophy, Mail } from "lucide-react";
+import { getProfileAvatar } from "../../utils/media";
 
 function JockeyDetailsModal({
     open,
@@ -7,6 +8,8 @@ function JockeyDetailsModal({
     jockey,
 }) {
     if (!jockey) return null;
+    const jockeyName = jockey.user?.fullName || jockey.name || "Jockey";
+    const avatar = getProfileAvatar(jockey);
 
     const getJockeyStatus = (exp) => {
         if (!exp) return "Amateur";
@@ -26,12 +29,16 @@ function JockeyDetailsModal({
             <div className="space-y-6 -mt-4">
                 {/* Header profile details */}
                 <div className="flex items-center gap-4 border-b border-zinc-100 pb-5">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center text-white text-3xl font-black shadow-md flex-shrink-0">
-                        {(jockey.user?.fullName || jockey.name || "J").charAt(0)}
+                    <div className="w-16 h-16 rounded-2xl overflow-hidden bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center text-white text-3xl font-black shadow-md flex-shrink-0">
+                        {avatar ? (
+                            <img src={avatar} alt={jockeyName} className="h-full w-full object-cover" />
+                        ) : (
+                            jockeyName.charAt(0).toUpperCase()
+                        )}
                     </div>
                     <div>
                         <h2 className="text-xl font-bold text-zinc-900 leading-tight">
-                            {jockey.user?.fullName || jockey.name}
+                            {jockeyName}
                         </h2>
                         <p className="text-xs text-zinc-400 font-medium mt-1 flex items-center gap-1">
                             <Mail size={12} />
@@ -71,7 +78,7 @@ function JockeyDetailsModal({
                             <Briefcase size={13} /> Experience
                         </span>
                         <span className="text-sm font-semibold text-zinc-800">
-                            {jockey.experienceYear !== undefined ? `${jockey.experienceYear} Years` : "Not set"}
+                            {jockey.experienceYear != null ? `${jockey.experienceYear} Years` : "Not set"}
                         </span>
                     </div>
                 </div>

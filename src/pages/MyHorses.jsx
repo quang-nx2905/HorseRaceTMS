@@ -56,14 +56,15 @@ function HorseCard({ horse, onView, onEdit, onRetire, onReinstate }) {
         <div className="bg-white border border-zinc-200 rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
 
             {/* Card top banner */}
-            <div className={`relative h-48 ${!horse.imageUrl ? "bg-gradient-to-br " + gradient : "bg-zinc-100"}`}>
+            <div className={`relative aspect-[3/2] overflow-hidden ${!horse.imageUrl ? "bg-gradient-to-br " + gradient : "bg-zinc-900"}`}>
                 {horse.imageUrl ? (
-                    <img src={horse.imageUrl} alt={horse.name} className="w-full h-full object-cover" />
+                    <>
+                        <img src={horse.imageUrl} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full scale-110 object-cover opacity-35 blur-xl" />
+                        <img src={horse.imageUrl} alt={horse.name} className="relative h-full w-full object-contain p-2 transition-transform duration-500 group-hover:scale-[1.02]" />
+                    </>
                 ) : (
                     <>
-                        <div className="absolute inset-0 opacity-20"
-                            style={{ backgroundImage: "radial-gradient(circle at 70% 50%, white 1px, transparent 1px)", backgroundSize: "18px 18px" }}
-                        />
+                        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "radial-gradient(circle at 70% 50%, white 1px, transparent 1px)", backgroundSize: "18px 18px" }} />
                         <div className="absolute inset-0 flex items-center justify-center">
                             <GanttChartSquare size={48} className="text-white/50" />
                         </div>

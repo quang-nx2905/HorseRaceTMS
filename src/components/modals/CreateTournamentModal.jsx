@@ -6,6 +6,7 @@ import { getAllHorses } from "../../api/horseApi";
 import { userApi } from "../../api/userApi";
 import tournamentApi from "../../api/tournamentApi";
 import ImageUpload from "../common/ImageUpload";
+import { getProfileAvatar } from "../../utils/media";
 
 function CreateTournamentModal({ open, onClose }) {
     const [step, setStep] = useState(1);
@@ -446,7 +447,7 @@ function CreateTournamentModal({ open, onClose }) {
                                             {availableReferees.map(ref => {
                                                 const refId = ref.id || ref.userId;
                                                 const refName = ref.name || ref.fullName || `Referee #${refId}`;
-                                                const refAvatar = ref.avatarUrl || ref.avatar || ref.imageUrl || ref.profilePicture;
+                                                const refAvatar = getProfileAvatar(ref);
                                                 const isSelected = (activeRace.refereeIds || []).includes(refId.toString());
                                                 
                                                 return (

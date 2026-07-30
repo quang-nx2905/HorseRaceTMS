@@ -12,7 +12,6 @@ import {
     Users,
     TrendingUp,
     Zap,
-    Clock,
     Activity,
     ShieldCheck,
     CalendarDays,
@@ -20,7 +19,9 @@ import {
     Wallet,
     ArrowDownLeft,
     ArrowUpRight,
-    ReceiptText
+    ReceiptText,
+    BadgeCheck,
+    Save
 } from "lucide-react";
 import TopupModal from "../components/TopupModal";
 import WithdrawModal from "../components/WithdrawModal";
@@ -158,27 +159,42 @@ function Profile() {
         : "N/A";
 
     return (
-        <div className="space-y-8 max-w-[1200px] mx-auto pb-12 animate-in fade-in duration-300">
+        <div className="mx-auto max-w-[1200px] space-y-6 pb-12 animate-in fade-in duration-300">
             {/* HEADER */}
-            <div className="flex flex-col gap-1.5">
-                <h1 className="text-4xl font-extrabold text-zinc-900 tracking-tight">
-                    Account Profile
-                </h1>
-                <p className="text-zinc-500 text-sm">
-                    Manage your personal details, credentials, and track tournament achievements.
-                </p>
-            </div>
+            <section className="relative overflow-hidden rounded-[2rem] bg-zinc-950 px-7 py-8 text-white shadow-xl shadow-zinc-300/40 md:px-10">
+                <div className="absolute -right-16 -top-24 h-72 w-72 rounded-full bg-amber-400/15 blur-3xl" />
+                <div className="absolute bottom-0 right-16 h-28 w-28 rounded-full border border-white/5" />
+                <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.22em] text-amber-400">
+                            <User size={15} /> Personal workspace
+                        </div>
+                        <h1 className="text-3xl font-black tracking-tight md:text-4xl">My Profile</h1>
+                        <p className="mt-2 max-w-xl text-sm leading-relaxed text-zinc-400">
+                            Manage your identity, contact details and account activity in one place.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.06] px-4 py-3 backdrop-blur">
+                        <div className={`h-2.5 w-2.5 rounded-full ${profile.isActive ? "bg-emerald-400 shadow-[0_0_12px_#34d399]" : "bg-red-400"}`} />
+                        <div>
+                            <p className="text-xs font-bold text-white">{profile.isActive ? "Account active" : "Account locked"}</p>
+                            <p className="text-[10px] text-zinc-400">{profile.role} access</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
             {/* MAIN GRID */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-[330px_minmax(0,1fr)]">
                 {/* LEFT COLUMN: OVERVIEW */}
-                <div className="lg:col-span-1 space-y-6">
-                    <div className="bg-white border border-zinc-200/80 rounded-3xl p-8 flex flex-col items-center text-center shadow-sm relative overflow-hidden">
+                <div className="space-y-6">
+                    <div className="relative overflow-hidden rounded-[2rem] border border-zinc-200 bg-white px-7 pb-7 pt-8 text-center shadow-sm">
                         {/* Decorative background accent */}
-                        <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-r from-amber-400/20 to-orange-500/20" />
+                        <div className="absolute left-0 right-0 top-0 h-28 bg-gradient-to-br from-amber-300 via-amber-400 to-orange-500" />
+                        <div className="absolute right-[-28px] top-[-36px] h-28 w-28 rounded-full bg-white/15" />
 
                         {/* Avatar */}
-                        <div className="relative mt-8 mb-4 group">
+                        <div className="group relative mb-4 mt-8 inline-flex">
                             <input
                                 type="file"
                                 accept="image/*"
@@ -186,7 +202,7 @@ function Profile() {
                                 onChange={handleAvatarUpload}
                                 className="hidden"
                             />
-                            <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center font-black text-zinc-950 text-3xl shadow-lg border-4 border-white relative z-10 overflow-hidden">
+                            <div className="relative z-10 flex h-28 w-28 items-center justify-center overflow-hidden rounded-[2rem] border-4 border-white bg-zinc-900 text-3xl font-black text-white shadow-xl">
                                 {isUploading ? (
                                     <div className="absolute inset-0 bg-black/30 flex items-center justify-center backdrop-blur-sm">
                                         <Loader2 size={24} className="animate-spin text-white" />
@@ -200,7 +216,7 @@ function Profile() {
                             <button 
                                 onClick={() => fileInputRef.current?.click()}
                                 disabled={isUploading}
-                                className="absolute bottom-[-6px] right-[-6px] w-8 h-8 rounded-xl bg-zinc-900 border-2 border-white flex items-center justify-center text-white hover:scale-105 active:scale-95 transition-all shadow-md z-20 disabled:opacity-50 disabled:hover:scale-100"
+                                className="absolute bottom-[-4px] right-[-4px] z-20 flex h-9 w-9 items-center justify-center rounded-xl border-2 border-white bg-zinc-900 text-white shadow-md transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
                                 title="Change Avatar"
                             >
                                 <Camera size={14} />
@@ -208,30 +224,33 @@ function Profile() {
                         </div>
 
                         {/* Profile Info */}
-                        <h2 className="text-xl font-bold text-zinc-900">{profile.name}</h2>
+                        <div className="flex items-center justify-center gap-1.5">
+                            <h2 className="text-xl font-black text-zinc-900">{profile.name}</h2>
+                            <BadgeCheck size={18} className="text-amber-500" />
+                        </div>
                         <p className="text-xs text-zinc-400 mt-1 font-medium">{profile.email}</p>
                         
-                        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold mt-4">
+                        <div className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">
                             <ShieldCheck size={12} className="text-amber-500" />
                             {profile.role}
                         </div>
 
                         {profile.role === "Spectator" && (
-                            <div className="mt-6 w-full p-4 bg-gradient-to-br from-zinc-50 to-zinc-100 border border-zinc-200 rounded-2xl flex flex-col items-center">
+                            <div className="mt-6 flex w-full flex-col items-center rounded-3xl border border-zinc-800 bg-zinc-950 p-5 text-white">
                                 <span className="text-xs font-bold text-zinc-500 uppercase tracking-wider mb-1">Points Balance</span>
-                                <div className="text-3xl font-black text-amber-500 flex items-center gap-2">
-                                    {profile.totalPoints.toLocaleString()} <span className="text-sm font-bold text-zinc-400">PTS</span>
+                                <div className="flex items-center gap-2 text-3xl font-black text-amber-400">
+                                    {profile.totalPoints.toLocaleString()} <span className="text-sm font-bold text-zinc-500">PTS</span>
                                 </div>
                                 <div className="mt-3 flex gap-2 w-full">
                                     <button 
                                         onClick={() => setIsTopupModalOpen(true)}
-                                        className="flex-1 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                                        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-amber-400 py-2.5 text-sm font-black text-zinc-950 transition-colors hover:bg-amber-500"
                                     >
                                         <Wallet size={16} /> Top Up
                                     </button>
                                     <button 
                                         onClick={() => setIsWithdrawModalOpen(true)}
-                                        className="flex-1 py-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                                        className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-white/10 py-2.5 text-sm font-bold text-white transition-colors hover:bg-white/15"
                                     >
                                         <Wallet size={16} className="text-zinc-600" /> Withdraw
                                     </button>
@@ -272,12 +291,17 @@ function Profile() {
                 </div>
 
                 {/* RIGHT COLUMN: DETAILS FORM */}
-                <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white border border-zinc-200/80 rounded-3xl p-8 shadow-sm flex flex-col gap-6">
-                        <h3 className="text-lg font-bold text-zinc-900 border-b border-zinc-100 pb-3 flex items-center gap-2">
-                            <User size={18} className="text-amber-500" />
-                            Personal Details
-                        </h3>
+                <div className="space-y-6">
+                    <div className="flex flex-col gap-6 rounded-[2rem] border border-zinc-200 bg-white p-6 shadow-sm md:p-8">
+                        <div className="flex items-start gap-4 border-b border-zinc-100 pb-6">
+                            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-amber-600">
+                                <User size={20} />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black text-zinc-900">Personal details</h3>
+                                <p className="mt-1 text-xs leading-relaxed text-zinc-400">Keep your account information accurate and up to date.</p>
+                            </div>
+                        </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             {/* Full Name */}
@@ -291,7 +315,7 @@ function Profile() {
                                         type="text"
                                         value={profile.name}
                                         onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                                        className="w-full pl-11 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
+                                        className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 pl-11 pr-4 text-sm font-semibold text-zinc-800 outline-none transition-all placeholder:font-normal placeholder:text-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10"
                                         placeholder="Enter full name"
                                     />
                                 </div>
@@ -308,7 +332,7 @@ function Profile() {
                                         type="email"
                                         value={profile.email}
                                         onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                                        className="w-full pl-11 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
+                                        className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 pl-11 pr-4 text-sm font-semibold text-zinc-800 outline-none transition-all placeholder:font-normal placeholder:text-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10"
                                         placeholder="Enter email address"
                                     />
                                 </div>
@@ -325,7 +349,7 @@ function Profile() {
                                         type="text"
                                         value={profile.phone}
                                         onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                                        className="w-full pl-11 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
+                                        className="w-full rounded-2xl border border-zinc-200 bg-white py-3.5 pl-11 pr-4 text-sm font-semibold text-zinc-800 outline-none transition-all placeholder:font-normal placeholder:text-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10"
                                         placeholder="Enter phone number"
                                     />
                                 </div>
@@ -342,8 +366,9 @@ function Profile() {
                                         type="text"
                                         value={profile.organization}
                                         onChange={(e) => setProfile({ ...profile, organization: e.target.value })}
-                                        className="w-full pl-11 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl outline-none text-sm text-zinc-800 placeholder-zinc-400 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/10 transition-all font-medium"
+                                        className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 py-3.5 pl-11 pr-4 text-sm font-semibold text-zinc-500 outline-none"
                                         placeholder="Enter organization name"
+                                        readOnly
                                     />
                                 </div>
                             </div>
@@ -354,7 +379,7 @@ function Profile() {
                             <button
                                 onClick={handleUpdate}
                                 disabled={isSaving || isUploading}
-                                className="bg-yellow-400 hover:bg-yellow-500 disabled:bg-zinc-200 text-black px-6 py-3 rounded-xl font-bold transition-all shadow-sm hover:shadow hover:shadow-yellow-400/25 flex items-center justify-center gap-2"
+                                className="flex min-w-48 items-center justify-center gap-2 rounded-2xl bg-amber-400 px-6 py-3 text-sm font-black text-zinc-950 shadow-lg shadow-amber-200/60 transition-all hover:-translate-y-0.5 hover:bg-amber-500 disabled:translate-y-0 disabled:bg-zinc-200 disabled:shadow-none"
                             >
                                 {isSaving ? (
                                     <>
@@ -362,7 +387,7 @@ function Profile() {
                                         Saving...
                                     </>
                                 ) : (
-                                    "Save Profile Changes"
+                                    <><Save size={17} /> Save profile changes</>
                                 )}
                             </button>
                         </div>
@@ -371,8 +396,8 @@ function Profile() {
             </div>
 
             {profile.role === "Spectator" && (
-                <div className="overflow-hidden rounded-3xl border border-zinc-200/80 bg-white shadow-sm">
-                    <div className="flex flex-col gap-4 border-b border-zinc-100 p-6 sm:flex-row sm:items-center sm:justify-between">
+                <div className="overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm">
+                    <div className="flex flex-col gap-4 border-b border-zinc-100 bg-gradient-to-r from-white to-amber-50/50 p-6 sm:flex-row sm:items-center sm:justify-between md:px-8">
                         <div>
                             <h3 className="flex items-center gap-2 text-lg font-black text-zinc-900">
                                 <ReceiptText size={19} className="text-amber-500" /> Point Transaction History
@@ -420,14 +445,17 @@ function Profile() {
             )}
 
             {/* PERFORMANCE STATS */}
-            <div className="space-y-4">
-                <h3 className="text-lg font-bold text-zinc-900 flex items-center gap-2">
-                    <Activity size={18} className="text-amber-500" />
-                    Tournament & Management Statistics
-                </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="space-y-5 rounded-[2rem] border border-zinc-200 bg-white p-6 shadow-sm md:p-8">
+                <div>
+                    <h3 className="flex items-center gap-2 text-lg font-black text-zinc-900">
+                        <Activity size={19} className="text-amber-500" />
+                        Tournament & Management Statistics
+                    </h3>
+                    <p className="mt-1 text-xs text-zinc-400">A quick overview of your activity across the platform.</p>
+                </div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                     {/* Stat 1 */}
-                    <div className="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm hover:scale-[1.01] transition-transform duration-200 flex items-center justify-between">
+                    <div className="flex items-center justify-between rounded-3xl border border-zinc-100 bg-zinc-50/70 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:bg-emerald-50/40">
                         <div>
                             <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Total Races</p>
                             <h4 className="text-3xl font-black text-zinc-800 mt-1.5">128</h4>
@@ -438,7 +466,7 @@ function Profile() {
                     </div>
 
                     {/* Stat 2 */}
-                    <div className="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm hover:scale-[1.01] transition-transform duration-200 flex items-center justify-between">
+                    <div className="flex items-center justify-between rounded-3xl border border-zinc-100 bg-zinc-50/70 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-200 hover:bg-amber-50/40">
                         <div>
                             <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Horses Managed</p>
                             <h4 className="text-3xl font-black text-zinc-800 mt-1.5">56</h4>
@@ -449,7 +477,7 @@ function Profile() {
                     </div>
 
                     {/* Stat 3 */}
-                    <div className="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm hover:scale-[1.01] transition-transform duration-200 flex items-center justify-between">
+                    <div className="flex items-center justify-between rounded-3xl border border-zinc-100 bg-zinc-50/70 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:bg-indigo-50/40">
                         <div>
                             <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Jockeys</p>
                             <h4 className="text-3xl font-black text-zinc-800 mt-1.5">24</h4>
@@ -460,67 +488,13 @@ function Profile() {
                     </div>
 
                     {/* Stat 4 */}
-                    <div className="bg-white border border-zinc-200/80 rounded-2xl p-5 shadow-sm hover:scale-[1.01] transition-transform duration-200 flex items-center justify-between">
+                    <div className="flex items-center justify-between rounded-3xl border border-zinc-100 bg-zinc-50/70 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-200 hover:bg-violet-50/40">
                         <div>
                             <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Win Rate</p>
                             <h4 className="text-3xl font-black text-zinc-800 mt-1.5">86%</h4>
                         </div>
                         <div className="w-10 h-10 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center text-violet-600">
                             <TrendingUp size={18} />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* RECENT ACTIVITIES TIMELINE */}
-            <div className="bg-white border border-zinc-200/80 rounded-3xl p-8 shadow-sm">
-                <h3 className="text-lg font-bold text-zinc-900 border-b border-zinc-100 pb-3.5 mb-6 flex items-center gap-2">
-                    <Clock size={18} className="text-amber-500" />
-                    Recent Activity Timeline
-                </h3>
-
-                <div className="relative pl-6 space-y-8 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-zinc-100">
-                    {/* Activity 1 */}
-                    <div className="relative flex items-start gap-4">
-                        <div className="absolute left-[-21px] w-3 h-3 rounded-full bg-emerald-500 border-4 border-white shadow-[0_0_0_2px_#10b981]" />
-                        <div className="flex-1">
-                            <p className="text-sm font-semibold text-zinc-800">
-                                Updated horse profile of Thunder Bolt
-                            </p>
-                            <p className="text-xs text-zinc-400 mt-1">5 minutes ago</p>
-                        </div>
-                    </div>
-
-                    {/* Activity 2 */}
-                    <div className="relative flex items-start gap-4">
-                        <div className="absolute left-[-21px] w-3 h-3 rounded-full bg-amber-500 border-4 border-white shadow-[0_0_0_2px_#f59e0b]" />
-                        <div className="flex-1">
-                            <p className="text-sm font-semibold text-zinc-800">
-                                Created new tournament: Summer Cup 2026
-                            </p>
-                            <p className="text-xs text-zinc-400 mt-1">20 minutes ago</p>
-                        </div>
-                    </div>
-
-                    {/* Activity 3 */}
-                    <div className="relative flex items-start gap-4">
-                        <div className="absolute left-[-21px] w-3 h-3 rounded-full bg-indigo-500 border-4 border-white shadow-[0_0_0_2px_#6366f1]" />
-                        <div className="flex-1">
-                            <p className="text-sm font-semibold text-zinc-800">
-                                Added new jockey: David Miller to roster
-                            </p>
-                            <p className="text-xs text-zinc-400 mt-1">1 hour ago</p>
-                        </div>
-                    </div>
-
-                    {/* Activity 4 */}
-                    <div className="relative flex items-start gap-4">
-                        <div className="absolute left-[-21px] w-3 h-3 rounded-full bg-zinc-400 border-4 border-white shadow-[0_0_0_2px_#a1a1aa]" />
-                        <div className="flex-1">
-                            <p className="text-sm font-semibold text-zinc-800">
-                                Updated race results for Race #04
-                            </p>
-                            <p className="text-xs text-zinc-400 mt-1">Yesterday</p>
                         </div>
                     </div>
                 </div>
