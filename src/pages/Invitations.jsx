@@ -337,7 +337,7 @@ function Invitations() {
 
     // ── Render ───────────────────────────────────────────────────────────────
     return (
-        <div className="max-w-7xl mx-auto">
+        <div className="w-full">
 
             {/* ── PAGE HEADER ── */}
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">

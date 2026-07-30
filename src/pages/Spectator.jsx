@@ -4,6 +4,7 @@ import * as signalR from "@microsoft/signalr";
 import axiosClient from "../api/axiosClient";
 import { useAuth } from "../context/AuthContext";
 import { Play, MapPin, Volume2, Maximize2, Radio, MessageSquare, Send, Flame, Trophy, Signal, Link as LinkIcon, MonitorPlay, X } from "lucide-react";
+import broadcastRaceHero from "../assets/broadcast-race-hero.png";
 
 const extractYoutubeId = (url) => {
     const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|live\/|shorts\/))([^&?/\s]+)/);
@@ -232,7 +233,10 @@ function Spectator() {
     if (!selectedStream) {
         return (
                 <div className="pb-12">
-                    <div className="relative mb-6 overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-950 px-6 py-8 shadow-2xl md:px-10">
+                    <div className="relative mb-6 min-h-[320px] overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-950 px-6 py-8 shadow-2xl md:aspect-[12/5] md:px-10">
+                        <img src={broadcastRaceHero} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-contain object-right opacity-90" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/55 to-transparent" />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/5" />
                         <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-amber-500/10 blur-3xl" />
                         <div className="relative z-10 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
                             <div>
@@ -304,7 +308,10 @@ function Spectator() {
     return (
         <div className="pb-12">
             {/* ═══════ HERO HEADER ═══════ */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-zinc-950 via-slate-950 to-zinc-900 rounded-3xl p-8 mb-10 border border-zinc-800/60 shadow-xl">
+            <div className="relative mb-10 min-h-[360px] overflow-hidden rounded-3xl border border-zinc-800/60 bg-zinc-950 p-8 shadow-xl md:aspect-[12/5]">
+                <img src={broadcastRaceHero} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-contain object-right opacity-90" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/55 to-transparent" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/5" />
                 <div className="absolute inset-0 pointer-events-none">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-red-500/8 rounded-full blur-3xl" />
                     <div className="absolute bottom-0 left-0 w-48 h-64 bg-blue-500/5 rounded-full blur-3xl" />

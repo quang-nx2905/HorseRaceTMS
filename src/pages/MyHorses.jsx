@@ -53,7 +53,7 @@ function HorseCard({ horse, onView, onEdit, onRetire, onReinstate }) {
     const status = statusConfig[horse.status] || statusConfig.Pending;
 
     return (
-        <div className="bg-white border border-zinc-200 rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+        <div className="group overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-2xl hover:shadow-zinc-200/60">
 
             {/* Card top banner */}
             <div className={`relative aspect-[3/2] overflow-hidden ${!horse.imageUrl ? "bg-gradient-to-br " + gradient : "bg-zinc-900"}`}>
@@ -73,7 +73,7 @@ function HorseCard({ horse, onView, onEdit, onRetire, onReinstate }) {
             </div>
 
             {/* Card body */}
-            <div className="pt-5 px-6 pb-5">
+            <div className="px-5 pb-5 pt-5">
                 <div className="flex items-start justify-between mb-3">
                     <div>
                         <h3 className="font-black text-zinc-900 text-lg leading-tight">
@@ -93,7 +93,7 @@ function HorseCard({ horse, onView, onEdit, onRetire, onReinstate }) {
                 </div>
 
                 {/* Stats row */}
-                <div className="flex gap-4 my-4 py-4 border-t border-b border-zinc-100">
+                <div className="my-4 flex gap-3 rounded-2xl bg-zinc-50 px-2 py-4">
                     <div className="flex-1 text-center">
                         <p className="text-2xl font-black text-zinc-900">{horse.age}</p>
                         <p className="text-xs text-zinc-400 mt-0.5">Age (yrs)</p>
@@ -114,7 +114,7 @@ function HorseCard({ horse, onView, onEdit, onRetire, onReinstate }) {
                 <div className="flex gap-2">
                     <button
                         onClick={() => onView(horse)}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all text-sm font-semibold"
+                        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-zinc-900 py-2.5 text-sm font-bold text-white transition-all hover:bg-zinc-800"
                     >
                         <Eye size={14} /> View
                     </button>
@@ -334,16 +334,18 @@ function MyHorses() {
     };
 
     return (
-        <div className="space-y-7">
+        <div className="w-full space-y-6 pb-10">
 
             {/* ── HEADER ── */}
-            <div className="flex items-end justify-between">
+            <section className="relative overflow-visible rounded-[2rem] bg-zinc-950 p-7 text-white shadow-xl shadow-zinc-300/40 md:p-9">
+                <div className="absolute -right-16 -top-20 h-64 w-64 rounded-full bg-amber-400/15 blur-3xl" />
+                <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                    <p className="text-sm font-semibold text-yellow-600 uppercase tracking-widest mb-2">
-                        Management
+                    <p className="mb-3 text-[11px] font-black uppercase tracking-[0.22em] text-amber-400">
+                        Personal stable
                     </p>
-                    <h1 className="text-5xl font-black text-zinc-900">{isAdmin ? "Owner's Horses" : "My Horses"}</h1>
-                    <p className="text-zinc-500 mt-2 text-base">
+                    <h1 className="text-3xl font-black tracking-tight md:text-4xl">{isAdmin ? "Owner's Horses" : "My Horses"}</h1>
+                    <p className="mt-2 text-sm text-zinc-400">
                         {isAdmin ? "Manage horses for the selected owner" : "Manage and track your registered horses"}
                     </p>
                 </div>
@@ -414,22 +416,23 @@ function MyHorses() {
 
                     <button
                         onClick={() => setOpenCreate(true)}
-                        className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5 whitespace-nowrap"
+                        className="flex items-center gap-2 whitespace-nowrap rounded-2xl bg-amber-400 px-5 py-3 text-sm font-black text-zinc-950 transition-all hover:bg-amber-500"
                     >
                         <Plus size={18} />
                         Add Horse
                     </button>
                 </div>
-            </div>
+                </div>
+            </section>
 
             {/* ── SUMMARY STATS ── */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 {[
                     { label: "Total Horses", value: horses.length, icon: GanttChartSquare, color: "bg-yellow-400", iconColor: "text-yellow-900" },
                     { label: "Total Wins",   value: totalWins,      icon: Trophy,           color: "bg-emerald-400", iconColor: "text-emerald-900" },
                     { label: "Top Health",   value: excellentCount, icon: Activity,         color: "bg-blue-400",   iconColor: "text-blue-900"    },
                 ].map(({ label, value, icon: Icon, color, iconColor }) => (
-                    <div key={label} className="bg-white border border-zinc-200 rounded-2xl p-5 flex items-center gap-4">
+                    <div key={label} className="flex items-center gap-4 rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
                         <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
                             <Icon size={20} className={iconColor} />
                         </div>
@@ -442,7 +445,7 @@ function MyHorses() {
             </div>
 
             {/* ── FILTERS ── */}
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex flex-wrap items-center gap-4 rounded-[1.75rem] border border-zinc-200 bg-white p-4 shadow-sm">
 
                 {/* Search */}
                 <div className="relative flex-1 min-w-[240px]">
@@ -452,7 +455,7 @@ function MyHorses() {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search by name or breed..."
-                        className="w-full pl-11 pr-4 py-3 bg-white border border-zinc-200 rounded-2xl outline-none text-sm focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all"
+                        className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 py-3 pl-11 pr-4 text-sm font-medium outline-none transition-all focus:border-amber-400 focus:bg-white focus:ring-4 focus:ring-amber-400/10"
                     />
                 </div>
 
@@ -491,7 +494,7 @@ function MyHorses() {
                     <p className="text-zinc-400 text-sm mt-1">Try adjusting your search or filter</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                     {filtered.map((horse) => (
                         <HorseCard
                             key={horse.id}

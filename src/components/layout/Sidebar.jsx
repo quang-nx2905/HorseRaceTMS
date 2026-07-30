@@ -29,6 +29,7 @@ const getNavGroups = (userRole) => {
     },
     {
       label: "Management",
+      hideLabel: true,
       items: [
         { name: "Race Duties", path: "/race-duties", icon: Shield, roles: ["Referee"] },
         { name: "Race Broadcasts", path: "/spectator", icon: Eye, roles: ["Admin", "HorseOwner", "Spectator"] },
@@ -127,7 +128,7 @@ function Sidebar() {
       <nav className="relative z-10 flex-1 overflow-y-auto py-4 px-3 space-y-1">
         {navGroups.map((group) => (
           <div key={group.label} className="mb-2">
-            {sidebarOpen && (
+            {sidebarOpen && !group.hideLabel && (
               <p className="px-2 py-2 text-[9px] font-black uppercase tracking-[0.15em] text-zinc-600">
                 {group.label}
               </p>

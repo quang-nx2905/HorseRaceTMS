@@ -159,7 +159,7 @@ function Profile() {
         : "N/A";
 
     return (
-        <div className="mx-auto max-w-[1200px] space-y-6 pb-12 animate-in fade-in duration-300">
+        <div className="w-full space-y-6 pb-12 animate-in fade-in duration-300">
             {/* HEADER */}
             <section className="relative overflow-hidden rounded-[2rem] bg-zinc-950 px-7 py-8 text-white shadow-xl shadow-zinc-300/40 md:px-10">
                 <div className="absolute -right-16 -top-24 h-72 w-72 rounded-full bg-amber-400/15 blur-3xl" />

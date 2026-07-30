@@ -51,7 +51,7 @@ function SentInvites() {
     }
 
     return (
-        <div className="space-y-7 animate-in fade-in duration-300 max-w-5xl mx-auto">
+        <div className="w-full space-y-7 animate-in fade-in duration-300">
             <div className="flex items-end justify-between">
                 <div>
                     <p className="text-sm font-semibold text-yellow-600 uppercase tracking-widest mb-2">
