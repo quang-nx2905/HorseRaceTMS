@@ -6,6 +6,7 @@ import { getAllHorses } from "../../api/horseApi";
 import { userApi } from "../../api/userApi";
 import tournamentApi from "../../api/tournamentApi";
 import ImageUpload from "../common/ImageUpload";
+import { getProfileAvatar } from "../../utils/media";
 
 function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
     const [step, setStep] = useState(1);
@@ -485,6 +486,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                                             {availableReferees.map(ref => {
                                                 const refId = ref.id || ref.userId;
                                                 const refName = ref.name || ref.fullName || `Referee #${refId}`;
+                                                const refAvatar = getProfileAvatar(ref);
                                                 const isSelected = (activeRace.refereeIds || []).includes(refId.toString());
                                                 return (
                                                     <label key={refId} className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-all hover:bg-zinc-100/50 ${isSelected ? 'bg-amber-50/50' : 'bg-white'}`}>
@@ -494,6 +496,13 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                                                             checked={isSelected}
                                                             onChange={() => toggleReferee(activeRaceIndex, refId.toString())}
                                                         />
+                                                        {refAvatar ? (
+                                                            <img src={refAvatar} alt={refName} className="h-8 w-8 flex-shrink-0 rounded-full border border-zinc-200 bg-white object-cover" />
+                                                        ) : (
+                                                            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-blue-200 bg-blue-100 text-sm font-bold text-blue-600">
+                                                                {refName.charAt(0).toUpperCase()}
+                                                            </div>
+                                                        )}
                                                         <span className={`font-medium text-sm ${isSelected ? 'text-amber-900 font-semibold' : 'text-zinc-700'}`}>{refName}</span>
                                                     </label>
                                                 );

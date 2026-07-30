@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { User, Mail, ShieldAlert, Phone, Clock, Star, Trash2, ImageOff } from "lucide-react";
 import Modal from "../common/Modal";
+import { getProfileAvatar } from "../../utils/media";
 
 function EditUserModal({ open, onClose, onSave, user }) {
+    const avatar = getProfileAvatar(user);
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -108,10 +110,10 @@ function EditUserModal({ open, onClose, onSave, user }) {
                     </div>
                     <div>
                         <label className="block mb-2 font-semibold text-zinc-700">Avatar</label>
-                        {user?.avatar ? (
+                        {avatar ? (
                             <div className="flex gap-3">
                                 <div className={`h-[58px] w-[58px] rounded-2xl overflow-hidden border border-zinc-200 flex-shrink-0 bg-zinc-50 transition-all ${formData.removeAvatar ? 'opacity-30 grayscale border-red-200 ring-2 ring-red-100 ring-offset-1' : ''}`}>
-                                    <img src={user.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                                    <img src={avatar} alt="Avatar" className="w-full h-full object-cover" />
                                 </div>
                                 <button
                                     type="button"

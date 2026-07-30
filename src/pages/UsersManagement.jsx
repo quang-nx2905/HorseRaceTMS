@@ -7,6 +7,7 @@ import EditUserModal from "../components/users/EditUserModal";
 import ConfirmModal from "../components/common/ConfirmModal";
 import Pagination from "../components/common/Pagination";
 import { userApi } from "../api/userApi";
+import { getProfileAvatar } from "../utils/media";
 
 const roleConfig = {
     Admin: {
@@ -40,6 +41,7 @@ function UserCard({ user, onEdit, onToggleStatus, onDelete }) {
     const config = roleConfig[user.role] || roleConfig.Spectator;
     const Icon = config.icon;
     const isActive = user.status === "Active";
+    const avatar = getProfileAvatar(user);
 
     // Disable actions if the target user is an Admin
     const isTargetAdmin = user.role === "Admin";
@@ -55,8 +57,12 @@ function UserCard({ user, onEdit, onToggleStatus, onDelete }) {
 
             <div className="relative flex items-start justify-between mb-5">
                 <div className="flex items-center gap-4 w-full min-w-0">
-                    <div className={`relative w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${config.gradient} text-white shadow-lg ${isTargetAdmin ? 'shadow-purple-500/30' : 'shadow-zinc-400/20'}`}>
-                        <Icon size={24} strokeWidth={2} />
+                    <div className={`relative w-14 h-14 rounded-2xl overflow-hidden flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${config.gradient} text-white shadow-lg ${isTargetAdmin ? 'shadow-purple-500/30' : 'shadow-zinc-400/20'}`}>
+                        {avatar ? (
+                            <img src={avatar} alt={user.name} className="h-full w-full object-cover" />
+                        ) : (
+                            <Icon size={24} strokeWidth={2} />
+                        )}
                         {isActive && (
                             <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white" />
                         )}
@@ -197,7 +203,11 @@ function UsersManagement() {
                 totalPoints: updatedUser.totalPoints ? parseInt(updatedUser.totalPoints) : null,
                 removeAvatar: updatedUser.removeAvatar || false
             });
-            setUsersList(usersList.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
+            setUsersList(usersList.map((u) =>
+                u.id === updatedUser.id
+                    ? { ...updatedUser, avatar: updatedUser.removeAvatar ? null : updatedUser.avatar }
+                    : u
+            ));
             toast.success("User updated successfully!");
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to update user");

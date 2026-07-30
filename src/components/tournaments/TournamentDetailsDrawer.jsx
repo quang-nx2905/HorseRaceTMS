@@ -12,6 +12,7 @@ import RaceRegistrationPanel from "../races/RaceRegistrationPanel";
 import fallbackTournamentBanner from "../../assets/hero.png";
 import ConfirmModal from "../common/ConfirmModal";
 import RaceIncidentsModal from "../modals/RaceIncidentsModal";
+import { getHorseImage, getProfileAvatar } from "../../utils/media";
 
 const STATUS_CONFIG = {
     Live: {
@@ -404,7 +405,7 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                                     {race.referees?.map(ref => (
                                                         <span key={ref.assignId} className="flex items-center gap-2 px-3 py-1.5 bg-white border border-zinc-200 rounded-full text-xs font-semibold text-zinc-700">
                                                             <div className="w-5 h-5 rounded-full bg-zinc-200 overflow-hidden flex-shrink-0">
-                                                                <img src={ref.refereeAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${ref.refereeName || ref.refereeId}&backgroundColor=f3f4f6`} alt={ref.refereeName} className="w-full h-full object-cover" />
+                                                                <img src={getProfileAvatar(ref) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${ref.refereeName || ref.refereeId}&backgroundColor=f3f4f6`} alt={ref.refereeName} className="w-full h-full object-cover" />
                                                             </div>
                                                             {ref.refereeName || `Ref #${ref.refereeId}`}
                                                         </span>
@@ -422,13 +423,13 @@ function TournamentDetailsDrawer({ open, onClose, tournament }) {
                                                                     {p.laneNumber}
                                                                 </div>
                                                                 <div className="w-10 h-10 rounded-full bg-amber-100 overflow-hidden flex-shrink-0 border border-amber-200 shadow-sm">
-                                                                    <img src={p.horseAvatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${p.horseName || p.horseId}&backgroundColor=fef3c7`} alt={p.horseName} className={`w-full h-full object-cover ${p.horseAvatar ? '' : 'p-1'}`} />
+                                                                    <img src={getHorseImage(p) || `https://api.dicebear.com/7.x/bottts/svg?seed=${p.horseName || p.horseId}&backgroundColor=fef3c7`} alt={p.horseName} className={`w-full h-full object-cover ${getHorseImage(p) ? '' : 'p-1'}`} />
                                                                 </div>
                                                                 <div>
                                                                     <p className="text-sm font-bold text-zinc-800">{p.horseName || `Horse #${p.horseId}`}</p>
                                                                     <div className="flex items-center gap-1.5 mt-1">
                                                                         <div className="w-4 h-4 rounded-full bg-zinc-200 overflow-hidden flex-shrink-0">
-                                                                            <img src={p.jockeyAvatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.jockeyName || p.jockeyId}&backgroundColor=f3f4f6`} alt={p.jockeyName} className="w-full h-full object-cover" />
+                                                                            <img src={getProfileAvatar(p) || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.jockeyName || p.jockeyId}&backgroundColor=f3f4f6`} alt={p.jockeyName} className="w-full h-full object-cover" />
                                                                         </div>
                                                                         <p className="text-[10px] text-zinc-500 font-semibold">{p.jockeyName || `Jockey #${p.jockeyId}`}</p>
                                                                     </div>

@@ -14,6 +14,7 @@ import { userApi } from "../api/userApi";
 import { invitationApi } from "../api/invitationApi";
 import CreateUserModal from "../components/users/CreateUserModal";
 import EditUserModal from "../components/users/EditUserModal";
+import { getProfileAvatar } from "../utils/media";
 
 // ── Config ──────────────────────────────────────────────
 const statusConfig = {
@@ -72,6 +73,7 @@ function JockeyCard({ jockey, index, onView, onAdminEdit, onDelete, onReview, on
     const statusVal = getJockeyStatus(jockey.experienceYear);
     const status = statusConfig[statusVal] || statusConfig.Amateur;
     const gradient = avatarColors[index % avatarColors.length];
+    const avatar = getProfileAvatar(jockey);
 
     const countryName = jockey.user?.country || jockey.country || "Vietnam";
     const flag = countryFlags[countryName] || "🌐";
@@ -97,8 +99,8 @@ function JockeyCard({ jockey, index, onView, onAdminEdit, onDelete, onReview, on
                 <div className="flex items-center gap-4">
                     {/* Avatar */}
                     <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm flex-shrink-0 bg-gradient-to-br bg-zinc-100 border border-zinc-200">
-                        {jockey.avatar ? (
-                            <img src={jockey.avatar} alt={jockeyName} className="w-full h-full object-cover" />
+                        {avatar ? (
+                            <img src={avatar} alt={jockeyName} className="w-full h-full object-cover" />
                         ) : (
                             <div className={`w-full h-full bg-gradient-to-br ${gradient} flex items-center justify-center text-white text-2xl font-black`}>
                                 {jockeyName.charAt(0)}
@@ -480,8 +482,8 @@ function Jockeys() {
                     />
                     <div className="flex items-center gap-5 relative z-10">
                         <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 bg-white border-2 border-yellow-400">
-                            {topJockey.avatar ? (
-                                <img src={topJockey.avatar} alt={topJockey.user?.fullName} className="w-full h-full object-cover" />
+                            {getProfileAvatar(topJockey) ? (
+                                <img src={getProfileAvatar(topJockey)} alt={topJockey.user?.fullName} className="w-full h-full object-cover" />
                             ) : (
                                 <div className="w-full h-full bg-yellow-400 flex items-center justify-center text-2xl font-black text-black">
                                     {(topJockey.user?.fullName || topJockey.name || "J").charAt(0)}
