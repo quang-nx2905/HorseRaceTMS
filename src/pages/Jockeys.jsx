@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Search, Trophy, Users, Star, Eye, Pencil, Trash2, MapPin, Medal, ChevronLeft, ChevronRight, Loader2, AlertTriangle, ClipboardEdit, Unlock } from "lucide-react";
+import { Plus, Search, Trophy, Users, Star, Eye, Pencil, Trash2, MapPin, ChevronLeft, ChevronRight, Loader2, AlertTriangle, ClipboardEdit, Unlock } from "lucide-react";
 
 import JockeyDetailsModal from "../components/jockeys/JockeyDetailsModal";
 import EditJockeyModal from "../components/jockeys/EditJockeyModal";
@@ -78,16 +78,16 @@ function JockeyCard({ jockey, index, onView, onAdminEdit, onDelete, onReview, on
     const countryName = jockey.user?.country || jockey.country || "Vietnam";
     const flag = countryFlags[countryName] || "🌐";
 
-    // Fallback/Mock wins just for visual win rate bar (wins are not directly exposed as editable DTO field)
     const wins = jockey.wins || 0;
-    const maxWins = 60;
-    const winPct = Math.min((wins / maxWins) * 100, 100);
+    const winPct = Math.max(0, Math.min(Number(jockey.winRate) || 0, 100));
 
     const isPending = jockey.updateStatus === "Pending";
     const isActive = jockey.user ? jockey.user.isActive : true;
 
     return (
-        <div className={`border rounded-3xl p-6 transition-all duration-300 flex flex-col gap-5 relative ${isActive ? 'bg-white border-zinc-200 hover:shadow-xl hover:-translate-y-1' : 'border-red-100 bg-red-50/30 opacity-90'}`}>
+        <div className={`group relative flex flex-col gap-5 overflow-hidden rounded-[28px] border p-5 transition-all duration-300 ${isActive ? 'border-zinc-200 bg-white shadow-[0_8px_30px_rgba(0,0,0,0.04)] hover:-translate-y-1 hover:border-amber-300 hover:shadow-[0_18px_45px_rgba(0,0,0,0.10)]' : 'border-red-100 bg-red-50/30 opacity-90'}`}>
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-br from-zinc-950 via-zinc-900 to-amber-950" />
+            <div className="pointer-events-none absolute right-4 top-3 h-20 w-20 rounded-full border border-white/5" />
             {isPending && (
                 <div className="absolute -top-2.5 right-4 bg-amber-100 text-amber-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full border border-amber-200 shadow-sm">
                     Pending Approval
@@ -95,10 +95,10 @@ function JockeyCard({ jockey, index, onView, onAdminEdit, onDelete, onReview, on
             )}
 
             {/* Top row: avatar + status */}
-            <div className="flex items-start justify-between">
+            <div className="relative z-10 flex items-start justify-between">
                 <div className="flex items-center gap-4">
                     {/* Avatar */}
-                    <div className="w-14 h-14 rounded-2xl overflow-hidden shadow-sm flex-shrink-0 bg-gradient-to-br bg-zinc-100 border border-zinc-200">
+                    <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-2xl border-2 border-white/80 bg-zinc-100 shadow-lg">
                         {avatar ? (
                             <img src={avatar} alt={jockeyName} className="w-full h-full object-cover" />
                         ) : (
@@ -108,17 +108,17 @@ function JockeyCard({ jockey, index, onView, onAdminEdit, onDelete, onReview, on
                         )}
                     </div>
                     <div>
-                        <h3 className={`font-black text-base leading-tight ${isActive ? 'text-zinc-900' : 'text-zinc-500 line-through decoration-zinc-300'}`}>
+                        <h3 className={`text-base font-black leading-tight ${isActive ? 'text-white' : 'text-zinc-300 line-through decoration-zinc-300'}`}>
                             {jockeyName}
                         </h3>
-                        <div className="flex items-center gap-1 mt-1 text-zinc-400 text-xs">
+                        <div className="mt-1 flex items-center gap-1 text-xs text-zinc-300">
                             <MapPin size={11} />
                             <span>{flag} {countryName}</span>
                         </div>
                     </div>
                 </div>
 
-                <span className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ring-1 ${status.style}`}>
+                <span className={`flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-bold shadow-sm ring-1 ${status.style}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${status.dot}`} />
                     {statusVal}
                 </span>
@@ -126,11 +126,11 @@ function JockeyCard({ jockey, index, onView, onAdminEdit, onDelete, onReview, on
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-3">
-                <div className="bg-zinc-50 rounded-2xl p-3 text-center">
+                <div className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3 text-center">
                     <p className="text-2xl font-black text-yellow-500">{wins}</p>
                     <p className="text-xs text-zinc-400 mt-0.5 font-medium">Total Wins</p>
                 </div>
-                <div className="bg-zinc-50 rounded-2xl p-3 text-center">
+                <div className="rounded-2xl border border-zinc-100 bg-zinc-50 p-3 text-center">
                     <p className="text-2xl font-black text-zinc-900">{jockey.experienceYear || 0}</p>
                     <p className="text-xs text-zinc-400 mt-0.5 font-medium">Years Exp</p>
                 </div>
@@ -147,8 +147,8 @@ function JockeyCard({ jockey, index, onView, onAdminEdit, onDelete, onReview, on
             {/* Win rate bar */}
             <div>
                 <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs text-zinc-400 font-medium">Win Rate Visual</span>
-                    <span className="text-xs font-bold text-zinc-700">{winPct.toFixed(0)}%</span>
+                    <span className="text-xs text-zinc-400 font-medium">Win Rate</span>
+                    <span className="text-xs font-bold text-zinc-700">{winPct.toFixed(1)}%</span>
                 </div>
                 <div className="w-full h-2 bg-zinc-100 rounded-full overflow-hidden">
                     <div
@@ -393,18 +393,34 @@ function Jockeys() {
     return (
         <div className="space-y-7 animate-in fade-in duration-300">
             {/* ── HEADER ── */}
-            <div className="flex items-end justify-between">
-                <div>
-                    <p className="text-sm font-semibold text-yellow-600 uppercase tracking-widest mb-2">
-                        Management
-                    </p>
-                    <h1 className="text-5xl font-black text-zinc-900">Jockeys</h1>
-                    <p className="text-zinc-500 mt-2 text-base">
-                        Professional jockey management and performance overview
-                    </p>
-                </div>
+            <div className="relative overflow-hidden rounded-[32px] bg-zinc-950 px-7 py-8 text-white shadow-[0_20px_55px_rgba(0,0,0,0.16)] lg:px-10 lg:py-10">
+                <div className="pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full bg-amber-400/20 blur-3xl" />
+                <div className="pointer-events-none absolute bottom-0 right-0 h-full w-1/2 opacity-20"
+                    style={{ backgroundImage: "radial-gradient(circle, #fbbf24 1px, transparent 1px)", backgroundSize: "22px 22px" }}
+                />
+                <div className="relative z-10 flex flex-col gap-7 lg:flex-row lg:items-center lg:justify-between">
+                    <div className="max-w-xl">
+                        <div className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.22em] text-amber-400">
+                            <span className="h-px w-8 bg-amber-400" /> Racing talent directory
+                        </div>
+                        <h1 className="text-4xl font-black tracking-tight sm:text-5xl">Jockey roster</h1>
+                        <p className="mt-3 text-sm leading-6 text-zinc-400 sm:text-base">
+                            Discover, manage and compare professional riders across the championship.
+                        </p>
+                    </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
+                    {topJockey && (
+                        <div className="mr-2 hidden items-center gap-3 border-r border-white/10 pr-6 md:flex">
+                            <div className="h-12 w-12 overflow-hidden rounded-xl border border-amber-400/60 bg-amber-400">
+                                {getProfileAvatar(topJockey) ? <img src={getProfileAvatar(topJockey)} alt="" className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center font-black text-zinc-950">{(topJockey.user?.fullName || "J").charAt(0)}</div>}
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-amber-400">Top performer</p>
+                                <p className="font-bold text-white">{topJockey.user?.fullName || topJockey.name}</p>
+                            </div>
+                        </div>
+                    )}
                     {user?.role === "Jockey" && (
                         <button
                             onClick={() => {
@@ -416,7 +432,7 @@ function Jockeys() {
                                     toast.error("Your jockey profile could not be found.");
                                 }
                             }}
-                            className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5"
+                            className="flex items-center gap-2 rounded-2xl bg-amber-400 px-6 py-3.5 text-sm font-black text-zinc-950 transition hover:-translate-y-0.5 hover:bg-amber-300"
                         >
                             <Pencil size={18} />
                             Edit My Profile
@@ -425,12 +441,13 @@ function Jockeys() {
                     {user?.role === "Admin" && (
                         <button
                             onClick={() => setOpenCreate(true)}
-                            className="flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5"
+                            className="flex items-center gap-2 rounded-2xl bg-amber-400 px-6 py-3.5 text-sm font-black text-zinc-950 transition hover:-translate-y-0.5 hover:bg-amber-300"
                         >
                             <Plus size={18} />
                             Add Jockey
                         </button>
                     )}
+                </div>
                 </div>
             </div>
 
@@ -462,8 +479,8 @@ function Jockeys() {
                     { label: "Total Wins", value: totalWins, icon: Trophy, color: "bg-emerald-400", iconColor: "text-emerald-900" },
                     { label: "Elite Jockeys", value: eliteCount, icon: Star, color: "bg-violet-400", iconColor: "text-violet-900" },
                 ].map(({ label, value, icon: Icon, color, iconColor }) => (
-                    <div key={label} className="bg-white border border-zinc-200 rounded-2xl p-5 flex items-center gap-4 shadow-sm">
-                        <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
+                    <div key={label} className="group flex items-center gap-4 rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+                        <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl ${color} transition-transform group-hover:scale-105`}>
                             <Icon size={20} className={iconColor} />
                         </div>
                         <div>
@@ -474,43 +491,8 @@ function Jockeys() {
                 ))}
             </div>
 
-            {/* ── TOP JOCKEY BANNER ── */}
-            {topJockey && (
-                <div className="bg-gradient-to-r from-zinc-900 to-zinc-800 rounded-3xl p-6 flex items-center justify-between overflow-hidden relative shadow-sm">
-                    <div className="absolute right-0 top-0 w-64 h-full opacity-5"
-                        style={{ backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "20px 20px" }}
-                    />
-                    <div className="flex items-center gap-5 relative z-10">
-                        <div className="w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 bg-white border-2 border-yellow-400">
-                            {getProfileAvatar(topJockey) ? (
-                                <img src={getProfileAvatar(topJockey)} alt={topJockey.user?.fullName} className="w-full h-full object-cover" />
-                            ) : (
-                                <div className="w-full h-full bg-yellow-400 flex items-center justify-center text-2xl font-black text-black">
-                                    {(topJockey.user?.fullName || topJockey.name || "J").charAt(0)}
-                                </div>
-                            )}
-                        </div>
-                        <div>
-                            <div className="flex items-center gap-2 mb-1">
-                                <Medal size={14} className="text-yellow-400" />
-                                <span className="text-yellow-400 text-xs font-bold uppercase tracking-wider">Top Performer</span>
-                            </div>
-                            <p className="text-white font-black text-xl">{topJockey.user?.fullName || topJockey.name}</p>
-                            <p className="text-zinc-400 text-sm">
-                                {countryFlags[topJockey.user?.country || topJockey.country || "Vietnam"] || "🌐"}{" "}
-                                {topJockey.user?.country || topJockey.country || "Vietnam"} · {topJockey.experienceYear || 0} Years Exp
-                            </p>
-                        </div>
-                    </div>
-                    <div className="text-right relative z-10">
-                        <p className="text-yellow-400 text-4xl font-black">{topJockey.wins || 0}</p>
-                        <p className="text-zinc-400 text-sm">Total Wins</p>
-                    </div>
-                </div>
-            )}
-
             {/* ── FILTERS ── */}
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex flex-wrap items-center gap-4 rounded-3xl border border-zinc-200 bg-white p-3 shadow-sm">
                 <div className="relative flex-1 min-w-[240px]">
                     <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
                     <input

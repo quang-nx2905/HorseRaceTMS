@@ -55,7 +55,7 @@ function CustomHorseSelect({ value, onChange, options, disabled }) {
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-lg border bg-white shadow-lg max-h-60 overflow-auto">
+        <div className="mt-1 w-full overflow-hidden rounded-xl border border-zinc-200 bg-white py-1 shadow-xl">
           {options.length === 0 ? (
             <div className="p-3 text-sm text-zinc-500 text-center">No horses available</div>
           ) : (
@@ -121,17 +121,21 @@ function RaceRegistrationPanel({ race, user, onUpdated }) {
   };
 
   const registrationOpen = race.status === "Open Registration" || race.status === "Upcoming";
-  const canRegister = user?.role === "HorseOwner" && registrationOpen;
+  const maxParticipants = summary?.maxParticipants || race.maxParticipants || 8;
+  const confirmedParticipantCount = summary?.confirmedParticipantCount ?? summary?.acceptedJockeyCount ?? 0;
+  const raceIsFull = confirmedParticipantCount >= maxParticipants;
+  const canRegister = user?.role === "HorseOwner" && registrationOpen && !raceIsFull;
 
   return <div className="mt-4 space-y-3">
     <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
       <div className="rounded-lg border bg-white p-2"><b>Status</b><br/>{summary?.raceStatus || race.status}</div>
-      <div className="rounded-lg border bg-white p-2"><b>Approved</b><br/>{summary?.approvedCount || 0}/{summary?.maxParticipants || race.maxParticipants || 8}</div>
+      <div className="rounded-lg border bg-white p-2"><b>Confirmed lanes</b><br/>{confirmedParticipantCount}/{maxParticipants}</div>
       <div className="rounded-lg border bg-white p-2"><b>Pending</b><br/>{summary?.pendingCount || 0}</div>
       <div className="rounded-lg border bg-white p-2"><b>Minimum</b><br/>{summary?.minParticipants || race.minParticipants || 2}</div>
     </div>
 
-    {canRegister && <div className="space-y-1"><div className="flex gap-2"><CustomHorseSelect value={horseId} onChange={setHorseId} options={horses} disabled={busy} /><button disabled={!horseId || busy} onClick={() => run(() => raceRegistrationApi.registerHorse(race.raceId, Number(horseId)), "Horse registration submitted for admin approval.")} className="rounded-lg bg-amber-500 px-3 py-2 text-xs font-bold text-white disabled:opacity-50">Register Horse</button></div>{horses.length === 0 && <p className="text-xs text-zinc-500">No approved, unassigned horses are available for this tournament.</p>}</div>}
+    {canRegister && <div className="space-y-1"><div className="flex items-start gap-2"><CustomHorseSelect value={horseId} onChange={setHorseId} options={horses} disabled={busy} /><button disabled={!horseId || busy} onClick={() => run(() => raceRegistrationApi.registerHorse(race.raceId, Number(horseId)), "Horse registration submitted for admin approval.")} className="shrink-0 rounded-lg bg-amber-500 px-3 py-2 text-xs font-bold text-white disabled:opacity-50">Register Horse</button></div>{horses.length === 0 && <p className="text-xs text-zinc-500">No approved, unassigned horses are available for this tournament.</p>}</div>}
+    {user?.role === "HorseOwner" && registrationOpen && raceIsFull && <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">Race full — all {maxParticipants} lanes already have a confirmed horse-jockey pair.</div>}
 
     {user?.role === "Admin" && <div className="flex flex-wrap gap-2"><button disabled={busy || !["Draft", "Upcoming", "Registration Closed"].includes(race.status)} onClick={() => run(() => raceRegistrationApi.open(race.raceId), "Registration opened.")} className="rounded-lg bg-emerald-100 px-3 py-2 text-xs font-bold text-emerald-700 disabled:opacity-50">Open Registration</button><button disabled={busy || !registrationOpen} onClick={() => run(() => raceRegistrationApi.close(race.raceId), "Registration closed.")} className="rounded-lg bg-zinc-900 px-3 py-2 text-xs font-bold text-white disabled:opacity-50">Close Registration</button></div>}
 

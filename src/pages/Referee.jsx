@@ -298,6 +298,9 @@ function Referee() {
                     <div className="space-y-6">
                         {Object.entries(groupedRaces).map(([tournamentName, tournamentRaces]) => {
                             const isExpanded = expandedTournaments[tournamentName];
+                            const tournamentCompleted =
+                                tournamentRaces[0]?.tournamentStatus === "Completed"
+                                || tournamentRaces.every(r => ["Completed", "Awarded", "Cancelled"].includes(r.status));
                             return (
                                 <div key={tournamentName} className="overflow-hidden rounded-[28px] border border-zinc-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lg hover:shadow-zinc-200/60">
                                     {/* Tournament Header with Banner */}
@@ -333,6 +336,12 @@ function Referee() {
                                             </div>
                                         </div>
                                         <div className="relative z-10 flex items-center gap-4">
+                                            {tournamentCompleted && (
+                                                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300/30 bg-emerald-400/15 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-300 backdrop-blur-md">
+                                                    <CheckCircle2 className="h-3.5 w-3.5" />
+                                                    Completed
+                                                </span>
+                                            )}
                                             <span className="px-3 py-1 bg-black/60 text-zinc-300 rounded-full text-xs font-bold border border-white/10 backdrop-blur-md">
                                                 {tournamentRaces.length} Race{tournamentRaces.length > 1 ? "s" : ""}
                                             </span>

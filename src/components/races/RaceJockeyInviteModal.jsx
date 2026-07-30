@@ -64,7 +64,7 @@ function CustomJockeySelect({ value, onChange, options, disabled }) {
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-xl border bg-white shadow-lg max-h-60 overflow-auto">
+        <div className="mt-2 max-h-[min(22rem,45vh)] w-full overscroll-contain rounded-xl border bg-white pb-2 shadow-lg overflow-x-hidden overflow-y-auto">
           {options.length === 0 ? (
             <div className="p-3 text-sm text-zinc-500 text-center">No available jockeys</div>
           ) : (
@@ -131,8 +131,8 @@ function RaceJockeyInviteModal({ registration, onClose }) {
     } finally { setSending(false); }
   };
 
-  return <div className="fixed inset-0 z-[80] flex items-center justify-center bg-zinc-950/45 p-4 backdrop-blur-sm">
-    <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
+  return <div className="fixed inset-0 z-[80] flex items-center justify-center overflow-y-auto bg-zinc-950/45 p-4 backdrop-blur-sm">
+    <div className="my-auto max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-3xl bg-white shadow-2xl">
       <div className="flex items-start justify-between border-b p-6"><div><h3 className="text-xl font-black">Invite a Jockey</h3><p className="mt-1 text-sm text-zinc-500"><b>{registration.horseName}</b> · {registration.raceName}</p></div><button onClick={onClose} className="rounded-full bg-zinc-100 p-2"><X size={18}/></button></div>
       <form onSubmit={submit} className="space-y-5 p-6">
         <div>
