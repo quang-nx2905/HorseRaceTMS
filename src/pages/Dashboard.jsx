@@ -3,6 +3,7 @@ import StatCard from "../components/ui/StatCard";
 import AnalyticsChart from "../components/charts/AnalyticsChart";
 import RecentRaces from "../components/dashboard/RecentRaces";
 import api from "../api/axiosClient";
+import dashboardRaceHero from "../assets/dashboard-race-hero.png";
 import {
     CalendarDays,
     Flag,
@@ -96,8 +97,16 @@ function Dashboard() {
     };
 
     return (
-        <div className="mx-auto w-full max-w-[1680px] space-y-6">
+        <div className="w-full space-y-6">
             <section className="relative overflow-hidden rounded-[32px] bg-[#0a0c0e] px-7 py-8 text-white shadow-[0_24px_70px_rgba(9,11,13,0.16)] lg:px-10 lg:py-10">
+                <img
+                    src={dashboardRaceHero}
+                    alt=""
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-0 h-full w-full scale-[1.02] object-cover object-center opacity-85"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#080a0c]/90 via-[#080a0c]/55 to-transparent" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/5" />
                 <div className="pointer-events-none absolute -right-24 -top-36 h-96 w-96 rounded-full bg-amber-400/10 blur-3xl" />
                 <div className="pointer-events-none absolute right-[20%] top-0 h-full w-px bg-gradient-to-b from-transparent via-white/10 to-transparent" />
                 <div className="relative flex flex-col justify-between gap-8 lg:flex-row lg:items-end">

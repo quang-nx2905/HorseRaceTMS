@@ -15,6 +15,7 @@ import EmptyState from "../components/common/EmptyState";
 import ConfirmModal from "../components/common/ConfirmModal";
 import EditTournamentModal from "../components/modals/EditTournamentModal";
 import fallbackTournamentBanner from "../assets/hero.png";
+import tournamentRaceHero from "../assets/tournament-race-hero.png";
 
 const STATUS_CONFIG = {
   Live: {
@@ -232,6 +233,14 @@ function Tournaments() {
     <div className="pb-16">
       {/* ═══════════════════ HERO HEADER ═══════════════════ */}
       <div className="relative overflow-hidden bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-800 rounded-3xl mb-10 shadow-2xl border border-zinc-700/50">
+        <img
+          src={tournamentRaceHero}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-full scale-[1.02] object-cover object-center opacity-85"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/55 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/5" />
         {/* Background decorations */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-20 -right-20 w-96 h-96 bg-amber-500/8 rounded-full blur-3xl" />

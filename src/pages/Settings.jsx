@@ -97,7 +97,7 @@ function Settings() {
     const passwordClass = `${inputClass} pr-12`;
 
     return (
-        <div className="mx-auto max-w-[1180px] space-y-6 pb-12 animate-in fade-in duration-300">
+        <div className="w-full space-y-6 pb-12 animate-in fade-in duration-300">
             <section className="relative overflow-hidden rounded-[2rem] bg-zinc-950 px-7 py-8 text-white shadow-xl shadow-zinc-300/40 md:px-10">
                 <div className="absolute -right-20 -top-28 h-72 w-72 rounded-full bg-amber-400/15 blur-3xl" />
                 <div className="absolute bottom-0 right-12 h-32 w-32 rounded-full border border-white/5" />

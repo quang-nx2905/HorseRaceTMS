@@ -48,34 +48,35 @@ function UserCard({ user, onEdit, onToggleStatus, onDelete }) {
     const canEditDelete = !isTargetAdmin;
 
     return (
-        <div className={`relative bg-white border rounded-[2rem] p-6 transition-all duration-300 group ${isActive ? 'border-zinc-200 hover:shadow-2xl hover:shadow-zinc-200/50 hover:-translate-y-1' : 'border-red-100 bg-red-50/30 opacity-90'}`}>
+        <div className={`group relative overflow-hidden rounded-[2rem] border bg-white p-6 shadow-sm transition-all duration-300 ${isActive ? 'border-zinc-200 hover:-translate-y-1 hover:border-amber-200 hover:shadow-2xl hover:shadow-zinc-200/60' : 'border-red-200 bg-red-50/30 opacity-90'}`}>
+            <div className={`absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r ${config.gradient}`} />
 
             {/* Background Pattern for Admin */}
             {isTargetAdmin && (
                 <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/5 rounded-bl-full pointer-events-none" />
             )}
 
-            <div className="relative flex items-start justify-between mb-5">
+            <div className="relative mb-5 flex items-start justify-between pt-1">
                 <div className="flex items-center gap-4 w-full min-w-0">
-                    <div className={`relative w-14 h-14 rounded-2xl overflow-hidden flex items-center justify-center flex-shrink-0 bg-gradient-to-br ${config.gradient} text-white shadow-lg ${isTargetAdmin ? 'shadow-purple-500/30' : 'shadow-zinc-400/20'}`}>
+                    <div className={`relative flex h-16 w-16 flex-shrink-0 items-center justify-center overflow-visible rounded-2xl bg-gradient-to-br text-white shadow-lg ${config.gradient} ${isTargetAdmin ? 'shadow-purple-500/30' : 'shadow-zinc-400/20'}`}>
                         {avatar ? (
-                            <img src={avatar} alt={user.name} className="h-full w-full object-cover" />
+                            <img src={avatar} alt={user.name} className="h-full w-full rounded-2xl object-cover" />
                         ) : (
                             <Icon size={24} strokeWidth={2} />
                         )}
                         {isActive && (
-                            <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white" />
+                            <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full border-2 border-white bg-emerald-500 shadow-sm" />
                         )}
                         {!isActive && (
                             <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-red-500 border-2 border-white" />
                         )}
                     </div>
                     <div className="flex-1 min-w-0">
-                        <h3 className={`font-black text-xl leading-tight flex items-center gap-2 ${isActive ? 'text-zinc-900' : 'text-zinc-500 line-through decoration-zinc-300'}`}>
+                        <h3 className={`flex items-center gap-2 text-lg font-black leading-tight ${isActive ? 'text-zinc-900' : 'text-zinc-500 line-through decoration-zinc-300'}`}>
                             <span className="truncate">{user.name}</span>
                             {isTargetAdmin && <BadgeCheck size={18} className="text-purple-500 flex-shrink-0" />}
                         </h3>
-                        <div className="flex items-center gap-1.5 text-sm text-zinc-500 mt-1 font-medium">
+                        <div className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-zinc-500">
                             <Mail size={14} className="text-zinc-400 flex-shrink-0" />
                             <span className="truncate block" title={user.email}>{user.email}</span>
                         </div>
@@ -83,7 +84,18 @@ function UserCard({ user, onEdit, onToggleStatus, onDelete }) {
                 </div>
             </div>
 
-            <div className="flex items-center justify-between mt-8 pt-5 border-t border-zinc-100/80">
+            <div className="mb-5 grid grid-cols-2 gap-2 rounded-2xl bg-zinc-50 p-3 text-xs">
+                <div>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400">User ID</p>
+                    <p className="mt-1 font-bold text-zinc-700">#{user.id}</p>
+                </div>
+                <div>
+                    <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400">Account</p>
+                    <p className={`mt-1 font-bold ${isActive ? "text-emerald-600" : "text-red-500"}`}>{user.status}</p>
+                </div>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-zinc-100/80 pt-5">
                 <span className={`text-xs font-bold px-3 py-1.5 rounded-xl ring-1 ${config.badge}`}>
                     {user.role}
                 </span>
@@ -252,46 +264,47 @@ function UsersManagement() {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500 pb-10">
+        <div className="w-full space-y-6 pb-10 animate-in fade-in duration-500">
             {/* ── HEADER ── */}
-            <div className="flex items-end justify-between">
+            <section className="relative overflow-hidden rounded-[2rem] bg-zinc-950 p-7 text-white shadow-xl shadow-zinc-300/40 md:p-9">
+                <div className="absolute -right-20 -top-28 h-80 w-80 rounded-full bg-violet-500/15 blur-3xl" />
+                <div className="absolute right-40 top-0 h-36 w-36 rounded-full bg-amber-400/10 blur-3xl" />
+                <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                    <p className="text-sm font-bold text-indigo-600 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
-                        <ShieldAlert size={16} strokeWidth={2.5} /> Administration
+                    <p className="mb-3 flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.22em] text-violet-400">
+                        <ShieldAlert size={15} strokeWidth={2.5} /> Administration
                     </p>
-                    <h1 className="text-5xl font-black text-zinc-900 tracking-tight">Access Control</h1>
-                    <p className="text-zinc-500 mt-3 text-lg font-medium">
-                        Manage platform users, roles, and system access.
+                    <h1 className="text-3xl font-black tracking-tight md:text-4xl">User Management</h1>
+                    <p className="mt-2 text-sm text-zinc-400">
+                        Control platform identities, roles and account access.
                     </p>
                 </div>
 
                 <button
                     onClick={() => setOpenCreate(true)}
-                    className="group flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white px-7 py-4 rounded-2xl font-bold transition-all shadow-xl shadow-zinc-900/20 hover:shadow-zinc-900/30 hover:-translate-y-0.5"
+                    className="group flex items-center gap-2 rounded-2xl bg-amber-400 px-6 py-3.5 font-black text-zinc-950 transition-all hover:-translate-y-0.5 hover:bg-amber-500"
                 >
                     <Plus size={20} className="transition-transform group-hover:rotate-90" />
                     Create New User
                 </button>
-            </div>
+                </div>
+            </section>
 
             {/* ── SUMMARY STATS ── */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {[
-                    { label: "Total Users", value: totalCount, icon: User, bg: "bg-white", border: "border-zinc-200", iconColor: "text-zinc-600", iconBg: "bg-zinc-100" },
-                    { label: "Active Users", value: activeUsersCount, icon: Shield, bg: "bg-gradient-to-br from-emerald-400 to-teal-500", border: "border-emerald-400", textColor: "text-white", iconColor: "text-emerald-500", iconBg: "bg-white", isDark: true },
-                    { label: "Administrators", value: adminCount, icon: ShieldAlert, bg: "bg-gradient-to-br from-purple-500 to-indigo-600", border: "border-purple-500", textColor: "text-white", iconColor: "text-purple-600", iconBg: "bg-white", isDark: true },
+                    { label: "Total Users", value: totalCount, icon: User, iconColor: "text-zinc-700", iconBg: "bg-zinc-100" },
+                    { label: "Active Users", value: activeUsersCount, icon: Shield, iconColor: "text-emerald-600", iconBg: "bg-emerald-100" },
+                    { label: "Administrators", value: adminCount, icon: ShieldAlert, iconColor: "text-violet-600", iconBg: "bg-violet-100" },
                 ].map((stat) => (
-                    <div key={stat.label} className={`relative overflow-hidden rounded-[2rem] p-6 border shadow-lg ${stat.bg} ${stat.border} ${stat.isDark ? 'shadow-current/20' : 'shadow-zinc-200/50'}`}>
-                        {stat.isDark && (
-                            <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-bl-full pointer-events-none" />
-                        )}
+                    <div key={stat.label} className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
                         <div className="flex items-center gap-5 relative z-10">
                             <div className={`w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm ${stat.iconBg}`}>
                                 <stat.icon size={24} className={stat.iconColor} strokeWidth={2.5} />
                             </div>
                             <div>
-                                <p className={`text-4xl font-black ${stat.textColor || 'text-zinc-900'}`}>{stat.value}</p>
-                                <p className={`text-sm font-bold uppercase tracking-wider mt-1 ${stat.textColor ? 'text-white/80' : 'text-zinc-500'}`}>{stat.label}</p>
+                                <p className="text-3xl font-black text-zinc-900">{stat.value}</p>
+                                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-zinc-400">{stat.label}</p>
                             </div>
                         </div>
                     </div>
@@ -299,7 +312,7 @@ function UsersManagement() {
             </div>
 
             {/* ── FILTERS ── */}
-            <div className="flex items-center gap-4 flex-wrap bg-white p-3 rounded-[2rem] shadow-sm border border-zinc-200">
+            <div className="flex flex-wrap items-center gap-3 rounded-[1.75rem] border border-zinc-200 bg-white p-3 shadow-sm">
                 {/* Search */}
                 <div className="relative flex-1 min-w-[280px]">
                     <Search size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
@@ -313,13 +326,13 @@ function UsersManagement() {
                 </div>
 
                 {/* Role filter chips */}
-                <div className="flex items-center gap-2 px-2">
+                <div className="flex max-w-full items-center gap-1 overflow-x-auto px-2 pb-1 sm:pb-0">
                     <Filter size={16} className="text-zinc-400 ml-2 mr-2" />
                     {roleFilters.map((f) => (
                         <button
                             key={f}
                             onClick={() => { setFilterRole(f); setCurrentPage(1); }}
-                            className={`px-5 py-3 rounded-2xl text-sm font-bold transition-all ${filterRole === f
+                            className={`whitespace-nowrap rounded-xl px-4 py-2.5 text-xs font-bold transition-all ${filterRole === f
                                 ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/20"
                                 : "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100"
                                 }`}

@@ -39,7 +39,7 @@ function HorseCard({ horse, onView, onEdit, onDelete, onSuspend, onReinstate, is
     const status = statusConfig[horse.status] || statusConfig.Pending;
 
     return (
-        <div className="bg-white border border-zinc-200 rounded-3xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+        <div className="group overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-amber-200 hover:shadow-2xl hover:shadow-zinc-200/60">
 
             {/* Card top banner */}
             <div className={`relative aspect-[3/2] overflow-hidden ${!horse.imageUrl ? "bg-gradient-to-br " + gradient : "bg-zinc-900"}`}>
@@ -56,44 +56,43 @@ function HorseCard({ horse, onView, onEdit, onDelete, onSuspend, onReinstate, is
                         </div>
                     </>
                 )}
+                <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/55 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between gap-3">
+                    <div className="min-w-0 text-white">
+                        <h3 className="truncate text-lg font-black drop-shadow">{horse.name}</h3>
+                        <p className="truncate text-xs font-medium text-white/75">{horse.breed} · {horse.ownerName || "Unknown Owner"}</p>
+                    </div>
+                    <span className={`flex flex-shrink-0 items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ring-1 ${health.color}`}>
+                        <span className={`h-1.5 w-1.5 rounded-full ${health.dot}`} /> {horse.health}
+                    </span>
+                </div>
             </div>
 
             {/* Card body */}
-            <div className="pt-5 px-6 pb-5">
-                <div className="flex items-start justify-between mb-3">
-                    <div>
-                        <h3 className="font-black text-zinc-900 text-lg leading-tight">
-                            {horse.name}
-                        </h3>
-                        <p className="text-zinc-400 text-sm mt-0.5">{horse.breed} • {horse.ownerName || "Unknown Owner"}</p>
-                    </div>
-                    <div className="flex flex-col gap-1.5 items-end">
-                        {isAdmin && (
-                            <span className={`flex items-center justify-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-md ring-1 ${status.color}`}>
-                                {status.icon} {horse.status || "Pending"}
-                            </span>
-                        )}
-                        <span className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full ring-1 ${health.color}`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${health.dot}`} />
-                            {horse.health}
+            <div className="px-5 pb-5 pt-4">
+                <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-[0.18em] text-zinc-400">Performance overview</span>
+                    {isAdmin && (
+                        <span className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-bold ring-1 ${status.color}`}>
+                            {status.icon} {horse.status || "Pending"}
                         </span>
-                    </div>
+                    )}
                 </div>
 
                 {/* Stats row */}
-                <div className="flex gap-4 my-4 py-4 border-t border-b border-zinc-100">
+                <div className="my-4 flex gap-3 rounded-2xl bg-zinc-50 px-2 py-4">
                     <div className="flex-1 text-center">
-                        <p className="text-2xl font-black text-zinc-900">#{horse.id}</p>
+                        <p className="text-xl font-black text-zinc-900">#{horse.id}</p>
                         <p className="text-xs text-zinc-400 mt-0.5">ID</p>
                     </div>
                     <div className="w-px bg-zinc-100" />
                     <div className="flex-1 text-center">
-                        <p className="text-2xl font-black text-zinc-900">{horse.age}</p>
+                        <p className="text-xl font-black text-zinc-900">{horse.age}</p>
                         <p className="text-xs text-zinc-400 mt-0.5">Age (yrs)</p>
                     </div>
                     <div className="w-px bg-zinc-100" />
                     <div className="flex-1 text-center">
-                        <p className="text-2xl font-black text-yellow-500">{horse.wins}</p>
+                        <p className="text-xl font-black text-amber-500">{horse.wins}</p>
                         <p className="text-xs text-zinc-400 mt-0.5">Total Wins</p>
                     </div>
                 </div>
@@ -101,7 +100,7 @@ function HorseCard({ horse, onView, onEdit, onDelete, onSuspend, onReinstate, is
                 <div className="flex gap-2">
                     <button
                         onClick={() => onView(horse)}
-                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all text-sm font-semibold"
+                        className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-zinc-900 py-2.5 text-sm font-bold text-white transition-all hover:bg-zinc-800"
                     >
                         <Eye size={14} /> View
                     </button>
@@ -389,25 +388,27 @@ function Horses() {
     };
 
     return (
-        <div className="space-y-7">
+        <div className="w-full space-y-6 pb-10">
 
             {/* ── HEADER ── */}
-            <div className="flex items-end justify-between">
+            <section className="relative overflow-hidden rounded-[2rem] bg-zinc-950 p-7 text-white shadow-xl shadow-zinc-300/40 md:p-9">
+                <div className="absolute -right-16 -top-24 h-72 w-72 rounded-full bg-amber-400/15 blur-3xl" />
+                <div className="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                    <p className="text-sm font-semibold text-yellow-600 uppercase tracking-widest mb-2">
-                        Management
+                    <p className="mb-3 text-[11px] font-black uppercase tracking-[0.22em] text-amber-400">
+                        Racing stable
                     </p>
-                    <h1 className="text-5xl font-black text-zinc-900">Horses</h1>
-                    <p className="text-zinc-500 mt-2 text-base">
+                    <h1 className="text-3xl font-black tracking-tight md:text-4xl">Horse Directory</h1>
+                    <p className="mt-2 text-sm text-zinc-400">
                         Manage and track all registered racing horses
                     </p>
                 </div>
 
                 {isAdmin && (
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                         <button
                             onClick={() => setOpenPendingUpdates(true)}
-                            className="relative flex items-center gap-2 bg-yellow-50 text-yellow-600 border border-yellow-200 hover:bg-yellow-100 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-100/50 hover:-translate-y-0.5"
+                            className="relative flex items-center gap-2 rounded-2xl border border-white/10 bg-white/10 px-5 py-3 text-sm font-bold text-white transition-all hover:bg-white/15"
                         >
                             <FileEdit size={18} />
                             Pending Updates
@@ -419,7 +420,7 @@ function Horses() {
                         </button>
                         <button
                             onClick={() => setOpenPending(true)}
-                            className="relative flex items-center gap-2 bg-yellow-400 hover:bg-yellow-500 px-6 py-3.5 rounded-2xl font-bold text-sm transition-all hover:shadow-lg hover:shadow-yellow-400/20 hover:-translate-y-0.5"
+                            className="relative flex items-center gap-2 rounded-2xl bg-amber-400 px-5 py-3 text-sm font-black text-zinc-950 transition-all hover:bg-amber-500"
                         >
                             <ClipboardList size={18} />
                             Review Applications
@@ -431,17 +432,18 @@ function Horses() {
                         </button>
                     </div>
                 )}
-            </div>
+                </div>
+            </section>
 
             {/* ── SUMMARY STATS ── */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 {[
                     { label: "Total Approved", value: approvedHorses.length, icon: GanttChartSquare, color: "bg-yellow-400", iconColor: "text-yellow-900" },
                     { label: "Total Wins", value: totalWins, icon: Trophy, color: "bg-emerald-400", iconColor: "text-emerald-900" },
                     { label: "Top Health", value: excellentCount, icon: Activity, color: "bg-blue-400", iconColor: "text-blue-900" },
                 ].map(({ label, value, icon: Icon, color, iconColor }) => (
-                    <div key={label} className="bg-white border border-zinc-200 rounded-2xl p-5 flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-xl ${color} flex items-center justify-center flex-shrink-0`}>
+                    <div key={label} className="flex items-center gap-4 rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm">
+                        <div className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl ${color}`}>
                             <Icon size={20} className={iconColor} />
                         </div>
                         <div>
@@ -453,7 +455,7 @@ function Horses() {
             </div>
 
             {/* ── FILTERS ── */}
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex flex-wrap items-center gap-4 rounded-[1.75rem] border border-zinc-200 bg-white p-4 shadow-sm">
 
                 {/* Search */}
                 <div className="relative flex-1 min-w-[240px]">
@@ -463,7 +465,7 @@ function Horses() {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search by name or breed..."
-                        className="w-full pl-11 pr-4 py-3 bg-white border border-zinc-200 rounded-2xl outline-none text-sm focus:border-yellow-400 focus:ring-4 focus:ring-yellow-400/10 transition-all"
+                        className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 py-3 pl-11 pr-4 text-sm font-medium outline-none transition-all focus:border-amber-400 focus:bg-white focus:ring-4 focus:ring-amber-400/10"
                     />
                 </div>
 
@@ -519,7 +521,7 @@ function Horses() {
                     <p className="text-zinc-400 text-sm mt-1">Try adjusting your search or filter</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                     {filtered.map((horse) => (
                         <HorseCard
                             key={horse.id}

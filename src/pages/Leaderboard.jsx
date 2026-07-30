@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { Trophy, Crown, Search, TrendingUp, Zap, Star, Eye, ChevronLeft, ChevronRight, ArrowUpRight, Sparkles } from "lucide-react";
 import leaderboardApi from "../api/leaderboardApi";
 import RankingDetailsModal from "../components/leaderboard/RankingDetailsModal";
+import leaderboardRaceHero from "../assets/leaderboard-race-hero.png";
 
 function Leaderboard() {
     const [leaderboardData, setLeaderboardData] = useState([]);
@@ -71,7 +72,10 @@ function Leaderboard() {
     return (
         <div className="pb-12">
             {/* HEADER HERO */}
-            <div className="relative overflow-hidden bg-gradient-to-r from-zinc-900 via-zinc-800 to-zinc-900 rounded-3xl p-8 md:p-12 mb-10 shadow-xl border border-zinc-700/50">
+            <div className="relative mb-10 min-h-[360px] overflow-hidden rounded-3xl border border-zinc-700/50 bg-zinc-950 p-8 shadow-xl md:aspect-[12/5] md:p-12">
+                <img src={leaderboardRaceHero} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-contain object-right opacity-90" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/55 to-transparent" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/5" />
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="absolute bottom-0 left-1/3 -mb-10 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
 

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import predictionApi from "../api/predictionApi";
-import { BrainCircuit, Search, Eye, AlertCircle, CheckCircle2, Clock } from "lucide-react";
+import { BrainCircuit, Search, Eye, AlertCircle, CheckCircle2, Clock, Loader2, Sparkles } from "lucide-react";
 import PredictionDetailsModal from "../components/predictions/PredictionDetailsModal";
 
 
@@ -63,61 +63,47 @@ function Predictions() {
     ) : 0;
 
     return (
-        <div className="pb-12">
+        <div className="w-full space-y-6 pb-12">
             {/* ═══════ HERO HEADER ═══════ */}
-            <div className="relative overflow-hidden bg-gradient-to-br from-violet-950 via-violet-900 to-indigo-900 rounded-3xl p-8 md:p-12 mb-10 border border-violet-800/40 shadow-xl">
+            <section className="relative overflow-hidden rounded-[2rem] bg-zinc-950 p-7 text-white shadow-xl shadow-zinc-300/40 md:p-10">
                 <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                    <div className="absolute -top-16 right-0 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl" />
-                    <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-indigo-400/8 rounded-full blur-3xl" />
+                    <div className="absolute -right-12 -top-24 h-80 w-80 rounded-full bg-violet-500/20 blur-3xl" />
+                    <div className="absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-indigo-400/10 blur-3xl" />
                     <div className="absolute top-1/2 left-0 w-40 h-40 bg-pink-500/6 rounded-full blur-2xl" />
                 </div>
                 <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
                     <div>
-                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-violet-500/20 border border-violet-400/30 text-violet-300 rounded-full text-xs font-bold uppercase tracking-widest mb-5">
+                        <div className="mb-4 inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.22em] text-violet-400">
                             <BrainCircuit className="w-3.5 h-3.5" />
-                            Algorithmic Engine
+                            AI analytics engine
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight leading-tight mb-3">
-                            Race <span className="bg-gradient-to-r from-violet-300 to-pink-300 bg-clip-text text-transparent">Predictions</span>
+                        <h1 className="mb-3 text-3xl font-black tracking-tight md:text-4xl">
+                            Race Predictions
                         </h1>
                         <p className="text-violet-300/70 text-base max-w-md">
                             Algorithmic predictions powered by race conditions, real-time data, and mathematical models.
                         </p>
                     </div>
-                    <div className="grid grid-cols-3 gap-3 min-w-[280px]">
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-                            <p className="text-xs text-violet-300/60 font-bold uppercase tracking-wider mb-1">Avg Confidence</p>
+                    <div className="grid min-w-[300px] grid-cols-3 gap-3">
+                        <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-center backdrop-blur">
+                            <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-zinc-500">Confidence</p>
                             <p className="text-2xl font-black text-white">{avgConfidence}%</p>
                         </div>
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-                            <p className="text-xs text-violet-300/60 font-bold uppercase tracking-wider mb-1">Upcoming Races</p>
+                        <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-center backdrop-blur">
+                            <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-zinc-500">Races</p>
                             <p className="text-2xl font-black text-white">{new Set(predictionsData.map(p => p.race)).size}</p>
                         </div>
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center">
-                            <p className="text-xs text-violet-300/60 font-bold uppercase tracking-wider mb-1">Predictions</p>
+                        <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-center backdrop-blur">
+                            <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-zinc-500">Insights</p>
                             <p className="text-2xl font-black text-white">{predictionsData.length}</p>
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
             {/* ═══════ ACCURACY STAT + SEARCH/FILTER ═══════ */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-                {/* Accuracy card */}
-                <div className="lg:col-span-1 bg-white rounded-3xl p-6 border border-zinc-200 shadow-sm">
-                    <p className="text-xs text-zinc-400 font-bold uppercase tracking-wider mb-2">Avg. Confidence</p>
-                    <p className="text-4xl font-black text-zinc-900 mb-3">{avgConfidence}%</p>
-                    <div className="w-full bg-zinc-100 h-2 rounded-full overflow-hidden">
-                        <div
-                            className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full transition-all duration-700"
-                            style={{ width: `${avgConfidence}%` }}
-                        />
-                    </div>
-                    <p className="text-xs text-zinc-400 mt-2 font-medium">{predictionsData.length} active predictions</p>
-                </div>
-
-                {/* Search + filters */}
-                <div className="lg:col-span-3 bg-white rounded-3xl p-5 border border-zinc-200 shadow-sm flex flex-col sm:flex-row gap-4">
+            <div className="rounded-[1.75rem] border border-zinc-200 bg-white p-4 shadow-sm">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
                     <div className="relative flex-1">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                         <input
@@ -125,15 +111,15 @@ function Predictions() {
                             placeholder="Search horse or race name..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full pl-11 pr-4 py-3 bg-zinc-50 border border-zinc-200 hover:border-zinc-300 focus:border-violet-400 focus:ring-2 focus:ring-violet-400/15 rounded-2xl outline-none text-sm transition-all"
+                            className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 py-3.5 pl-11 pr-4 text-sm font-medium outline-none transition-all hover:border-zinc-300 focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-400/10"
                         />
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex max-w-full gap-2 overflow-x-auto pb-1 lg:pb-0">
                         {["All", "High Chance", "Moderate", "Risky"].map((f) => (
                             <button
                                 key={f}
                                 onClick={() => setFilterStatus(f)}
-                                className={`px-3 py-3 rounded-2xl text-xs font-bold whitespace-nowrap transition-all border ${
+                                className={`whitespace-nowrap rounded-xl border px-4 py-3 text-xs font-bold transition-all ${
                                     filterStatus === f
                                         ? f === "High Chance"
                                             ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
@@ -149,14 +135,18 @@ function Predictions() {
                             </button>
                         ))}
                     </div>
+                    <div className="hidden items-center gap-2 rounded-2xl bg-violet-50 px-4 py-3 text-xs font-bold text-violet-700 xl:flex">
+                        <Sparkles size={15} /> Updated from live race data
+                    </div>
                 </div>
             </div>
 
             {/* ═══════ PREDICTION CARDS ═══════ */}
             <div className="space-y-5">
                 {isLoading ? (
-                    <div className="text-center py-20 text-zinc-400 font-medium bg-white rounded-3xl border border-zinc-200">
-                        Loading AI Predictions...
+                    <div className="flex min-h-64 flex-col items-center justify-center rounded-[2rem] border border-zinc-200 bg-white text-zinc-400">
+                        <Loader2 className="mb-3 animate-spin text-violet-500" size={28} />
+                        <p className="font-bold">Analyzing race data...</p>
                     </div>
                 ) : filtered.length === 0 ? (
                     <div className="text-center py-20 text-zinc-400 font-medium bg-white rounded-3xl border border-zinc-200">
@@ -169,10 +159,10 @@ function Predictions() {
                     return (
                         <div
                             key={`${item.race}-${item.horse}-${index}`}
-                            className="group bg-white border border-zinc-200 rounded-3xl shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden"
+                            className="group overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-xl hover:shadow-zinc-200/60"
                         >
                             {/* Top gradient stripe */}
-                            <div className={`h-1 w-full bg-gradient-to-r ${item.gradient}`} />
+                            <div className={`h-1.5 w-full bg-gradient-to-r ${cfg.bar}`} />
 
                             <div className="p-7">
                                 <div className="flex flex-col md:flex-row md:items-center gap-6">
@@ -182,7 +172,7 @@ function Predictions() {
                                             <img 
                                                 src={item.imageUrl} 
                                                 alt={item.horse} 
-                                                className="w-14 h-14 rounded-2xl object-cover shadow-sm flex-shrink-0"
+                                                 className="h-16 w-16 flex-shrink-0 rounded-2xl object-cover shadow-sm ring-1 ring-zinc-200"
                                             />
                                         ) : (
                                             <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center font-black text-lg shadow-sm flex-shrink-0">
@@ -221,7 +211,7 @@ function Predictions() {
                                     </div>
 
                                     {/* Confidence bar */}
-                                    <div className="flex-1 max-w-[180px]">
+                                    <div className="w-full flex-1 md:max-w-[220px]">
                                         <div className="flex justify-between text-xs font-bold text-zinc-500 mb-2">
                                             <span>Win Probability</span>
                                             <span className="text-zinc-800">{item.confidence}%</span>
@@ -242,7 +232,7 @@ function Predictions() {
                                         </div>
                                         <button
                                             onClick={() => { setSelectedPrediction(item); setOpenDetails(true); }}
-                                            className="flex items-center gap-2 px-4 py-3 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl text-xs font-bold transition-all shadow-md shadow-violet-600/20 hover:shadow-violet-500/30 group-hover:scale-105"
+                                            className="flex items-center gap-2 rounded-2xl bg-zinc-900 px-4 py-3 text-xs font-bold text-white shadow-md transition-all hover:bg-violet-700 group-hover:scale-105"
                                         >
                                             <Eye className="w-3.5 h-3.5" />
                                             Details
