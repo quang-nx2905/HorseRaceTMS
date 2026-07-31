@@ -11,6 +11,8 @@ import {
     TrendingUp,
     Trophy,
     Users,
+    ChevronDown,
+    ChevronUp,
 } from "lucide-react";
 import predictionApi from "../api/predictionApi";
 
@@ -38,6 +40,14 @@ function Predictions() {
     const [predictions, setPredictions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
+    const [expandedGroups, setExpandedGroups] = useState({});
+
+    const toggleGroup = (name) => {
+        setExpandedGroups((prev) => ({
+            ...prev,
+            [name]: !prev[name],
+        }));
+    };
 
     useEffect(() => {
         const loadPredictions = async () => {
@@ -71,6 +81,25 @@ function Predictions() {
     const totalWagered = predictions.reduce((total, prediction) => total + (prediction.betPoints || 0), 0);
     const settledCount = predictions.filter((prediction) => prediction.profitLoss !== null).length;
     const uniqueBettors = new Set(predictions.map((prediction) => prediction.bettorAlias)).size;
+
+    const groupedBets = useMemo(() => {
+        const groups = {};
+        filtered.forEach(prediction => {
+            const tournamentName = prediction.tournamentName || "Unknown Tournament";
+            if (!groups[tournamentName]) {
+                groups[tournamentName] = {
+                    tournamentName,
+                    predictions: [],
+                    bannerUrl: prediction.tournamentBanner || null
+                };
+            }
+            if (prediction.tournamentBanner && !groups[tournamentName].bannerUrl) {
+                groups[tournamentName].bannerUrl = prediction.tournamentBanner;
+            }
+            groups[tournamentName].predictions.push(prediction);
+        });
+        return Object.values(groups);
+    }, [filtered]);
 
     return (
         <div className="w-full space-y-6 pb-12">
@@ -166,90 +195,139 @@ function Predictions() {
                         <p className="mt-1 text-sm text-zinc-400">Try another tournament name or filter.</p>
                     </div>
                 ) : (
-                    <div>
-                        <div className="hidden grid-cols-12 items-center gap-4 border-b border-zinc-100 bg-zinc-50/80 px-6 py-3 text-[10px] font-black uppercase tracking-[0.14em] text-zinc-400 lg:grid">
-                            <span className="col-span-3">Bettor</span>
-                            <span className="col-span-3">Tournament & race</span>
-                            <span className="col-span-2">Selected horse</span>
-                            <span className="col-span-1">Odds</span>
-                            <span className="col-span-1">Stake</span>
-                            <span className="col-span-2 text-right">Net result</span>
-                        </div>
-                        <div className="divide-y divide-zinc-100">
-                        {filtered.map((prediction) => {
-                            const isSettled = prediction.profitLoss !== null;
-                            const isProfit = isSettled && prediction.profitLoss >= 0;
+                    <div className="p-4 space-y-4">
+                        {groupedBets.map((group) => {
+                            const isExpanded = expandedGroups[group.tournamentName];
                             return (
-                                <article
-                                    key={prediction.predictionId}
-                                    className="group grid gap-5 px-6 py-5 transition hover:bg-amber-50/40 md:grid-cols-2 lg:grid-cols-12 lg:items-center lg:gap-4 lg:py-4"
-                                >
-                                    <div className="flex min-w-0 items-center gap-3 lg:col-span-3">
-                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-xs font-black text-amber-400">
-                                            {prediction.bettorAlias?.slice(-2)}
-                                        </div>
-                                        <div className="min-w-0">
-                                            <p className="truncate text-sm font-black text-zinc-900">{prediction.bettorAlias}</p>
-                                            <p className="mt-1 flex items-center gap-1.5 truncate text-[11px] text-zinc-400">
-                                                <Clock3 size={12} /> {formatDate(prediction.betPlacedAt)}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div className="min-w-0 lg:col-span-3">
-                                        <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-zinc-400 lg:hidden">Tournament</p>
-                                        <p className="truncate text-sm font-bold text-zinc-800">{prediction.tournamentName}</p>
-                                        <p className="mt-1 flex items-center gap-1.5 truncate text-xs text-zinc-400">
-                                            <CalendarDays size={12} /> {prediction.raceName}
-                                        </p>
-                                    </div>
-
-                                    <div className="flex min-w-0 items-center gap-3 lg:col-span-2">
-                                        {prediction.horseAvatar ? (
-                                            <img src={prediction.horseAvatar} alt="" className="h-9 w-9 shrink-0 rounded-xl object-cover ring-1 ring-zinc-200" />
+                                <div key={group.tournamentName} className="border border-zinc-200 rounded-2xl overflow-hidden shadow-sm">
+                                    {/* Accordion Header / Banner */}
+                                    <button
+                                        onClick={() => toggleGroup(group.tournamentName)}
+                                        className="w-full text-left relative overflow-hidden bg-zinc-900 group/header flex items-center justify-between px-6 py-5 cursor-pointer transition-all hover:bg-zinc-800"
+                                    >
+                                        {group.bannerUrl ? (
+                                            <>
+                                                <div 
+                                                    className="absolute inset-0 bg-cover bg-center opacity-40 transition-transform duration-500 group-hover/header:scale-105"
+                                                    style={{ backgroundImage: `url(${group.bannerUrl})` }}
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-r from-zinc-900 via-zinc-900/80 to-transparent" />
+                                            </>
                                         ) : (
-                                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-xs font-black text-amber-700">
-                                                {getInitials(prediction.horseName)}
+                                            <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-400/10 blur-2xl transition-all group-hover/header:bg-amber-400/20" />
+                                        )}
+                                        <div className="relative z-10 flex items-center gap-4">
+                                            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-800 text-amber-400 border border-zinc-700">
+                                                <Trophy size={20} />
                                             </div>
-                                        )}
-                                        <div className="min-w-0">
-                                            <p className="truncate text-sm font-black text-zinc-900">{prediction.horseName}</p>
-                                            <p className="mt-0.5 text-[10px] font-bold uppercase text-zinc-400 lg:hidden">Selected horse</p>
+                                            <div>
+                                                <p className="text-[10px] font-black uppercase tracking-wider text-zinc-400 mb-0.5">Tournament</p>
+                                                <h3 className="text-lg font-black text-white">{group.tournamentName}</h3>
+                                            </div>
                                         </div>
-                                    </div>
+                                        <div className="relative z-10 flex items-center gap-4">
+                                            <div className="hidden sm:flex items-center gap-2">
+                                                <span className="text-xs font-bold text-zinc-400 bg-zinc-800 px-3 py-1 rounded-lg">
+                                                    {group.predictions.length} bets
+                                                </span>
+                                            </div>
+                                            <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 transition-colors group-hover/header:text-white">
+                                                {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                            </div>
+                                        </div>
+                                    </button>
 
-                                    <div className="lg:col-span-1">
-                                        <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400 lg:hidden">Odds</p>
-                                        <p className="mt-1 text-sm font-black text-amber-600 lg:mt-0">
-                                            {numberFormatter.format(prediction.odds)}x
-                                        </p>
-                                    </div>
+                                    {/* Accordion Content */}
+                                    {isExpanded && (
+                                        <div className="bg-white">
+                                            <div className="hidden grid-cols-12 items-center gap-4 border-b border-zinc-100 bg-zinc-50/80 px-6 py-3 text-[10px] font-black uppercase tracking-[0.14em] text-zinc-400 lg:grid">
+                                                <span className="col-span-3">Bettor</span>
+                                                <span className="col-span-3">Tournament & race</span>
+                                                <span className="col-span-2">Selected horse</span>
+                                                <span className="col-span-1">Odds</span>
+                                                <span className="col-span-1">Stake</span>
+                                                <span className="col-span-2 text-right">Net result</span>
+                                            </div>
+                                            <div className="divide-y divide-zinc-100">
+                                                {group.predictions.map((prediction) => {
+                                                    const isSettled = prediction.profitLoss !== null;
+                                                    const isProfit = isSettled && prediction.profitLoss >= 0;
+                                                    return (
+                                                        <article
+                                                            key={prediction.predictionId}
+                                                            className="group/bet grid gap-5 px-6 py-5 transition hover:bg-amber-50/40 md:grid-cols-2 lg:grid-cols-12 lg:items-center lg:gap-4 lg:py-4"
+                                                        >
+                                                            <div className="flex min-w-0 items-center gap-3 lg:col-span-3">
+                                                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-xs font-black text-amber-400">
+                                                                    {prediction.bettorAlias?.slice(-2)}
+                                                                </div>
+                                                                <div className="min-w-0">
+                                                                    <p className="truncate text-sm font-black text-zinc-900">{prediction.bettorAlias}</p>
+                                                                    <p className="mt-1 flex items-center gap-1.5 truncate text-[11px] text-zinc-400">
+                                                                        <Clock3 size={12} /> {formatDate(prediction.betPlacedAt)}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
 
-                                    <div className="lg:col-span-1">
-                                        <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400 lg:hidden">Stake</p>
-                                        <p className="mt-1 flex items-center gap-1 text-sm font-black text-zinc-900 lg:mt-0">
-                                            <CircleDollarSign size={15} className="text-amber-500" />
-                                            <span className="truncate">{formatPoints(prediction.betPoints)}</span>
-                                        </p>
-                                    </div>
+                                                            <div className="min-w-0 lg:col-span-3">
+                                                                <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-zinc-400 lg:hidden">Tournament</p>
+                                                                <p className="truncate text-sm font-bold text-zinc-800">{prediction.tournamentName}</p>
+                                                                <p className="mt-1 flex items-center gap-1.5 truncate text-xs text-zinc-400">
+                                                                    <CalendarDays size={12} /> {prediction.raceName}
+                                                                </p>
+                                                            </div>
 
-                                    <div className="lg:col-span-2 lg:text-right">
-                                        <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400 lg:hidden">Net result</p>
-                                        {isSettled ? (
-                                            <p className={`mt-1 inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-black lg:mt-0 ${isProfit ? "text-emerald-600" : "text-red-500"}`}>
-                                                {isProfit ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-                                                {isProfit ? "+" : ""}{formatPoints(prediction.profitLoss)}
-                                            </p>
-                                        ) : (
-                                            <span className="mt-1 inline-flex rounded-full bg-zinc-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-zinc-500 lg:mt-0">
-                                                Pending
-                                            </span>
-                                        )}
-                                    </div>
-                                </article>
+                                                            <div className="flex min-w-0 items-center gap-3 lg:col-span-2">
+                                                                {prediction.horseAvatar ? (
+                                                                    <img src={prediction.horseAvatar} alt="" className="h-9 w-9 shrink-0 rounded-xl object-cover ring-1 ring-zinc-200" />
+                                                                ) : (
+                                                                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-xs font-black text-amber-700">
+                                                                        {getInitials(prediction.horseName)}
+                                                                    </div>
+                                                                )}
+                                                                <div className="min-w-0">
+                                                                    <p className="truncate text-sm font-black text-zinc-900">{prediction.horseName}</p>
+                                                                    <p className="mt-0.5 text-[10px] font-bold uppercase text-zinc-400 lg:hidden">Selected horse</p>
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="lg:col-span-1">
+                                                                <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400 lg:hidden">Odds</p>
+                                                                <p className="mt-1 text-sm font-black text-amber-600 lg:mt-0">
+                                                                    {numberFormatter.format(prediction.odds)}x
+                                                                </p>
+                                                            </div>
+
+                                                            <div className="lg:col-span-1">
+                                                                <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400 lg:hidden">Stake</p>
+                                                                <p className="mt-1 flex items-center gap-1 text-sm font-black text-zinc-900 lg:mt-0">
+                                                                    <CircleDollarSign size={15} className="text-amber-500" />
+                                                                    <span className="truncate">{formatPoints(prediction.betPoints)}</span>
+                                                                </p>
+                                                            </div>
+
+                                                            <div className="lg:col-span-2 lg:text-right">
+                                                                <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400 lg:hidden">Net result</p>
+                                                                {isSettled ? (
+                                                                    <p className={`mt-1 inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-black lg:mt-0 ${isProfit ? "text-emerald-600" : "text-red-500"}`}>
+                                                                        {isProfit ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                                                                        {isProfit ? "+" : ""}{formatPoints(prediction.profitLoss)}
+                                                                    </p>
+                                                                ) : (
+                                                                    <span className="mt-1 inline-flex rounded-full bg-zinc-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-zinc-500 lg:mt-0">
+                                                                        Pending
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </article>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             );
                         })}
-                        </div>
                     </div>
                 )}
             </section>
