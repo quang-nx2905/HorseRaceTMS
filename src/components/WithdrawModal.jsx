@@ -130,6 +130,24 @@ export default function WithdrawModal({ isOpen, onClose, currentPoints }) {
                             <p className="text-[11px] text-zinc-400 font-medium mt-1.5">
                                 10 PTS = 10,000 VND. Minimum withdrawal: 10 PTS.
                             </p>
+                            {Number(amount.replace(/[^0-9]/g, '')) >= 10 && !errors.amount && (
+                                <div className="mt-3 p-3 bg-zinc-100 rounded-lg text-sm space-y-1">
+                                    <div className="flex justify-between text-zinc-500">
+                                        <span>Withdraw Amount:</span>
+                                        <span className="font-semibold">{Number(amount.replace(/[^0-9]/g, '')).toLocaleString()} PTS</span>
+                                    </div>
+                                    <div className="flex justify-between text-red-500">
+                                        <span>System Fee (5%):</span>
+                                        <span className="font-semibold">-{(Number(amount.replace(/[^0-9]/g, '')) * 0.05).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 })} PTS</span>
+                                    </div>
+                                    <div className="flex justify-between text-zinc-900 pt-2 border-t border-zinc-200 mt-2">
+                                        <span className="font-bold">You will receive:</span>
+                                        <span className="font-black text-amber-600">
+                                            {((Number(amount.replace(/[^0-9]/g, '')) * 0.95) * 1000).toLocaleString()} VND
+                                        </span>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div>

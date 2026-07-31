@@ -18,24 +18,26 @@ function RankingDetailsModal({
         >
             <div className="-mt-6">
                 {/* MODAL HERO BANNER */}
-                <div className={`relative rounded-2xl p-6 overflow-hidden bg-gradient-to-br ${ranking.avatarBg} text-white shadow-lg mb-6`}>
-                    <div className="absolute top-0 right-0 -mt-6 -mr-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
+                <div className="relative rounded-3xl p-8 overflow-hidden bg-zinc-950 text-white shadow-2xl mb-6 border border-zinc-800">
+                    <div className="absolute top-0 right-0 -mt-6 -mr-6 w-48 h-48 bg-white/5 rounded-full blur-3xl pointer-events-none" />
                     
-                    <div className="flex items-center gap-4 relative z-10">
+                    <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10">
                         {/* Horse Avatar */}
                         {ranking.imageUrl ? (
-                            <img src={ranking.imageUrl} alt={ranking.horse} className="w-16 h-16 rounded-xl object-cover shadow-inner border border-white/20" />
+                            <img src={ranking.imageUrl} alt={ranking.horse} className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl object-cover shadow-2xl border-2 border-zinc-700/50" />
                         ) : (
-                            <div className="w-16 h-16 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center font-black text-2xl border border-white/20 shadow-inner text-white">
-                                {ranking.horse.split(" ").map(w => w[0]).join("").toUpperCase()}
+                            <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-2xl bg-zinc-800 flex items-center justify-center font-black text-5xl border-2 border-zinc-700/50 shadow-2xl text-white">
+                                {ranking.horse?.split(" ").map(w => w[0]).join("").toUpperCase()}
                             </div>
                         )}
 
-                        <div>
-                            <span className="inline-block px-2 py-0.5 bg-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider mb-1">
-                                {ranking.breed}
-                            </span>
-                            <h3 className="text-2xl font-black leading-tight tracking-tight">
+                        <div className="text-center sm:text-left sm:pt-4 flex flex-col justify-center h-full">
+                            <div>
+                                <span className="inline-block px-3 py-1 bg-zinc-800 text-zinc-300 rounded-lg text-xs font-bold uppercase tracking-widest mb-3 border border-zinc-700">
+                                    {ranking.breed}
+                                </span>
+                            </div>
+                            <h3 className="text-3xl sm:text-4xl font-black leading-tight tracking-tight text-white">
                                 {ranking.horse}
                             </h3>
                         </div>
@@ -65,7 +67,7 @@ function RankingDetailsModal({
                         </div>
                         <div className="w-full bg-zinc-100 h-2.5 rounded-full overflow-hidden">
                             <div
-                                className={`h-full bg-gradient-to-r ${ranking.avatarBg} rounded-full transition-all duration-500`}
+                                className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-500"
                                 style={{ width: `${ranking.winRate || 50}%` }}
                             />
                         </div>
