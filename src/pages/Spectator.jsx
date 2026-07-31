@@ -308,8 +308,8 @@ function Spectator() {
     return (
         <div className="pb-12">
             {/* ═══════ HERO HEADER ═══════ */}
-            <div className="relative mb-10 min-h-[360px] overflow-hidden rounded-3xl border border-zinc-800/60 bg-zinc-950 p-8 shadow-xl md:aspect-[12/5]">
-                <img src={broadcastRaceHero} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-contain object-right opacity-90" />
+            <div className="relative mb-8 min-h-[200px] overflow-hidden rounded-3xl border border-zinc-800/60 bg-zinc-950 p-8 shadow-xl md:min-h-[240px]">
+                <img src={broadcastRaceHero} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-cover object-[center_right] opacity-90" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/55 to-transparent" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/5" />
                 <div className="absolute inset-0 pointer-events-none">

@@ -206,7 +206,7 @@ function Horses() {
                         weight: h.weight,
                         gender: h.gender,
                         health: h.healthStatus || "Fair",
-                        wins: 0,
+                        wins: h.wins || 0,
                         status: h.status || "Pending",
                         imageUrl: h.imageUrl,
                         inspectionUrl: latestVer ? latestVer.inspectionUrl : "",

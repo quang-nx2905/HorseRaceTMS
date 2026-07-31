@@ -296,7 +296,13 @@ function Referee() {
                 ) : (
                     /* ═══════ RACE LIST BY TOURNAMENT ═══════ */
                     <div className="space-y-6">
-                        {Object.entries(groupedRaces).map(([tournamentName, tournamentRaces]) => {
+                        {Object.entries(groupedRaces)
+                            .sort(([, aRaces], [, bRaces]) => {
+                                const aTourId = aRaces[0]?.tournamentId || 0;
+                                const bTourId = bRaces[0]?.tournamentId || 0;
+                                return bTourId - aTourId; // Descending order (newest first)
+                            })
+                            .map(([tournamentName, tournamentRaces]) => {
                             const isExpanded = expandedTournaments[tournamentName];
                             const tournamentCompleted =
                                 tournamentRaces[0]?.tournamentStatus === "Completed"

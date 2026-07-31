@@ -33,7 +33,6 @@ function Profile() {
         name: "",
         email: "",
         phone: "",
-        organization: "Horse Race Tournament", // Still static as not in DB
         avatarUrl: null,
         role: "User",
         joinedDate: null,
@@ -355,23 +354,6 @@ function Profile() {
                                 </div>
                             </div>
 
-                            {/* Organization */}
-                            <div className="space-y-1.5">
-                                <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">
-                                    Organization
-                                </label>
-                                <div className="relative">
-                                    <Building size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
-                                    <input
-                                        type="text"
-                                        value={profile.organization}
-                                        onChange={(e) => setProfile({ ...profile, organization: e.target.value })}
-                                        className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 py-3.5 pl-11 pr-4 text-sm font-semibold text-zinc-500 outline-none"
-                                        placeholder="Enter organization name"
-                                        readOnly
-                                    />
-                                </div>
-                            </div>
                         </div>
 
                         {/* Save Button */}

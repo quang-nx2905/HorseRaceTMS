@@ -14,7 +14,7 @@ import usePagination from "../hooks/usePagination";
 import EmptyState from "../components/common/EmptyState";
 import ConfirmModal from "../components/common/ConfirmModal";
 import EditTournamentModal from "../components/modals/EditTournamentModal";
-import fallbackTournamentBanner from "../assets/hero.png";
+import fallbackTournamentBanner from "../assets/horse-hero-cinematic.png";
 import tournamentRaceHero from "../assets/tournament-race-hero.png";
 
 const STATUS_CONFIG = {
