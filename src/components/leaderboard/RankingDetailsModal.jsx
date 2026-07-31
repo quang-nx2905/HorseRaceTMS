@@ -1,5 +1,5 @@
 import Modal from "../common/Modal";
-import { Trophy, Zap, Star, Activity } from "lucide-react";
+import { Trophy } from "lucide-react";
 
 function RankingDetailsModal({
     open,
@@ -22,13 +22,14 @@ function RankingDetailsModal({
                     <div className="absolute top-0 right-0 -mt-6 -mr-6 w-32 h-32 bg-white/10 rounded-full blur-2xl pointer-events-none" />
                     
                     <div className="flex items-center gap-4 relative z-10">
-                        {/* Rank Badge */}
-                        <div className="w-14 h-14 rounded-xl bg-white/15 backdrop-blur-md flex flex-col items-center justify-center border border-white/20">
-                            <span className="text-[10px] uppercase font-bold text-white/70 leading-none">Rank</span>
-                            <span className="text-2xl font-black leading-none mt-1">
-                                {isFirst ? "🏆" : `#${ranking.rank}`}
-                            </span>
-                        </div>
+                        {/* Horse Avatar */}
+                        {ranking.imageUrl ? (
+                            <img src={ranking.imageUrl} alt={ranking.horse} className="w-16 h-16 rounded-xl object-cover shadow-inner border border-white/20" />
+                        ) : (
+                            <div className="w-16 h-16 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center font-black text-2xl border border-white/20 shadow-inner text-white">
+                                {ranking.horse.split(" ").map(w => w[0]).join("").toUpperCase()}
+                            </div>
+                        )}
 
                         <div>
                             <span className="inline-block px-2 py-0.5 bg-white/20 rounded-md text-[10px] font-bold uppercase tracking-wider mb-1">
@@ -37,25 +38,12 @@ function RankingDetailsModal({
                             <h3 className="text-2xl font-black leading-tight tracking-tight">
                                 {ranking.horse}
                             </h3>
-                            <p className="text-white/80 text-xs font-medium">
-                                Jockey: <strong className="text-white">{ranking.jockey}</strong>
-                            </p>
                         </div>
                     </div>
                 </div>
 
                 {/* STATS DECK */}
-                <div className="grid grid-cols-2 gap-4 mb-6">
-                    <div className="bg-zinc-50 border border-zinc-100 rounded-xl p-4 flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center">
-                            <Zap className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <p className="text-[11px] text-zinc-400 font-bold uppercase tracking-wider">Championship Pts</p>
-                            <h4 className="text-xl font-black text-zinc-800">{ranking.points.toLocaleString()}</h4>
-                        </div>
-                    </div>
-
+                <div className="grid grid-cols-1 mb-6">
                     <div className="bg-zinc-50 border border-zinc-100 rounded-xl p-4 flex items-center gap-3">
                         <div className="w-9 h-9 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center">
                             <Trophy className="w-5 h-5" />
@@ -109,17 +97,6 @@ function RankingDetailsModal({
                         <div className="flex items-center justify-between text-xs">
                             <span className="text-zinc-400 font-semibold">Breed Lineage:</span>
                             <span className="font-bold text-zinc-700">{ranking.breed} Purebred</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                            <span className="text-zinc-400 font-semibold">Championship Tier:</span>
-                            <span className="font-bold text-zinc-700 flex items-center gap-1">
-                                {ranking.rank <= 3 ? (
-                                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                                ) : (
-                                    <Activity className="w-3.5 h-3.5 text-zinc-400" />
-                                )}
-                                {ranking.rank <= 3 ? "Elite Podium Status" : "Active Division Pro"}
-                            </span>
                         </div>
                     </div>
                 </div>

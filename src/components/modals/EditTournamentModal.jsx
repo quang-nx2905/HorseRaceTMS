@@ -76,6 +76,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                             rewardRatio: r.rewardRatio?.toString() || "2",
                             refereeIds: (r.referees || []).map(ref => ref.refereeId.toString()),
                             participants: (r.participants || []).map(p => ({
+                                participantId: p.participantId,
                                 lane: p.laneNumber,
                                 horseId: p.horseId ? p.horseId.toString() : "",
                                 jockeyId: p.jockeyId ? p.jockeyId.toString() : ""
@@ -175,6 +176,7 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
             BannerUrl: basicInfo.bannerUrl,
             PrizePool: parseFloat(basicInfo.prizePool.toString().replace(/[,.]/g, '') || 0),
             Races: races.map(r => ({
+                RaceId: r.id && !r.id.toString().startsWith('race-') ? parseInt(r.id) : 0,
                 RaceName: r.name,
                 RaceDateTime: r.dateTime,
                 Distance: parseFloat(r.distance || 0),
@@ -182,7 +184,12 @@ function EditTournamentModal({ open, onClose, tournament, onUpdate }) {
                 MinParticipants: Math.min(2, basicInfo.lanesPerRace),
                 MaxParticipants: basicInfo.lanesPerRace,
                 RefereeIds: r.refereeIds.map(id => parseInt(id)),
-                Participants: []
+                Participants: r.participants.map(p => ({
+                    ParticipantId: p.participantId || 0,
+                    LaneNumber: p.lane || null,
+                    HorseId: p.horseId ? parseInt(p.horseId) : null,
+                    JockeyId: p.jockeyId ? parseInt(p.jockeyId) : null
+                }))
             }))
         };
 
