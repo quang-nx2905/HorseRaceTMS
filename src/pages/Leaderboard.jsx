@@ -72,8 +72,8 @@ function Leaderboard() {
     return (
         <div className="pb-12">
             {/* HEADER HERO */}
-            <div className="relative mb-10 min-h-[360px] overflow-hidden rounded-3xl border border-zinc-700/50 bg-zinc-950 p-8 shadow-xl md:aspect-[12/5] md:p-12">
-                <img src={leaderboardRaceHero} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-contain object-right opacity-90" />
+            <div className="relative mb-8 min-h-[280px] overflow-hidden rounded-3xl border border-zinc-700/50 bg-zinc-950 p-8 shadow-xl md:h-[320px] md:min-h-0 md:p-10">
+                <img src={leaderboardRaceHero} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-cover object-right opacity-90" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/55 to-transparent" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/5" />
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
