@@ -31,7 +31,11 @@ export default function ImageUpload({ value, onChange, className = "", variant =
         formData.append("file", file);
 
         try {
-            const uploadUrl = variant === "banner" ? "/Upload/Image?banner=true" : "/Upload/Image";
+            const uploadUrl = variant === "banner"
+                ? "/Upload/Image?banner=true"
+                : imageFit === "contain"
+                    ? "/Upload/Image?preserveAspect=true"
+                    : "/Upload/Image";
             const response = await axiosClient.post(uploadUrl, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",

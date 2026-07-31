@@ -233,8 +233,8 @@ function Spectator() {
     if (!selectedStream) {
         return (
                 <div className="pb-12">
-                    <div className="relative mb-6 min-h-[320px] overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-950 px-6 py-8 shadow-2xl md:aspect-[12/5] md:px-10">
-                        <img src={broadcastRaceHero} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-contain object-right opacity-90" />
+                    <div className="relative mb-6 min-h-[280px] overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-950 px-6 py-8 shadow-2xl md:h-[320px] md:min-h-0 md:px-10">
+                        <img src={broadcastRaceHero} alt="" aria-hidden="true" className="pointer-events-none absolute inset-0 h-full w-full object-cover object-right opacity-90" />
                         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-zinc-950/90 via-zinc-950/55 to-transparent" />
                         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/5" />
                         <div className="pointer-events-none absolute -right-20 -top-24 h-72 w-72 rounded-full bg-amber-500/10 blur-3xl" />

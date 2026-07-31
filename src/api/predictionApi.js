@@ -13,6 +13,9 @@ const predictionApi = {
     },
     getAiInsights: () => {
         return axiosClient.get("/prediction/ai-insights");
+    },
+    getAnonymousFeed: () => {
+        return axiosClient.get("/prediction/anonymous-feed");
     }
 };
 

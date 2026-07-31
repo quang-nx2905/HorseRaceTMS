@@ -1,255 +1,258 @@
-import { useState, useMemo, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+    CalendarDays,
+    CircleDollarSign,
+    Clock3,
+    Coins,
+    Loader2,
+    Search,
+    ShieldCheck,
+    TrendingDown,
+    TrendingUp,
+    Trophy,
+    Users,
+} from "lucide-react";
 import predictionApi from "../api/predictionApi";
-import { BrainCircuit, Search, Eye, AlertCircle, CheckCircle2, Clock, Loader2, Sparkles } from "lucide-react";
-import PredictionDetailsModal from "../components/predictions/PredictionDetailsModal";
 
+const numberFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 
-const STATUS_CONFIG = {
-    "High Chance": {
-        badge: "bg-emerald-500/10 text-emerald-600 border border-emerald-500/25",
-        icon: CheckCircle2,
-        bar: "from-emerald-400 to-teal-500",
-    },
-    "Moderate": {
-        badge: "bg-amber-500/10 text-amber-700 border border-amber-500/25",
-        icon: Clock,
-        bar: "from-amber-400 to-orange-500",
-    },
-    "Risky": {
-        badge: "bg-red-500/10 text-red-500 border border-red-500/25",
-        icon: AlertCircle,
-        bar: "from-red-400 to-rose-500",
-    },
+const formatPoints = (value) => `${numberFormatter.format(Number(value) || 0)} pts`;
+
+const formatDate = (value) => {
+    if (!value) return "Time unavailable";
+    return new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(new Date(value));
 };
+
+const getInitials = (name = "") =>
+    name.split(" ").filter(Boolean).slice(0, 2).map((part) => part[0]).join("").toUpperCase() || "HR";
 
 function Predictions() {
     const [search, setSearch] = useState("");
-    const [filterStatus, setFilterStatus] = useState("All");
-    const [openDetails, setOpenDetails] = useState(false);
-    const [selectedPrediction, setSelectedPrediction] = useState(null);
-    const [predictionsData, setPredictionsData] = useState([]);
+    const [statusFilter, setStatusFilter] = useState("All");
+    const [predictions, setPredictions] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
-        const fetchPredictions = async () => {
+        const loadPredictions = async () => {
             try {
-                const response = await predictionApi.getAiInsights();
-                if (response.data && response.data.data) {
-                    setPredictionsData(response.data.data);
-                } else if (response.data) {
-                    setPredictionsData(response.data);
-                }
-            } catch (error) {
-                console.error("Failed to load AI predictions", error);
+                const response = await predictionApi.getAnonymousFeed();
+                setPredictions(response.data?.data ?? response.data ?? []);
+            } catch (loadError) {
+                console.error("Failed to load anonymous predictions", loadError);
+                setError("We could not load the betting activity. Please try again later.");
             } finally {
                 setIsLoading(false);
             }
         };
-        fetchPredictions();
+
+        loadPredictions();
     }, []);
 
     const filtered = useMemo(() => {
-        return predictionsData.filter((item) => {
-            const matchSearch =
-                item.horse.toLowerCase().includes(search.toLowerCase()) ||
-                item.race.toLowerCase().includes(search.toLowerCase());
-            const matchStatus = filterStatus === "All" || item.status === filterStatus;
-            return matchSearch && matchStatus;
+        const query = search.trim().toLowerCase();
+        return predictions.filter((prediction) => {
+            const matchesTournament = !query ||
+                prediction.tournamentName?.toLowerCase().includes(query);
+            const matchesStatus =
+                statusFilter === "All" ||
+                (statusFilter === "Settled" && prediction.profitLoss !== null) ||
+                (statusFilter === "Pending" && prediction.profitLoss === null);
+            return matchesTournament && matchesStatus;
         });
-    }, [search, filterStatus, predictionsData]);
+    }, [predictions, search, statusFilter]);
 
-    const avgConfidence = predictionsData.length > 0 ? Math.round(
-        predictionsData.reduce((sum, p) => sum + p.confidence, 0) / predictionsData.length
-    ) : 0;
+    const totalWagered = predictions.reduce((total, prediction) => total + (prediction.betPoints || 0), 0);
+    const settledCount = predictions.filter((prediction) => prediction.profitLoss !== null).length;
+    const uniqueBettors = new Set(predictions.map((prediction) => prediction.bettorAlias)).size;
 
     return (
         <div className="w-full space-y-6 pb-12">
-            {/* ═══════ HERO HEADER ═══════ */}
             <section className="relative overflow-hidden rounded-[2rem] bg-zinc-950 p-7 text-white shadow-xl shadow-zinc-300/40 md:p-10">
-                <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                    <div className="absolute -right-12 -top-24 h-80 w-80 rounded-full bg-violet-500/20 blur-3xl" />
-                    <div className="absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-indigo-400/10 blur-3xl" />
-                    <div className="absolute top-1/2 left-0 w-40 h-40 bg-pink-500/6 rounded-full blur-2xl" />
-                </div>
-                <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                <div className="pointer-events-none absolute -right-16 -top-24 h-80 w-80 rounded-full bg-amber-400/20 blur-3xl" />
+                <div className="pointer-events-none absolute bottom-0 left-1/3 h-60 w-60 rounded-full bg-orange-500/10 blur-3xl" />
+
+                <div className="relative z-10 flex flex-col justify-between gap-8 lg:flex-row lg:items-end">
                     <div>
-                        <div className="mb-4 inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.22em] text-violet-400">
-                            <BrainCircuit className="w-3.5 h-3.5" />
-                            AI analytics engine
+                        <div className="mb-4 inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.22em] text-amber-400">
+                            <ShieldCheck size={15} />
+                            Anonymous betting activity
                         </div>
                         <h1 className="mb-3 text-3xl font-black tracking-tight md:text-4xl">
-                            Race Predictions
+                            Community Bets
                         </h1>
-                        <p className="text-violet-300/70 text-base max-w-md">
-                            Algorithmic predictions powered by race conditions, real-time data, and mathematical models.
+                        <p className="max-w-xl text-sm leading-6 text-zinc-400 md:text-base">
+                            Follow the latest tournament bets while every bettor&apos;s identity stays protected.
+                            Results and net returns appear after a tournament is completed.
                         </p>
                     </div>
-                    <div className="grid min-w-[300px] grid-cols-3 gap-3">
-                        <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-center backdrop-blur">
-                            <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-zinc-500">Confidence</p>
-                            <p className="text-2xl font-black text-white">{avgConfidence}%</p>
-                        </div>
-                        <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-center backdrop-blur">
-                            <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-zinc-500">Races</p>
-                            <p className="text-2xl font-black text-white">{new Set(predictionsData.map(p => p.race)).size}</p>
-                        </div>
-                        <div className="rounded-2xl border border-white/10 bg-white/[0.06] p-4 text-center backdrop-blur">
-                            <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-zinc-500">Insights</p>
-                            <p className="text-2xl font-black text-white">{predictionsData.length}</p>
-                        </div>
+
+                    <div className="grid grid-cols-3 gap-3">
+                        {[
+                            { label: "Bettors", value: uniqueBettors, icon: Users },
+                            { label: "Wagered", value: numberFormatter.format(totalWagered), icon: Coins },
+                            { label: "Settled", value: settledCount, icon: Trophy },
+                        ].map(({ label, value, icon: Icon }) => (
+                            <div key={label} className="min-w-[94px] rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur">
+                                <Icon className="mb-3 text-amber-400" size={17} />
+                                <p className="text-xl font-black">{value}</p>
+                                <p className="mt-1 text-[9px] font-black uppercase tracking-wider text-zinc-500">{label}</p>
+                            </div>
+                        ))}
                     </div>
                 </div>
             </section>
 
-            {/* ═══════ ACCURACY STAT + SEARCH/FILTER ═══════ */}
-            <div className="rounded-[1.75rem] border border-zinc-200 bg-white p-4 shadow-sm">
-                <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+            <section className="rounded-[1.75rem] border border-zinc-200 bg-white p-4 shadow-sm">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center">
+                    <label className="relative flex-1">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={17} />
                         <input
-                            type="text"
-                            placeholder="Search horse or race name..."
+                            type="search"
                             value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 py-3.5 pl-11 pr-4 text-sm font-medium outline-none transition-all hover:border-zinc-300 focus:border-violet-400 focus:bg-white focus:ring-4 focus:ring-violet-400/10"
+                            onChange={(event) => setSearch(event.target.value)}
+                            placeholder="Search by tournament name..."
+                            aria-label="Search by tournament name"
+                            className="w-full rounded-2xl border border-zinc-200 bg-zinc-50 py-3.5 pl-11 pr-4 text-sm font-medium outline-none transition focus:border-amber-400 focus:bg-white focus:ring-4 focus:ring-amber-400/10"
                         />
-                    </div>
-                    <div className="flex max-w-full gap-2 overflow-x-auto pb-1 lg:pb-0">
-                        {["All", "High Chance", "Moderate", "Risky"].map((f) => (
+                    </label>
+                    <div className="flex gap-2" aria-label="Filter betting activity">
+                        {["All", "Pending", "Settled"].map((filter) => (
                             <button
-                                key={f}
-                                onClick={() => setFilterStatus(f)}
-                                className={`whitespace-nowrap rounded-xl border px-4 py-3 text-xs font-bold transition-all ${
-                                    filterStatus === f
-                                        ? f === "High Chance"
-                                            ? "bg-emerald-500 text-white border-emerald-500 shadow-sm"
-                                            : f === "Moderate"
-                                            ? "bg-amber-500 text-white border-amber-500 shadow-sm"
-                                            : f === "Risky"
-                                            ? "bg-red-500 text-white border-red-500 shadow-sm"
-                                            : "bg-violet-600 text-white border-violet-600 shadow-sm"
-                                        : "bg-zinc-50 text-zinc-600 border-zinc-200 hover:bg-zinc-100"
+                                key={filter}
+                                type="button"
+                                onClick={() => setStatusFilter(filter)}
+                                className={`rounded-xl border px-4 py-3 text-xs font-bold transition ${
+                                    statusFilter === filter
+                                        ? "border-zinc-900 bg-zinc-900 text-white"
+                                        : "border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50"
                                 }`}
                             >
-                                {f}
+                                {filter}
                             </button>
                         ))}
                     </div>
-                    <div className="hidden items-center gap-2 rounded-2xl bg-violet-50 px-4 py-3 text-xs font-bold text-violet-700 xl:flex">
-                        <Sparkles size={15} /> Updated from live race data
-                    </div>
                 </div>
-            </div>
+            </section>
 
-            {/* ═══════ PREDICTION CARDS ═══════ */}
-            <div className="space-y-5">
+            <section className="overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm">
+                <div className="flex flex-col gap-2 border-b border-zinc-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 className="font-black text-zinc-900">Latest bets</h2>
+                        <p className="mt-1 text-xs text-zinc-500">Newest activity is shown first</p>
+                    </div>
+                    <span className="text-xs font-bold text-zinc-400">{filtered.length} records</span>
+                </div>
+
                 {isLoading ? (
-                    <div className="flex min-h-64 flex-col items-center justify-center rounded-[2rem] border border-zinc-200 bg-white text-zinc-400">
-                        <Loader2 className="mb-3 animate-spin text-violet-500" size={28} />
-                        <p className="font-bold">Analyzing race data...</p>
+                    <div className="flex min-h-72 flex-col items-center justify-center text-zinc-400">
+                        <Loader2 className="mb-3 animate-spin text-amber-500" size={28} />
+                        <p className="text-sm font-bold">Loading betting activity...</p>
+                    </div>
+                ) : error ? (
+                    <div className="flex min-h-72 items-center justify-center px-6 text-center text-sm font-medium text-red-500">
+                        {error}
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="text-center py-20 text-zinc-400 font-medium bg-white rounded-3xl border border-zinc-200">
-                        No predictions match your search.
+                    <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
+                        <Search className="mb-3 text-zinc-300" size={30} />
+                        <p className="font-bold text-zinc-700">No bets found</p>
+                        <p className="mt-1 text-sm text-zinc-400">Try another tournament name or filter.</p>
                     </div>
                 ) : (
-                filtered.map((item, index) => {
-                    const cfg = STATUS_CONFIG[item.status] || STATUS_CONFIG["Moderate"];
-                    const StatusIcon = cfg.icon;
-                    return (
-                        <div
-                            key={`${item.race}-${item.horse}-${index}`}
-                            className="group overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-violet-200 hover:shadow-xl hover:shadow-zinc-200/60"
-                        >
-                            {/* Top gradient stripe */}
-                            <div className={`h-1.5 w-full bg-gradient-to-r ${cfg.bar}`} />
+                    <div>
+                        <div className="hidden grid-cols-12 items-center gap-4 border-b border-zinc-100 bg-zinc-50/80 px-6 py-3 text-[10px] font-black uppercase tracking-[0.14em] text-zinc-400 lg:grid">
+                            <span className="col-span-3">Bettor</span>
+                            <span className="col-span-3">Tournament & race</span>
+                            <span className="col-span-2">Selected horse</span>
+                            <span className="col-span-1">Odds</span>
+                            <span className="col-span-1">Stake</span>
+                            <span className="col-span-2 text-right">Net result</span>
+                        </div>
+                        <div className="divide-y divide-zinc-100">
+                        {filtered.map((prediction) => {
+                            const isSettled = prediction.profitLoss !== null;
+                            const isProfit = isSettled && prediction.profitLoss >= 0;
+                            return (
+                                <article
+                                    key={prediction.predictionId}
+                                    className="group grid gap-5 px-6 py-5 transition hover:bg-amber-50/40 md:grid-cols-2 lg:grid-cols-12 lg:items-center lg:gap-4 lg:py-4"
+                                >
+                                    <div className="flex min-w-0 items-center gap-3 lg:col-span-3">
+                                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-xs font-black text-amber-400">
+                                            {prediction.bettorAlias?.slice(-2)}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <p className="truncate text-sm font-black text-zinc-900">{prediction.bettorAlias}</p>
+                                            <p className="mt-1 flex items-center gap-1.5 truncate text-[11px] text-zinc-400">
+                                                <Clock3 size={12} /> {formatDate(prediction.betPlacedAt)}
+                                            </p>
+                                        </div>
+                                    </div>
 
-                            <div className="p-7">
-                                <div className="flex flex-col md:flex-row md:items-center gap-6">
-                                    {/* Horse avatar + info */}
-                                    <div className="flex items-center gap-4 flex-1">
-                                        {item.imageUrl ? (
-                                            <img 
-                                                src={item.imageUrl} 
-                                                alt={item.horse} 
-                                                 className="h-16 w-16 flex-shrink-0 rounded-2xl object-cover shadow-sm ring-1 ring-zinc-200"
-                                            />
+                                    <div className="min-w-0 lg:col-span-3">
+                                        <p className="mb-1 text-[9px] font-black uppercase tracking-wider text-zinc-400 lg:hidden">Tournament</p>
+                                        <p className="truncate text-sm font-bold text-zinc-800">{prediction.tournamentName}</p>
+                                        <p className="mt-1 flex items-center gap-1.5 truncate text-xs text-zinc-400">
+                                            <CalendarDays size={12} /> {prediction.raceName}
+                                        </p>
+                                    </div>
+
+                                    <div className="flex min-w-0 items-center gap-3 lg:col-span-2">
+                                        {prediction.horseAvatar ? (
+                                            <img src={prediction.horseAvatar} alt="" className="h-9 w-9 shrink-0 rounded-xl object-cover ring-1 ring-zinc-200" />
                                         ) : (
-                                            <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center font-black text-lg shadow-sm flex-shrink-0">
-                                                {item.horse.split(" ").map(w => w[0]).join("").toUpperCase()}
+                                            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-xs font-black text-amber-700">
+                                                {getInitials(prediction.horseName)}
                                             </div>
                                         )}
-                                        <div>
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <h2 className="text-lg font-black text-zinc-900 group-hover:text-violet-700 transition-colors">
-                                                    {item.horse}
-                                                </h2>
-                                                <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold ${cfg.badge}`}>
-                                                    <StatusIcon className="w-3 h-3" />
-                                                    {item.status}
-                                                </span>
-                                            </div>
-                                            <p className="text-zinc-500 text-sm font-medium">
-                                                {item.race} · <span className="text-zinc-400">{item.track}</span>
+                                        <div className="min-w-0">
+                                            <p className="truncate text-sm font-black text-zinc-900">{prediction.horseName}</p>
+                                            <p className="mt-0.5 text-[10px] font-bold uppercase text-zinc-400 lg:hidden">Selected horse</p>
+                                        </div>
+                                    </div>
+
+                                    <div className="lg:col-span-1">
+                                        <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400 lg:hidden">Odds</p>
+                                        <p className="mt-1 text-sm font-black text-amber-600 lg:mt-0">
+                                            {numberFormatter.format(prediction.odds)}x
+                                        </p>
+                                    </div>
+
+                                    <div className="lg:col-span-1">
+                                        <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400 lg:hidden">Stake</p>
+                                        <p className="mt-1 flex items-center gap-1 text-sm font-black text-zinc-900 lg:mt-0">
+                                            <CircleDollarSign size={15} className="text-amber-500" />
+                                            <span className="truncate">{formatPoints(prediction.betPoints)}</span>
+                                        </p>
+                                    </div>
+
+                                    <div className="lg:col-span-2 lg:text-right">
+                                        <p className="text-[9px] font-black uppercase tracking-wider text-zinc-400 lg:hidden">Net result</p>
+                                        {isSettled ? (
+                                            <p className={`mt-1 inline-flex items-center gap-1.5 whitespace-nowrap text-sm font-black lg:mt-0 ${isProfit ? "text-emerald-600" : "text-red-500"}`}>
+                                                {isProfit ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
+                                                {isProfit ? "+" : ""}{formatPoints(prediction.profitLoss)}
                                             </p>
-                                            <p className="text-zinc-400 text-xs mt-0.5">{item.jockey} · {item.breed} · {item.raceDate}</p>
-                                        </div>
+                                        ) : (
+                                            <span className="mt-1 inline-flex rounded-full bg-zinc-100 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-zinc-500 lg:mt-0">
+                                                Pending
+                                            </span>
+                                        )}
                                     </div>
-
-                                    {/* Recent Form */}
-                                    <div className="hidden lg:flex flex-col items-center gap-2">
-                                        <p className="text-[9px] text-zinc-400 font-bold uppercase tracking-widest">Recent Form</p>
-                                        <div className="flex gap-1">
-                                            {item.form.map((f, i) => (
-                                                <span key={i} className={`w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-black border ${
-                                                    f === "W"
-                                                        ? "bg-emerald-50 border-emerald-200 text-emerald-600"
-                                                        : "bg-red-50 border-red-200 text-red-500"
-                                                }`}>{f}</span>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Confidence bar */}
-                                    <div className="w-full flex-1 md:max-w-[220px]">
-                                        <div className="flex justify-between text-xs font-bold text-zinc-500 mb-2">
-                                            <span>Win Probability</span>
-                                            <span className="text-zinc-800">{item.confidence}%</span>
-                                        </div>
-                                        <div className="w-full bg-zinc-100 h-2.5 rounded-full overflow-hidden">
-                                            <div
-                                                className={`h-full bg-gradient-to-r ${cfg.bar} rounded-full transition-all duration-700`}
-                                                style={{ width: `${item.confidence}%` }}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Odds + CTA */}
-                                    <div className="flex items-center gap-4">
-                                        <div className="text-center">
-                                            <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Betting Odds</p>
-                                            <p className="text-2xl font-black text-zinc-900">{item.odds}</p>
-                                        </div>
-                                        <button
-                                            onClick={() => { setSelectedPrediction(item); setOpenDetails(true); }}
-                                            className="flex items-center gap-2 rounded-2xl bg-zinc-900 px-4 py-3 text-xs font-bold text-white shadow-md transition-all hover:bg-violet-700 group-hover:scale-105"
-                                        >
-                                            <Eye className="w-3.5 h-3.5" />
-                                            Details
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                                </article>
+                            );
+                        })}
                         </div>
-                    );
-                }))}
-            </div>
-
-            <PredictionDetailsModal
-                open={openDetails}
-                onClose={() => setOpenDetails(false)}
-                prediction={selectedPrediction}
-            />
+                    </div>
+                )}
+            </section>
         </div>
     );
 }
